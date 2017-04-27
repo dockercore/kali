@@ -1,0 +1,189 @@
+课时21 google搜索：实例
+
+╋━━━━━━━━━━━━━━━╋
+┃世界第四大搜索引擎-----俄罗斯 ┃
+┃http://www.yandex.com/        ┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃邮件、主机                                                      ┃
+┃    theharvester -d sina.com -l 300 -b google                   ┃
+┃文件                                                            ┃
+┃    metagoogil -d microsoft.com -t pdf -l 200 -o test -f 1.html ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# theharvester -h
+
+*******************************************************************
+*                                                                 *
+* | |_| |__   ___    /\  /\__ _ _ ____   _____  ___| |_ ___ _ __  *
+* | __| '_ \ / _ \  / /_/ / _` | '__\ \ / / _ \/ __| __/ _ \ '__| *
+* | |_| | | |  __/ / __  / (_| | |   \ V /  __/\__ \ ||  __/ |    *
+*  \__|_| |_|\___| \/ /_/ \__,_|_|    \_/ \___||___/\__\___|_|    *
+*                                                                 *
+* TheHarvester Ver. 2.6                                           *
+* Coded by Christian Martorella                                   *
+* Edge-Security Research                                          *
+* cmartorella@edge-security.com                                   *
+*******************************************************************
+
+
+Usage: theharvester options 
+
+       -d: Domain to search or company name
+       -b: data source: google, googleCSE, bing, bingapi, pgp
+                        linkedin, google-profiles, people123, jigsaw, 
+                        twitter, googleplus, all
+
+       -s: Start in result number X (default: 0)
+       -v: Verify host name via dns resolution and search for virtual hosts
+       -f: Save the results into an HTML and XML file
+       -n: Perform a DNS reverse query on all ranges discovered
+       -c: Perform a DNS brute force for the domain name
+       -t: Perform a DNS TLD expansion discovery
+       -e: Use this DNS server
+       -l: Limit the number of results to work with(bing goes from 50 to 50 results,
+       -h: use SHODAN database to query discovered hosts
+            google 100 to 100, and pgp doesn't use this option)
+
+Examples:
+        theharvester -d microsoft.com -l 500 -b google
+        theharvester -d microsoft.com -b pgp
+        theharvester -d microsoft -l 200 -b linkedin
+        theharvester -d apple.com -b googleCSE -l 500 -s 300
+
+
+╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤
+tmux是指通过一个终端登录远程主机并运行后，在其中可以开启多个控制台的终端复用软件。
+
+tmux是一个优秀的终端复用软件，类似GNU Screen，但来自于OpenBSD，采用BSD授权。使用它最直观的好处就是，通过一个终端登录远程主机并运行tmux后，在其中可以开启多个控制台而无需再“浪费”多余的终端来连接这台远程主机；当然其功能远不止于此。
+
+tmux #开启tmux
+tmux ls #显示已有tmux列表（C-b s）
+tmux attach-session -t 数字 #选择tmux
+C-b c 创建一个新的窗口
+C-b n 切换到下一个窗口
+C-b p 切换到上一个窗口
+C-b l 最后一个窗口,和上一个窗口的概念不一样哟,谁试谁知道
+c-b w 通过上下键选择当前窗口中打开的会话
+C-b 数字 直接跳到你按的数字所在的窗口
+C-b & 退出当前窗口
+C-b d 临时断开会话 断开以后,还可以连上的哟:)
+C-b " 分割出来一个窗口
+C-b % 分割出来一个窗口
+C-b o 在小窗口中切换
+C-b (方向键)
+C-b ! 关闭所有小窗口
+C-b x 关闭当前光标处的小窗口
+C-b t 钟表
+C-b pageup/pagedo
+ 
+ 控制键就是tmux的主键.当你在tmux环境下按下这个键的时候,tmux就会把你后面输入的指令,解析成它内置的功能.tmux默认的控制键是ctrl+b(同时按下ctrl和b,在后面将直接用小写的c-b代替).
+
+c-b c 创建一个新的窗口
+      在你正后悔当前窗口被一个指令占用的时候,这个快捷键会解燃眉之急哟.当前窗口在任务栏会显示*
+
+C-b n 切换到下一个窗口
+      C-b p 切换到上一个窗口
+      C-b l 最后一个窗口,和上一个窗口的概念不一样哟,谁试谁知道
+      c-b w 通过上下键选择当前窗口中打开的会话
+
+c-b & 退出当前窗口(个人觉得这个没多大用,因为笔者习惯上c-d退出bash.当然了,如果你确保其它窗口没有有用的程序正在运行,试试这个命令也不错)（不管有几个panel都一次关掉）
+      C-b d 临时断开会话 断开以后,还可以连上的哟:)   用tmux ls 看一下，然后tmux a –t 数字
+      4.分割窗口
+      vim中,可以直接:!命令,来执行命令,或者直接把命令的结果读到当前的编辑器.很多时候我们就是有这样一种需要,看一下上次的执行结果,而不想通过切换来实现.最初看到官方网站的图片可以,横着分,可以竖着分,挺酷的.不过到现在笔者也还不知道怎么紧着分:)
+      c-b " 分割出来一个窗口
+     c-b o 在小窗口中切换 这种方法一次只能切换一次,再想切换再c-b o,适合两个窗口的时候使用.如果在当前窗口分割了好多小窗口的话,就要用下面的两个指令了.
+      c-b (方向键)上 上一个窗口
+      c-b (方向键)下 下一个窗口  要指出的是,按一次c-b,可以上上下下的选,直到选到你想要的那个窗口,这点和c-b o不一样噢.
+      c-b ! 关闭所有小窗口
+      c-b x 关闭当前光标处的小窗口
+      5.切换到其它的会话
+      上面提到的都是窗口的概念,是在一个会话里建立多个窗口,在一个窗口里建立多个小窗口.而现在说是的会话的概念.你每次执行tmux就会新建一个会话,c-b d的时候就会保存退出一个会话.
+      c-b s 选择attach的会话
+      注意看哟，和上图显示的不一样
+      6.修改当前窗口名称
+      tmux允许你给不同的窗口指定不同的名字
+      c-b , 修改当前窗口名称
+ 是不是将窗口的名字改成rainbird了?
+      7.显示一个钟表
+      其实简单的时候没啥大用处,就是一个屏保的作用,不过你可以通过设置配置文件,使从钟表退出来的时候要输入密码:)
+      c-b t 钟表
+     8.查看历史记录
+      这个是困扰了笔者很长时间的一个功能,因为一些命令执行的时候,显示结果总会超过一屏,而笔者不知道怎么向上翻页以看到前面的东西,直到后来才不经意的发现是用:
+      C-b pageup/pagedown
+
+      退出的话,当然还是用q了
+      9.复制粘贴:
+      复制东西在使用GNOME Terminal的时候效果不大明显,因为你可以通过鼠标上下翻页,可以左键选择东西,右键复制或者粘贴.单把这一点拿出来,是为了说明一种猜测和一种高效的移动习惯.在看tmux帮助的时候,笔者注意到,有说按完c-b以后,通过[进入复制模式.但是进来以后呢?界面类似翻看以前的历史记录.研究的许久才这样整明白,如果要使用这个功能,你得知道c-b :可以进入tmux的命令模式,然后可以设置一些指令.比如说,修改模式键setw mode-keys vi.这样你就把当前模式改成了vi.再进入复制模式(c-b [)是不是可以通过j,k在字符里上下移动就像在vim里一样?
+按 C-a ] 粘贴已复制的内容。
+ 
+ 
+      
+      10.常用参数
+      最后说一下tmux本身常用的几个参数吧:)
+      tmux ls 列出已有会话(list-sessions)
+╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧
+
+root@kali:~# vi /etc/proxychanis.conf
+
+root@kali:~# netstat -pantu | grep 9510
+tcp        0       0 127.0.0.1:9150        0.0.0.0:*       LISTEN     10771/tor
+
+root@kali:~# proxychains theharvester -q microsoft.com -l 500 -b google
+不要经常使用此命令
+
+root@kali:~# apt-get install metagoofil
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树       
+正在读取状态信息... 完成       
+下列【新】软件包将被安装：
+  metagoofil
+升级了 0 个软件包，新安装了 1 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级。
+需要下载 570 kB 的软件包。
+解压缩后会消耗掉 2,418 kB 的额外空间。
+获取：1 http://http.kali.org/kali/ sana/main metagoofil all 2.2-1kali1 [570 kB]
+下载 570 kB，耗时 5秒 (98.9 kB/s)
+正在选中未选择的软件包 metagoofil。
+(正在读取数据库 ... 系统当前共安装有 337098 个文件和目录。)
+正准备解包 .../metagoofil_2.2-1kali1_all.deb  ...
+正在解包 metagoofil (2.2-1kali1) ...
+正在设置 metagoofil (2.2-1kali1) ...
+
+root@kali:~# metagoofil -h
+
+******************************************************
+*     /\/\   ___| |_ __ _  __ _  ___   ___  / _(_) | *
+*    /    \ / _ \ __/ _` |/ _` |/ _ \ / _ \| |_| | | *
+*   / /\/\ \  __/ || (_| | (_| | (_) | (_) |  _| | | *
+*   \/    \/\___|\__\__,_|\__, |\___/ \___/|_| |_|_| *
+*                         |___/                      *
+* Metagoofil Ver 2.2                                 *
+* Christian Martorella                               *
+* Edge-Security.com                                  *
+* cmartorella_at_edge-security.com                   *
+******************************************************	
+
+ Usage: metagoofil options
+
+         -d: domain to search
+         -t: filetype to download (pdf,doc,xls,ppt,odp,ods,docx,xlsx,pptx)
+         -l: limit of results to search (default 200)
+         -h: work with documents in directory (use "yes" for local analysis)
+         -n: limit of files to download
+         -o: working directory (location to save downloaded files)
+         -f: output file
+
+ Examples:
+  metagoofil.py -d apple.com -t doc,pdf -l 200 -n 50 -o applefiles -f results.html
+  metagoofil.py -h yes -o applefiles -f results.html (local dir analysis)
+
+
+root@kali:~# proxychains metagoofil -d microsoft.com -t pdf -l 200 -o test -f 1.html
+
+╋━━━━━━╋
+┃  maltego   ┃
+┃  申请账号  ┃
+┃  登录使用  ┃
+╋━━━━━━╋
+

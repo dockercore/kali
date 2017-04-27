@@ -1,0 +1,75 @@
+课时78 OWASP_ZAP
+
+OWASP_ZAP
+Zed attack proxy
+WEB Applicaiton集成渗透测试和漏洞挖掘工具
+开源免费跨平台简单易用
+
+截断代理
+主动、被动扫描
+Fuzzy、暴力破解
+API
+    http://zap/
+
+Do you want to persist the ZAP Session
+   Yes,I want to persist this session with name based on the current timestamp
+√ Yes,I want to persist this session but I want to specify the name and location
+   No,I do not want to persist this session at this moment in time
+   Remember my choice and not ask me again.
+you can always changs your decision via the Options/Database screen
+
+root@kali:~# netstat -pantu | grep 8080
+tcp6       0      0 127.0.0.1:8080          :::*               LISTEN
+1685/Java
+
+一、简单介绍
+ZAproxy是一个易于使用交互式的用于web应用程序漏洞挖掘的渗透测试工具。
+ZAP即可以用于安全专家、开发人员、功能测试人员，甚至是渗透测试入门人员。
+ZAP除了提供了自动扫描工具还提供了一些用于手动挖掘安全漏洞的工具。
+
+二、基本设置
+1菜单栏-->>工具-->>选项-->>本地代理（ie通过本地代理进行测试）
+
+2菜单栏-->>工具-->>选项-->>connection（设置timeout时间及网络代理、认证）
+
+3菜单栏-->>工具-->>选项-->>Spider（设置连接的线程等） 4菜单栏-->>工具-->>选项-->>暴力破解（此处可导入字典文件） 5菜单栏-->>分析-->>扫描策略（设置扫描策略） 三、一些要点 1主动扫描和被动扫描：主动扫描就像普通的扫描器主动去探测测试漏洞，而被动扫描是将写好的正则表达式（规则）放在后台线程，不影响应用程序整体运行速度，被动地对被测试的Web应用程序进行响应（如果触发了规则）。
+
+2请求断点：主要通过请求断点的方法实现绕过客户端验证（通常使用javascript执行），截取请求从浏览器和改变它之前提交到网站所测试的应用程序。
+
+3目录扫描（暴力）主要通过字典文件直接访问目录的形式猜解存在的目录，可用来找管理后台，字典文件目录:G:\program files\OWASP\Zed Attack Proxy\dirbuster
+
+4模糊测试（Fuzzer）：模糊测试是指大量无效的或意外的数据提交到目标的技术。（来源·google）；在此处导入模糊测试列表：菜单栏-->>工具-->>选项-->>Fuzzer，还可以选择默认测试哪种类型的漏洞。
+
+5调用应用程序：例如Nmap（来源google，有这个功能，但是怎么扩展不太明白） 6蜘蛛（Spider）：现手动探索应用程序，只用蜘蛛找到你已经错过了，或以某种方式隐藏的链接。 四、基本的渗透测试流程 1探索：使用浏览器来探索所有的应用程序提供的功能。打开各个URL，按下所有按钮，填写并提交的一切表单类别。如果应用程序支持多个用户，那么做的每一个用户保存在不同的文件，然后再开始使用的下一个用户，启动一个新的会话。
+
+2蜘蛛：使用蜘蛛找到的网址。
+
+3暴力扫描：使用暴力扫描仪找到未引用的文件和目录。
+
+4主动扫描：使用主动扫描器找到基本的漏洞。 
+5手动测试：上述步骤或许找到基本的漏洞。为了找到更多的漏洞，需要手动测试应用程序。 另：还有一项端口扫描的功能，作为辅助测试用。
+
+OWASP_ZAP
+Persist Session
+Mode-----safe、Protected、Standard、ATTACK
+升级add-ons
+Scan policy
+Anti CSRF Tokens
+https-----CA
+Scope / Contexts / filter
+Http Sessions------default session tokens & site session tokens
+Note/tag
+Passive scan
+
+OWASP_ZAP
+标准扫描工作流程
+    设置代理
+    手动爬网
+    自动爬网
+    自动扫描
+
+
+
+
+
+

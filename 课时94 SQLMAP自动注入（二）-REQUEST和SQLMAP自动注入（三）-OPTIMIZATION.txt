@@ -1,0 +1,60 @@
+课时94 SQLMAP自动注入（二）-REQUEST和SQLMAP自动注入（三）-OPTIMIZATION
+
+SQLMAP自动注入02-----REQUEST
+--delay
+    每次http(s)请求之间延迟时间，浮点数，单位为秒,默认无延迟
+--timeout
+    请求超时时间，浮点数，默认为30秒
+--retries
+    http(s)连接超时重试次数，默认3次
+--randomize
+    长度、类型与原始值保持一致的前提下，指定每次请求随机取值的参数名
+
+SQLMAP自动注入02-----REQUEST
+--scope
+    过滤日志内容，通过正则表达式筛选扫描对象
+    sqlmap -l burp.log --scope="(www)?\.target.\.(com|net|org)"
+    sqlmap -l 2.log --scope="(19)?\.168\.20\.(1|10|100)" --level 3 -dbs
+    User-agent中的注入点
+--safe-url / --safe-freq
+    检测和盲注阶段会产生大量失败请求，服务器端可能因此销毁session
+    每发送--safe-freq次注入请求后，发送一次正常请求
+
+root@R:~# sqlmap -l burp.log --scope="(19)?\.168\.1\.(1|11|121|221)" --dbs
+
+root@R:~# sqlmap -l burp.log --scope="(19)?\.168\.1\.(1|11|121|221)" --level 3 -dbs
+
+SQLMAP自动注入02-----REQUEST
+--sik-urlencode
+    默认Get方法会对传输内容进行编码，某些WEB服务器不遵守RFC标准编码，
+    使用原始字符提交数据
+--eval
+    每次请求前执行指定的python代码
+    每次请求更改或增加新的参数值（时间依赖、其他参数值依赖）
+    sqlmap -u
+    "http://1.1.1.1/a.php?id=1&hash=c4ca4238a0b923820dcc509a6f75849b"
+    --eval="import hashlib;hash=hashlib.md5(id).hexdigest()"
+
+SQLMAP自动注入03-----OPTIMIZATION
+优化性能
+--predict-output
+    根据测试方法，对比返回值和统计值内容，不断缩小检测范围，提高检测效率
+    版本名、用户名、密码、Privileg、role、数据库名称、表名、列名
+    与--threads参数不兼容
+    统计表：/usr/share/sqlmap/txt/common-outputs.txt
+--keep-alive
+    使用http(s)长连接，性能好
+    与--proxy参数不兼容
+    长连接避免重复建立连接的网络开销，但大量长连接会严重占用服务器资源
+
+SQLMAP自动注入03-----OPTIMIZATION
+--null-connection
+    只获取相应页面的大小值，而非页面具体内容
+    通常用于盲注判断 真/假，降低网络带宽消耗
+    与--text-only参数不兼容（基于页面内容的比较判断 真/假）
+--threads
+    最大并发线程
+    盲注时每个线程获取一个字符（7次请求）。获取完成后线程结果
+    默认值为1，建议不要超过10,否则可能影响站点可用性
+    与 --predict-output参数不兼容
+-o 开启前三个性能参数（除--threads参数）

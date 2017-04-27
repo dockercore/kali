@@ -1,0 +1,56 @@
+课时79 Burpsuite
+
+Burpsuite
+Web安全工具中的瑞士军刀
+统一的集成工具发现全部现代WEB安全漏洞
+PortSwigger公司开发
+    Burp Free
+    Burp Professional
+    http://www.portswigger.net
+所有的工具共享一个能处理并显示HTTP消息的可扩展框架,模块之间无缝交换信息。
+http://pan.baidu.com/s/1o6kT6gm
+字体
+
+jython-atandalone-2.7.0.jar
+
+root@kali:~# cd /opt/
+
+root@kali:/opt# ls
+arachni-1.3.2-0.5.9  google  VBoxGuestAdditions-5.0.10  w3af
+burppro16            nessus  VSCode-linux-x64           xplico
+firware-mod-kit      Teeth   VSCode-linux-x64.zip       ZAP_2.4.3
+
+root@kali:/opt# cd burppro16
+
+root@kali:/opt/burppro16# ls
+bapps             BurpLoader.ja   burpsuite_pro_v1.6.jar
+burp-hash.sqlite  burp.sh         run.bat
+
+//linux启动burp.sh
+//windowsq启动run.bat
+//windows下启动cat burp.sh
+
+root@kali:/opt/burppro16# ./burp.sh
+
+//不要关闭终端端口，不然软件也会被关闭
+
+Burpsuite
+Proxy
+    Options
+        Invisible(主机头/多目标域名)
+        CA(导入/导出)
+        Intercept(入站/出站)
+        Response modify
+Target
+    Scope(logout)
+    Filter
+    Comparing site map
+
+when using plain HTTP,a proxy-style request looks likes this:
+GET http://example.org/foo.php HTTP/1.1
+Host:example.org
+whereas the corresponding non-proxy-style request looks like this:
+GET /foo.php HTTP/1.1
+Host:example.org
+
+

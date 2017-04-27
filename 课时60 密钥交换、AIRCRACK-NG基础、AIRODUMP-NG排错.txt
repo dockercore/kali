@@ -1,0 +1,477 @@
+课时60 密钥交换、AIRCRACK-NG基础、AIRODUMP-NG排错
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃密钥交换                                            ┃
+┃无线网络设计用于一组无线设备通信                    ┃
+┃    关联到同一AP的设备共享无线信道                  ┃
+┃    单播、广播、组播                                ┃
+┃        安全特性要求不同                            ┃
+┃        单播通信需要单独密钥加密通信双方流量        ┃
+┃        pairwise key: 对偶密钥 (PTK)                ┃
+┃        组播通信需要信任域内所有成员共享的同一密钥  ┃
+┃        group key: 组密钥(GTK)                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃PMK                                                             ┃
+┃安全上下的顶级密钥                                              ┃
+┃    MK进行TLS-PRF加密得出PMK-----PTK                            ┃
+┃基于服务密钥                                                    ┃
+┃    由上层身份验证方法服务器生成                                ┃
+┃    从服务器通过radius传给AP                                    ┃
+┃    从AP通过EAP消息传给所有STA                                  ┃
+┃基于PSK共享密钥                                                 ┃
+┃    Essid + PSK + 迭代次数4096-----Hash计算生成-----PMK-----PTK ┃
+┃    STA和AP分别计算得出PMK，并不在网络中传递交换                ┃
+┃256位即32字节                                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━╋
+┃密钥交换                ┃
+┃PTK的生成过程           ┃
+┃    HMAC-SHA1散列算法   ┃
+┃    PRF-X散列算法       ┃
+╋━━━━━━━━━━━━╋
+
+                  ┌────────┐
+                  │                │
+PMK     ────→│                │
+                  │                │───→ Data Encr
+Nonce 1 ────→│                │
+                  │      Key       │───→ Data MIC
+Nonce 2 ────→│  Computation   │
+                  │                │───→ EAPOL Encr
+MAC 1   ────→│                │
+                  │                │───→ EAPOL MIC
+MAC 2   ────→│                │
+                  │                │
+                  └────────┘
+
+╋━━━━━━━━━━━━━━━━╋
+┃密钥交换                        ┃
+┃四步握手过程生成PTK             ┃
+┃    AP发送Anonce给STA           ┃
+┃    STA生成Snonce计算出PTK      ┃
+┃    Snonce加PTK的MIC发给AP      ┃
+┃    AP拿到Snonce计算出PTK       ┃
+┃    AP计算MIC与接收的MIC比对    ┃
+┃    MIC一致说明确定STA知道PMK   ┃
+┃    AP发GTK给STA                ┃
+┃    STA回复ACK并使用密钥加密    ┃
+╋━━━━━━━━━━━━━━━━╋
+
+
+Supplicant                                                     Authenticatior
+              │               ANonce                     │
+              │←────────────────────│
+              │                                          │
+   ┌───────────┐                             │
+   │ Supplicant construct │                             │
+   │Pairwise Transient Key│                             │
+   │       (256 bit)      │                             │
+   └───────────┘                             │
+              │                                          │
+              │             SNonce + MIC                 │
+              │────────────────────→│
+              │                                          │
+              │                              ┌────────────┐
+              │                              │Authenticatior construct│
+              │                              │ Pairwise Transient Key │
+              │                              │        (256 bit)       │
+              │                              └────────────┘
+              │                                          │
+              │               GTK +MIC                   │
+              │←────────────────────│
+              │                                          │
+              │                  ACK                     │
+              │────────────────────→│
+              │                                          │
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃数据加密和完整性                                    ┃
+┃三种算法                                            ┃
+┃    Temporal Key Integrity Protocol (TKIP) 4        ┃
+┃    Counter Mode with CBC-MAC (CCMP) 5              ┃
+┃    Wireless Robust Authenticated Protocol (WRAP) 6 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━╋
+┃    无线渗透实操      ┃
+╋━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━╋
+┃AIRCRACK-NG基础         ┃
+┃无线渗透和审计神器      ┃
+┃包含各种功能的工具套件  ┃
+┃    网络检测            ┃
+┃    嗅探抓包            ┃
+┃    包注入              ┃
+┃    密码破解            ┃
+╋━━━━━━━━━━━━╋
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2     Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# service network-manager stop
+
+╋━━━━━━━━━━━━╋
+┃AIRCRACK-NG             ┃
+┃检查完卡驱动            ┃
+┃开启和停止无线侦听      ┃
+┃                        ┃
+┃                        ┃
+┃airmon check            ┃
+┃airmon check            ┃
+┃airmon start wlan2 3    ┃
+┃iwlist wlan2mon channel ┃
+┃airmon stop wlan2mon    ┃
+╋━━━━━━━━━━━━╋
+
+root@kali:~# airmon-ng
+PHY     Interface        Dirver           Chipset
+
+phy0    wlan2            ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+
+root@kali:~# airmon check
+Found 4 proesses that could cause trouble.
+If airmon-ng, aireplay-ng or airtun-ng stops working after
+a short period of time,you may want to kill (some of) them
+
+  PID Name
+  768 dhclient
+  967 avahi-daemon
+  968 avahi-daemon
+  990 wpa_supplicat
+
+root@kali:~# airmon-ng check kill    
+Killing these processes:
+
+  PID Name
+  768 dhclient
+  990 wpa_supplicat
+
+root@kali:~# airmon start wlan2
+NO interfering processes found
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2mon  Link encap:UNSPEC  HWaddr 08-57-00-0c-96-68-00-00-00-00-00-00-00-00-00-00
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:85 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:18257 (17.8 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2mon  IEEE 802.11bgn  Mode:Monitor Frequency:2.57 GHz   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# iwlist wlan2mon channel
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+          Current Frequency:2.457 GHz (Channel 10)
+
+root@kali:~# airmon stop wlan2
+NO interfering processes found
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2mon)
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+root@kali:~# ifconfig -a
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2     Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# ifconfig wlan2 up
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions.
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRCRACK-NG                                                 ┃
+┃无线抓包                                                    ┃
+┃airodump-ng wlan2mon                                        ┃
+┃airodump wlan2mon -c 1 --bssid 00:11:22:33:44:55 -w file.cap┃
+┃aireplay -9 wlan2mon                                        ┃
+┃airreplay                                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airmon-ng stop wlan2mon
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2mon)
+
+root@kali:~# airmon-ng start wlan2 1
+NO interfering processes found
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# iwlist wlan2mon channel
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+          Current Frequency:2.457 GHz (Channel 1)
+
+root@kali:~# airmon-ng wlan2mon
+CH 12 ][ Elapsed: 30 s ][ 2015-10-29 17:25
+
+BSSID              PwR  Beacons    #Data,#/s  CH  MB   ENC  CIPHER  AUTH ESSID
+
+4C:60:DE:25:9F:5E  -74       70        1   0  11  54e  WPA2 CCMP    PSK  PSK  vivi_EXT
+A0:63:91:E9:C5:9F  -78       94       17   0  11  54 . WPA2 CCMP    PSK  <length:  5>
+C4:3D:C7:92:29:68  -81       87        5   0  11  54e. WPA2 CCMP    PSK  vivi
+00:24:B2:91:50:08  -85       35        0   0   6  54e. WPA2 CCMP    PSK  vivi0
+C8:D7:19:95:73:96  -86       33        2   0   1  54e. WPA2 CCMP    PSK  Cisco26094
+CA:D7:19:95:73:98  -87       34        0   0   1  54e. WPA2 CCMP    PSK  TP-LINK_XUHAO
+9C:21:6A:2A:78:22  -88       30        1   0   1  54e. WPA2 CCMP    PSK  junyuandianqi
+14:75:90:AA:AF:8C  -90       10      164   0   1  54e. WPA2 CCMP    PSK  WYZ
+A8:15:4D:73:B2:B8  -91        2        0   0   1  54e. WPA2 CCMP    PSK  junyuandianqi
+88:25:93:25:7D:A9  -92       10        0   0  11  54e. WPA2 CCMP    PSK  pang
+00:E0:4D:01:53:CC  -90       13        0   0   1  54e. WPA2 CCMP    PSK  junyuandianqi-ext
+40:16:9F:A5:B2:36  -91        8        0   0   1  54e. WPA2 CCMP    PSK  TP-LINK_A5B236
+
+BSSID              STATION            PwR    Rate    Lost    Frame  Probe
+
+4C:60:DE:25:9F:5E  78:92:9C:03:6F:18  -76    0 - le     0        6  viv_EXT
+4C:60:DE:25:9F:5E  60:40:08:84:69:4A   -1    5e- 0      0        1
+A0:63:91:E9:C5:9F  88:32:9B:7B:50:C6   -1    0e- 0      0        2
+9C:21:6A:2A:78:22  88:32:9B:CF:6F:7D   -1    le- 0      0        1
+14:75:90:AA:AF:8C  08:10:78:C5:3D:28   -1    5e- 0      0      159
+40:16:9F:A5:B2:36  84:FC:FE:97:D3:F0   -1    le- 0      0        2
+
+root@kali:~# airmon-ng wlan2mon -c 1
+CH 1 ][ Elapsed: 30 s ][ 2015-10-29 17:25
+
+BSSID              PwR RXQ  Beacons    #Data,#/s  CH  MB   ENC  CIPHER  AUTH ESSID
+
+4C:60:DE:25:9F:5E  -89   0        8        1   1  11  54e  WPA2 CCMP    PSK  PSK  vivi_EXTi
+00:E0:4D:01:53:CC  -88   0       10        0   1   6  54e. WPA2 CCMP    PSK  junyuandianqi-ext
+A8:15:4D:73:B2:B8  -93   0        2        0   1   1  54e. WPA2 CCMP    PSK  junyuandianqi
+CA:D7:19:95:73:98  -83   0       17        0   1   1  54e. WPA2 CCMP    PSK  TP-LINK_XUHAO
+C8:D7:19:95:73:96  -83   0       19        0   1   1  54e. WPA2 CCMP    PSK  Cisco26094
+9C:21:6A:2A:78:22  -88   0       21        0   1   1  54e. WPA2 CCMP    PSK  junyuandianqi
+14:75:90:AA:AF:8C  -90   5       23       67   1  54e. WPA2 CCMP    PSK  WYZ
+
+BSSID              STATION            PwR    Rate    Lost    Frame  Probe
+
+(not associated)   0C:1D:AF:D5:25:15  -85    0 - 1     10       11  6-PC_Network,yuanjianping,FAST_70B2C,FAST_76BA2,nyinn,nyinn7-1,CMCC-LJFREE,@AIRP
+14:75:90:AA:AF:8C  08:10:78:C5:3D:28   -1    5e- 0      0      168
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRCRACK-NG                                                       ┃
+┃airodump-ng wlan2mon                                              ┃
+┃airodump wlan2mon -c 1 --bssid 00:11:22:33:44:55 -w file.cap      ┃
+┃airodump wlan2mon -c 1 --bssid 00:11:22:33:44:55 -w file.cap --lvs┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+root@kali:~# airodump wlan2mon -c 1 --bssid C8:D7:19:95:73:96
+CH 1 ][ Elapsed: 30 s ][ 2015-10-29 17:25
+
+BSSID              PwR RXQ  Beacons    #Data,#/s  CH  MB   ENC  CIPHER  AUTH ESSID
+
+C8:D7:19:95:73:96  -83   0       19        0   1   1  54e. WPA2 CCMP    PSK  Cisco26094
+
+BSSID              STATION            PwR    Rate    Lost    Frame  Probe
+
+root@kali:~# airodump wlan2mon -c 1 --bssid C8:D7:19:95:73:96 -w test1
+
+root@kali:~# ls
+test1-01.csv  test1-01.kisment.netxml  test1-01.cap  test-01.kisment.csv  下载
+
+root@kali:~# ls test-01.*
+test1-01.cap  test-01.kisment.csv  test1-01.kisment.csv  test1-01.kisment.netxml
+
+root@kali:~# wireshark test1-01.cap
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRCRACK-NG                                                                   ┃
+┃BSSID: AP的MAC地址                                                            ┃
+┃PWR: 网卡接收到的信号强度，距离越近信号越强                                   ┃
+┃    -1: 驱动不支持信号强度、STA距离超出信号接受范围                           ┃
+┃RXQ: 最近10秒成功接收的数据帧的百分比(数据帧、管理帧)，只有固定信道时才会出现 ┃
+┃Beacons: 接收到此AP发送的beacon帧数量                                         ┃
+┃#Data: 抓到的数据帧数量(WEP表示IV数量)，包含广播数据帧                        ┃
+┃#/s: 最近10秒内，每秒平均抓到的帧的数量                                       ┃
+┃CH: 信道好(从beacon帧中获得)，信道重叠时可能发现其他信道                      ┃
+┃MB: AP支持的最大速率                                                          ┃
+┃ENC: 采用的无线安全技术WEP、WPA、WPA2、OPEN                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRCRACK-NG                                                                   ┃
+┃CIPHER: 采用的加密套件CCMP、TKIP、WEP40、WEP104                               ┃
+┃AUTH: 身份验证方法MGT、PSK、SKA、OPEN                                         ┃
+┃ESSID: 无线网络名称，隐藏AP此值可能为空,airodump从probe和association request帧┃
+┃中发现隐藏AP                                                                  ┃
+┃STATION: STA的MAC地址                                                         ┃
+┃Lost: 通过sequence umber判断最近10秒STA发送丢失的数据包数量(管理帧、数据帧)   ┃
+┃    干扰、距离                                                                ┃
+┃    发包不能收，收包不能发                                                    ┃
+┃Packets: STA发送的数据包数量                                                  ┃
+┃Probes: STA探测的ESSID                                                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airodump wlan2mon -c 1
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRCRACK-NG                                                         ┃
+┃不显示任何AP和STA信息                                               ┃
+┃    物理机场景下使用笔记本内置无线网卡时，确保BIOS中已经启动无线网卡┃
+┃    确认无线网卡在managed模式下可以正常工作                         ┃
+┃    尝试禁用network-manager服务                                     ┃
+┃    尝试卸载rmmod和重新加载modprobe驱动                             ┃
+┃工作一段时间后airodump-ng无法继续抓包                               ┃
+┃    airmon-ng check kill                                            ┃
+┃    确认wpa_supplicant进程已停止                                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# rmmod
+rmmod: ERROR: missing module name
+
+root@kali:~# airmon-ng
+PHY     Interface        Dirver           Chipset
+
+phy0    wlan2            ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+
+root@kali:~# modprobe ath9k_htc
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions.
+

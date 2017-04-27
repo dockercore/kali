@@ -1,0 +1,87 @@
+课时19 搜索引擎、SHODAN
+
+╋━━━━━━━━━━━━━━━━━╋
+┃搜索引擎                          ┃
+┃公司新闻动态                      ┃
+┃重要雇员信息                      ┃
+┃机密文件/网络拓扑                 ┃
+┃用户名密码                        ┃
+┃目标系统软硬件技术架构            ┃
+┃                                  ┃
+┃SHODAN                            ┃
+┃搜索联网的设备                    ┃
+┃Banner: http、ftp、ssh、telnet    ┃
+┃http://www.shodan.io/             ┃
+┃常见filter                        ┃
+┃    net                           ┃
+┃    city                          ┃
+┃    country(CN、US)               ┃
+┃    port(80、21、22、23）         ┃
+┃    os                            ┃
+┃    Hostname(主机或域名）         ┃
+┃    server                        ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+基于物联网的搜索引擎，会不会让你感到恐惧？
+
+也许 Google、Bing 等搜索引擎已经索引了整个虚拟世界，然而它们尚未成功地将自己的触角延伸到现实世界当中。不过，怎样的搜索引擎才能索引现实世界？
+
+这里向大家介绍完全不一样的搜索引擎 Shodan。它搜索的对象是所有连上网络的东西——它搜索的不是与某个字段相关联的内容，而是各种各样，完全不同的 IP 地址。
+
+shodan1
+
+不同的 IP 地址背后，是放在某处的路由器、冰箱、甚至是摄像头等等。我们也可以通过它来搜索阿拉斯加地区的 GPS 信号接收器，或者查找游泳池的控制面板。用 Shodan 来帮助自己科研的 Dan Tentler 说，这种体验就好像不是从店面的前方来观察它，而是跑到店面运出运入的地方来观察一样。
+
+如果我们掌握使用 Shodan 的搜索技巧，将进入一个完全不同以往的世界。但因为这些地方少有人涉足，东西杂乱无章，就好像埋着金子的荒野。Shodan 有时候会搜索摄像头，有时候会搜索履带牵引车的控制面板，有时候甚至会搜索医疗设备。而由于，世界上没有几个搜索引擎会收录这些资料，最近几年 Shodan 颇受研究人员的关注。
+
+
+九年前，Shodan 的创始人 John Matherly 在学校里花了一个月时间来搭建搜索引擎，很快他的服务器提供商 Cox 不再愿意为他提供服务。Cox 说，“哥们，你发了好几百封邮件，你在搞什么？”实际上，他在向网络服务器发送请求，但用了服务器管理员不喜欢的方法。
+
+Shodan 告诉我们，网络的多样性超过我们的想象。就好像网络服务器，我们会想起 Apache 活 Nginx，但 Shodan 所收录的 1.44 亿部服务器的资料则告诉我们， 服务器的种类还有很多。比如说，现在有 850 万部服务器运行着微软的 IIS
+服务，有 220 万部服务器运行着 Allegro Software 所开发的 RomPage，都是网络服务器的过去时或者很少见到的。
+
+Shodan 不是免费服务，想收到完整的搜索结果，需要每个月支付 19.9 美元。
+
+回忆自己花在 Shodan 的九年时间，Matherly 说，“为 Shodan 工作，让我越来越意识到这个世界是如何连接起来的。我从未想象过电冰箱会有一个 IP 地址，路上的交通灯在线上。汽车会有一个网络界面。”
+
+目前，Shodan 仍然是一人项目。Matherly 拥有相当的耐心。
+
+SHODAN搜索引擎
+net:1.179.177.0/24
+
+country:CN city:beijing port:22
+
+root@kali:~# nc 115.159.0.151 3360
+(UNKNOWN) [115.159.0.151] 3360 (?) : Connection refused
+
+root@kali:~# nc 115.159.0.151 22
+SSH-2.0-OpenSSH_5.3
+
+country:CN city:beijing port:22 HTTP/1.1 200
+
+country:CN city:beijing os:"windows"
+
+hostname:baidu.com
+
+server:open_ssh
+
+server:"Apache2.2.3"
+
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃SHODAN                              ┃
+┃  200 OK cisco country:JP           ┃
+┃  user:admin pass:password          ┃
+┃  http://1.179.177.109:81/index.htm ┃
+┃  linux upup avtech                 ┃
+┃      http://75.69.59.49:8000       ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+
+200 OK cisco country:JP
+
+常用的参数有：
+OS：win32
+OS：Win Database-MySQL
+OS：CentOS
+OS: Red HatPort:根据端口搜索，常用的端口有：HTTP (80)、FTP (21)、SSH (22)、SNMP (161)、SIP (5060)四、应用举例：

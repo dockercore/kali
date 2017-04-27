@@ -1,0 +1,412 @@
+课时55 CONTROL FRAME
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                ┃
+┃More frag (1bit) : 标示是否还有后续帧                                 ┃
+┃    值为1时表示有后续分段，可能是Data或Management帧类型。只有单播接收 ┃
+┃    地址的帧会被分段；                                                ┃
+┃Retry (1bit) : 重传                                                   ┃
+┃    值为1标示重传帧，可能是Data或Management帧类型，接收端进程使用此值 ┃
+┃    防止帧重复；                                                      ┃
+┃Power Mgmet (1bit) : 活动模式 (0)/省电模式(1)                         ┃
+┃    STA处于省电模式时，向关联的AP发送该值为1的帧 (AP从不使用此字段),  ┃
+┃    省电模式下STA不接收数据，发送给它的Data帧由AP暂时缓存；           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+          B0    B1   B2     B3   B4    B7   B8   B9   B10    B11     B12      B13   B14    B15
+      ┌─────┬─────┬─────┬─┬──┬──┬───┬────┬──┬──┬───┐
+      │ Protocol │   Type   │ Subtype  │TO│From│More│Retry │Power   │More│ WEP│ Order│
+      │ Version  │          │          │DS│DS  │flag│      │Manage- │Data│    │      │
+      │          │          │          │  │    │    │      │ments   │    │    │      │
+      └─────┴─────┴─────┴─┴──┴──┴───┴────┴──┴──┴───┘
+Bits       2           2           4         1     1    1     1       1        1     1       1  
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                          ┃
+┃More Data (1bit)                                                                ┃
+┃    当AP缓存了至少一个MSDU时，会向省电模式STA发送该值为1的帧，标示有数据要传    ┃
+┃    输给STA，接收到此帧的STA唤醒自己并向AP发送PS-Poll帧，取回由AP为其缓存的数据 ┃
+┃    也被用于AP有更多的广播/多播帧需要发送的情况；                               ┃
+┃Protoected Frame (1bit)                                                         ┃
+┃    可能是Data或Management帧类型，表示MSDU是否被加密；也被用于表示PSK身份验证   ┃
+┃    Frame#3帧；数据载荷为空时，该字段值为0；                                    ┃
+┃Order (1bit)                                                                    ┃
+┃    在非Qos帧的情况下，值为1表示数据必须按严格顺序处理，通常为0；               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+          B0    B1   B2     B3   B4    B7   B8   B9   B10    B11     B12      B13   B14    B15
+      ┌─────┬─────┬─────┬─┬──┬──┬───┬────┬──┬──┬───┐
+      │ Protocol │   Type   │ Subtype  │TO│From│More│Retry │Power   │More│ WEP│ Order│
+      │ Version  │          │          │DS│DS  │flag│      │Manage- │Data│    │      │
+      │          │          │          │  │    │    │      │ments   │    │    │      │
+      └─────┴─────┴─────┴─┴──┴──┴───┴────┴──┴──┴───┘
+Bits       2           2           4         1     1    1     1       1        1     1       1  
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                          ┃
+┃Duration/ID (16bit)                                                             ┃
+┃    所有Control帧都使用该字段，其作用随Type/SubType变化有所不同；               ┃
+┃    帧类型为PS Poll (type:1,subtyupe:10) 时，表示STA关联的AID(association       ┃
+┃     identity)；                                                                ┃
+┃    其他情况下该字段作为一种载波侦听机制，表示接受下一帧之前需要保持的时间间隔，┃
+┃    用于NAV (Network Allocation Vector) 计算，单位是微妙；                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+btyes          30                 0-2324            4
+      ┌─────────┬─────────┬─────┐
+      │      Header      │       Data       │   FCS    │
+      └─────────┴─────────┴─────┘
+      │
+      │
+      │
+      │
+bytes │       2           2             6          6            6          2         6
+      ┌──────┬──────┬─────┬─────┬─────┬────┬─────┐
+      │    Frame   │ Duration/ID│ Address 1│ Address 2│ Address 3│Sequence│ Address 4│
+      │   control  │            │          │          │          │ Control│          │
+      └──────┴──────┴─────┴─────┴─────┴────┴─────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                          ┃
+┃MAC Layer Address                                                               ┃
+┃    前面已经提到了4种，这里补充最后一种：Basic service set ID (BSSID)；它是BSS的┃
+┃    2层唯一标识，Infrastructure模式中BSSID就是AP的MAC地址，当AP支持多BSS时，随机┃
+┃    生成每个BSSID；                                                             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+btyes          30                 0-2324            4
+      ┌─────────┬─────────┬─────┐
+      │      Header      │       Data       │   FCS    │
+      └─────────┴─────────┴─────┘
+      │
+      │
+      │
+      │
+bytes │       2           2             6          6            6          2         6
+      ┌──────┬──────┬─────┬─────┬─────┬────┬─────┐
+      │    Frame   │ Duration/ID│ Address 1│ Address 2│ Address 3│Sequence│ Address 4│
+      │   control  │            │          │          │          │ Control│          │
+      └──────┴──────┴─────┴─────┴─────┴────┴─────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                          ┃
+┃Sequence Control (16bit)                                                        ┃
+┃    这个字段包含两个子字段: Sequence Number和Fragment Number；                  ┃
+┃    Sequence Number是每个帧的编号，数值范围是0-4095，以1为步长递增。当帧被分段  ┃
+┃    时，同一帧中不同分段的Sequence Number相同；                                 ┃
+┃    Fragment Number是被分段的帧用于标识分段位置顺序的编号，数值范围是0---15，以 ┃
+┃    1为步长递增                                                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+           B0             B3   B4           B15
+        ┌─────────┬─────────┐
+        │  Fragment Number │  Sequence Number │
+        └─────────┴─────────┘
+Bits:            4                    12
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                          ┃
+┃FCS (32bit)                                                                     ┃
+┃    发送端对全部MAC包头和Frame Body内容进行CRC计算，计算结果即为FCS (Frame Check┃
+┃    Sequence)值，接收端进行同样的计算，结果一致时，则接收端向发送端返回ACK，否则┃
+┃    丢弃帧 (只对单播帧有效，FCS错误的广播/多播帧可能被接收)                     ┃
+┃    注: wireshark抓包时以及删除了FCS值                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+btyes          30                 0-2324            4
+      ┌─────────┬─────────┬─────┐
+      │      Header      │       Data       │   FCS    │
+      └─────────┴─────────┴─────┘
+      │
+      │
+      │
+      │
+bytes │       2           2             6          6            6          2         6
+      ┌──────┬──────┬─────┬─────┬─────┬────┬─────┐
+      │    Frame   │ Duration/ID│ Address 1│ Address 2│ Address 3│Sequence│ Address 4│
+      │   control  │            │          │          │          │ Control│          │
+      └──────┴──────┴─────┴─────┴─────┴────┴─────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                          ┃
+┃Frame Body（变长）                                                              ┃
+┃    数据字段，未加密的最大MSDU长度为2304字节 (其中包含最大256字节的上层头信息， ┃
+┃    和可被传递的数据2048字节)。不同的加密方法会增加一定的内容长度；             ┃
+┃    WEP: 8 bytes → 2312 bytes                                                  ┃
+┃    TKIP (WPA1):20 bytes → 2324 bytes                                          ┃
+┃    CCMP (WPA2): 16 bytes → 2320 bytes                                         ┃
+┃                                                                                ┃
+┃注: Control类型的帧没有Frame Body内容                                           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━╋
+┃        CONTROL FRAME       ┃
+┃            控制帧          ┃
+╋━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃CONTROL FRAME                                               ┃
+┃控制帧时一些通知设备开始、停止传输或连接失败等情况的短消息；┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+┌───────┬───────┬────────┬─────────────────┐
+│      01      │Control       │    000-0110    │ Reserved                         │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      0111      │ Control Wrapper                  │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1000      │ Block Ack Request (BlockAckReq)  │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1001      │ Block Ack (BlockAck)             │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1010      │ PS-Pll                           │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1011      │ RTS                              │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1100      │ CTS                              │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1101      │ ACK                              │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1110      │ CF-End                           │
+├───────┼───────┼────────┼─────────────────┤
+│      01      │Control       │      1111      │ CF-End + CF-Ack                  │
+└───────┴───────┴────────┴─────────────────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃ACK                                       ┃
+┃接收端正确接收数据之后向发送端返回ACK确认 ┃
+┃每个单播帧需要ACK立刻确认                 ┃
+┃    组播和广播帧不需要ACK确认             ┃
+┃尽快响应                                  ┃
+┃    由硬件完成，而非驱动层                ┃
+┃T/S: 1/13                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+bytes          2           2             6          4
+      ┌──────┬──────┬─────┬─────┐
+      │    Frame   │  Duration  │ Receiver │   FCS    │
+      │   control  │            │  Address │          │
+      └──────┴──────┴─────┴─────┘
+
+root@kali:~# cp /media/sf_D_DRIVE/802.11/control
+ack.pcap      rts-cts.pcap
+
+root@kali:~# cp /media/sf_D_DRIVE/802.11/control/* .
+
+root@kali:~# ls
+ack.pcap  rts-cts.pcap  下载  公共  图片  文档  桌面  模板  视频  音乐
+
+root@kali:~# wrieshark ack.pcap
+
+root@kali:~# service network-mamager stop
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)]
+
+root@kali:~# ifconfig -a
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2     Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# iw dev wlan2 interface add wlan2mon type monitor
+
+root@kali:~# ifconfig wlan2mon up
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# wireshark
+
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+┃PS-POLL                                     ┃
+┃RF系统的放大器                              ┃
+┃    主要耗电的组件                          ┃
+┃    发射前放大信号，接收并放大还原信号      ┃
+┃省电模式                                    ┃
+┃    关闭信号发射器节省电源耗电(几乎完全关闭)┃
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃PS-POLL                                       ┃
+┃AID------Association ID                       ┃
+┃STA省电模式唤醒                               ┃
+┃    数据发送至AP（AP缓存数据包）              ┃
+┃    通过Beacon发送TIM (traffic indication map)┃
+┃        其中包含AID                           ┃
+┃    STA对比AID后唤醒网卡                      ┃
+┃    STA发送PS-Poll帧，请求从AP缓存中取回数据  ┃
+┃        每个镇都需要ACK确认                   ┃
+┃        ACK去人后AP从缓存中删除数据帧         ┃
+┃        传输过程中STA保持唤醒状态             ┃
+┃        传输结束后STA恢复省电状态             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+    STA    │         PS-Poll              │    AP
+           │──────────────→│
+           │                              │
+           │                              │
+           │         Frame 1              │
+           │←──────────────│
+           │    More data bit set         │
+           │                              │
+           │                              │
+           │          ACK                 │
+           │──────────────→│
+           │                              │
+           │                              │
+           │         PS-Poll              │
+           │──────────────→│
+           │                              │
+           │                              │
+           │         Frame 2              │
+           │←──────────────│
+           │                              │
+           │                              │
+           │          ACK                 │
+           │──────────────→│
+           │                              │
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃PS-POLL                                       ┃
+┃AP接收PS-Poll帧                               ┃
+┃    立刻响应                                  ┃
+┃    延迟响应                                  ┃
+┃        简单响应帧                            ┃
+┃                                              ┃
+┃                                              ┃
+┃AID: 关联ID                                   ┃
+┃BSSID: STA正关联的AP地址                      ┃
+┃TA: 发送此帧的STA地址                         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+Octets:       2           2          6        6          4
+      ┌──────┬────┬────┬────┬────┐
+      │    Frame   │  AID   │ BSSID  │   TA   │   FCS  │ 
+      │   control  │        │  (RA)  │        │        │
+      └──────┴────┴────┴────┴────┘
+        ←───────────────────→
+                        MAC Header
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RTS/CTS                                               ┃
+┃RTS/CTS是CSMA/CA方法的一种补充手段                    ┃
+┃    降低冲突产生的可能性                              ┃
+┃    正式通信之前通过请求应答机制，确信通信介质的可用性┃
+┃    并锁定传输介质和预约通信时间                      ┃
+┃    只有在传输长帧时使用，传输短帧时不会使用          ┃
+┃         驱动接口提供阀值的自定义                     ┃
+┃         大于阀值的帧被视为长帧，反之则视为短帧       ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RTS/CTS                                             ┃
+┃Node1发送Request to Send包给Node2                   ┃
+┃如果未发生冲突，Node2返回Clear to Send给Node        ┃
+┃Node1传输数据                                       ┃
+┃数据正常接收，Node2返回ACK，否则Node1什么也不会收到 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+    Node 1    │           RTS                │    Node 2
+              │──────────────→│ 
+              │                              │
+              │                              │
+              │           CTS                │
+              │←──────────────│
+              │                              │
+              │                              │
+              │          Data                │
+              │──────────────→│
+              │                              │
+              │                              │
+              │           ACK                │
+              │←──────────────│
+              │                              │
+
+╋━━━━━━━━━━━━━━━╋
+┃RTS/CTS                       ┃
+┃有限网络介质访问方式: CSMA/CD ┃
+┃无线网络介质访问方法: CSMA/CA ┃
+┃隐藏节点                      ┃
+╋━━━━━━━━━━━━━━━╋
+
+    Node 1    │           RTS                │    Node 2
+              │──────────────→│ 
+              │                              │
+              │                              │
+              │           CTS                │
+              │←──────────────│
+              │                              │
+              │                              │
+              │          Data                │
+              │──────────────→│
+              │                              │
+              │                              │
+              │           ACK                │
+              │←──────────────│
+              │                              │
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RTS/CTS                                                                   ┃
+┃RTS帧长度20字节                                                           ┃
+┃bytes          2           2             6           6            4       ┃
+┃      ┌──────┬──────┬─────┬──────┬─────┐┃
+┃      │    Frame   │  Duration  │ Receiver │Transmitter │   FCS    │┃
+┃      │   control  │            │  Address │  Address   │          │┃
+┃      └──────┴──────┴─────┴──────┴─────┘┃      
+┃CTS帧长度14字节                                                           ┃
+┃bytes          2           2             6          4                     ┃
+┃      ┌──────┬──────┬─────┬─────┐              ┃
+┃      │    Frame   │  Duration  │ Receiver │   FCS    │              ┃
+┃      │   control  │            │  Address │          │              ┃
+┃      └──────┴──────┴─────┴─────┘              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋

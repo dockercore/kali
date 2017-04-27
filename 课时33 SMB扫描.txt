@@ -1,0 +1,632 @@
+课时33 SMB扫描
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃SMB扫描                                                                     ┃
+┃nmap -v -p 139,134 192.168.60.1-20                                          ┃
+┃nmap 192.168.1.132 -p139,445 --script=smb-os-discovery.nse                  ┃
+┃nmap -v -p139,145 --script=smb-check-vulns --script-args=unsafe=1 1.1.1.1   ┃
+┃nbtscan -r 192.168.60.0/24                                                  ┃
+┃enum4linux -a 192.168.60.10                                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━╋
+┃SMB扫描                         ┃
+┃Server Message Block协议        ┃
+┃  微软历史上出现问题最多的协议  ┃
+┃  实现复杂                      ┃
+┃  默认开放                      ┃
+┃  文件共享                      ┃
+┃  空会话未身份认证访问(SMBI)    ┃
+┃   密码策略                     ┃
+┃   用户名                       ┃
+┃   组名                         ┃
+┃   机器名                       ┃
+┃   用户、组SID                  ┃
+╋━━━━━━━━━━━━━━━━╋
+
+┌────┬──────────────────┐
+│ 版本   │             操作系统               │
+├────┼──────────────────┤
+│  SMB1  │  Windows 2000 / XP / Windows 2003  │
+├────┼──────────────────┤
+│  SMB2  │  windows Vista SP1 / Windows 2008  │
+├────┼──────────────────┤
+│  SMB2.1│  Windows 7 / Windows 2008 R2       │
+├────┼──────────────────┤
+│  SMB3  │  Windows 8 / Windows 2012          │
+└────┴──────────────────┘
+
+root@kali:~# uname -a
+Linux kali 4.0.0-kali1-686-pae #1 SMP Debian 4.0.4-1+kali2 (2015-06-03) i686 GNU/Linux
+
+root@kali:~# lsb_release -a
+No LSB modules are available.
+Distributor ID:	Kali
+Description:	Kali GNU/Linux 2.0
+Release:	2.0
+Codename:	sana
+
+root@kali:~# cat /etc/apt/sources.list
+# 
+
+# deb cdrom:[Debian GNU/Linux 2.0 _Sana_ - Official Snapshot i386 LIVE/INSTALL Binary 20150811-09:06]/ sana contrib main non-free
+
+#deb cdrom:[Debian GNU/Linux 2.0 _Sana_ - Official Snapshot i386 LIVE/INSTALL Binary 20150811-09:06]/ sana contrib main non-free
+
+deb http://http.kali.org/kali sana main non-free contrib
+deb-src http://http.kali.org/kali sana main non-free contrib
+
+deb http://security.kali.org/kali-security/ sana/updates main contrib non-free
+deb-src http://security.kali.org/kali-security/ sana/updates main contrib non-free
+
+deb http://mirrors.ustc.edu.cn/kali kali main non-free contrib
+deb-src http://mirrors.ustc.edu.cn/kali kali main non-free contrib
+deb http://mirrors.ustc.edu.cn/kali-security kali/updates main contrib non-free
+root@kali:~# apt-get upadate && apt-get dis-ugrade -y
+
+----------------------------------------------------------------------------------
+root@kali:~# nmap -v -p 139,445 192.168.1.0/24
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-06 17:04 CST
+Initiating ARP Ping Scan at 17:04
+Scanning 255 hosts [1 port/host]
+Completed ARP Ping Scan at 17:04, 1.97s elapsed (255 total hosts)
+Initiating Parallel DNS resolution of 255 hosts. at 17:04
+Completed Parallel DNS resolution of 255 hosts. at 17:04, 0.23s elapsed
+Nmap scan report for 192.168.1.0 [host down]
+Nmap scan report for 192.168.1.2 [host down]
+Nmap scan report for 192.168.1.3 [host down]
+Nmap scan report for 192.168.1.4 [host down]
+Nmap scan report for 192.168.1.5 [host down]
+Nmap scan report for 192.168.1.6 [host down]
+Nmap scan report for 192.168.1.7 [host down]
+Nmap scan report for 192.168.1.8 [host down]
+Nmap scan report for 192.168.1.9 [host down]
+Nmap scan report for 192.168.1.10 [host down]
+Nmap scan report for 192.168.1.11 [host down]
+Nmap scan report for 192.168.1.12 [host down]
+Nmap scan report for 192.168.1.13 [host down]
+Nmap scan report for 192.168.1.14 [host down]
+Nmap scan report for 192.168.1.15 [host down]
+Nmap scan report for 192.168.1.16 [host down]
+Nmap scan report for 192.168.1.17 [host down]
+Nmap scan report for 192.168.1.18 [host down]
+Nmap scan report for 192.168.1.19 [host down]
+Nmap scan report for 192.168.1.20 [host down]
+Nmap scan report for 192.168.1.21 [host down]
+Nmap scan report for 192.168.1.22 [host down]
+Nmap scan report for 192.168.1.23 [host down]
+Nmap scan report for 192.168.1.24 [host down]
+Nmap scan report for 192.168.1.25 [host down]
+Nmap scan report for 192.168.1.26 [host down]
+Nmap scan report for 192.168.1.27 [host down]
+Nmap scan report for 192.168.1.28 [host down]
+Nmap scan report for 192.168.1.29 [host down]
+Nmap scan report for 192.168.1.30 [host down]
+Nmap scan report for 192.168.1.31 [host down]
+Nmap scan report for 192.168.1.32 [host down]
+Nmap scan report for 192.168.1.33 [host down]
+Nmap scan report for 192.168.1.34 [host down]
+Nmap scan report for 192.168.1.35 [host down]
+Nmap scan report for 192.168.1.36 [host down]
+Nmap scan report for 192.168.1.37 [host down]
+Nmap scan report for 192.168.1.38 [host down]
+Nmap scan report for 192.168.1.39 [host down]
+Nmap scan report for 192.168.1.40 [host down]
+Nmap scan report for 192.168.1.41 [host down]
+Nmap scan report for 192.168.1.42 [host down]
+Nmap scan report for 192.168.1.43 [host down]
+Nmap scan report for 192.168.1.44 [host down]
+Nmap scan report for 192.168.1.45 [host down]
+Nmap scan report for 192.168.1.46 [host down]
+Nmap scan report for 192.168.1.47 [host down]
+Nmap scan report for 192.168.1.48 [host down]
+Nmap scan report for 192.168.1.49 [host down]
+Nmap scan report for 192.168.1.50 [host down]
+Nmap scan report for 192.168.1.51 [host down]
+Nmap scan report for 192.168.1.52 [host down]
+Nmap scan report for 192.168.1.53 [host down]
+Nmap scan report for 192.168.1.54 [host down]
+Nmap scan report for 192.168.1.55 [host down]
+Nmap scan report for 192.168.1.56 [host down]
+Nmap scan report for 192.168.1.57 [host down]
+Nmap scan report for 192.168.1.58 [host down]
+Nmap scan report for 192.168.1.59 [host down]
+Nmap scan report for 192.168.1.60 [host down]
+Nmap scan report for 192.168.1.61 [host down]
+Nmap scan report for 192.168.1.62 [host down]
+Nmap scan report for 192.168.1.63 [host down]
+Nmap scan report for 192.168.1.64 [host down]
+Nmap scan report for 192.168.1.65 [host down]
+Nmap scan report for 192.168.1.66 [host down]
+Nmap scan report for 192.168.1.67 [host down]
+Nmap scan report for 192.168.1.68 [host down]
+Nmap scan report for 192.168.1.69 [host down]
+Nmap scan report for 192.168.1.70 [host down]
+Nmap scan report for 192.168.1.71 [host down]
+Nmap scan report for 192.168.1.72 [host down]
+Nmap scan report for 192.168.1.73 [host down]
+Nmap scan report for 192.168.1.74 [host down]
+Nmap scan report for 192.168.1.75 [host down]
+Nmap scan report for 192.168.1.76 [host down]
+Nmap scan report for 192.168.1.77 [host down]
+Nmap scan report for 192.168.1.78 [host down]
+Nmap scan report for 192.168.1.79 [host down]
+Nmap scan report for 192.168.1.80 [host down]
+Nmap scan report for 192.168.1.81 [host down]
+Nmap scan report for 192.168.1.82 [host down]
+Nmap scan report for 192.168.1.83 [host down]
+Nmap scan report for 192.168.1.84 [host down]
+Nmap scan report for 192.168.1.85 [host down]
+Nmap scan report for 192.168.1.86 [host down]
+Nmap scan report for 192.168.1.87 [host down]
+Nmap scan report for 192.168.1.88 [host down]
+Nmap scan report for 192.168.1.89 [host down]
+Nmap scan report for 192.168.1.90 [host down]
+Nmap scan report for 192.168.1.91 [host down]
+Nmap scan report for 192.168.1.92 [host down]
+Nmap scan report for 192.168.1.93 [host down]
+Nmap scan report for 192.168.1.94 [host down]
+Nmap scan report for 192.168.1.95 [host down]
+Nmap scan report for 192.168.1.96 [host down]
+Nmap scan report for 192.168.1.97 [host down]
+Nmap scan report for 192.168.1.98 [host down]
+Nmap scan report for 192.168.1.99 [host down]
+Nmap scan report for 192.168.1.100 [host down]
+Nmap scan report for 192.168.1.102 [host down]
+Nmap scan report for 192.168.1.103 [host down]
+Nmap scan report for 192.168.1.104 [host down]
+Nmap scan report for 192.168.1.105 [host down]
+Nmap scan report for 192.168.1.106 [host down]
+Nmap scan report for 192.168.1.108 [host down]
+Nmap scan report for 192.168.1.109 [host down]
+Nmap scan report for 192.168.1.110 [host down]
+Nmap scan report for 192.168.1.111 [host down]
+Nmap scan report for 192.168.1.112 [host down]
+Nmap scan report for 192.168.1.113 [host down]
+Nmap scan report for 192.168.1.114 [host down]
+Nmap scan report for 192.168.1.115 [host down]
+Nmap scan report for 192.168.1.116 [host down]
+Nmap scan report for 192.168.1.117 [host down]
+Nmap scan report for 192.168.1.118 [host down]
+Nmap scan report for 192.168.1.119 [host down]
+Nmap scan report for 192.168.1.120 [host down]
+Nmap scan report for 192.168.1.121 [host down]
+Nmap scan report for 192.168.1.122 [host down]
+Nmap scan report for 192.168.1.123 [host down]
+Nmap scan report for 192.168.1.124 [host down]
+Nmap scan report for 192.168.1.125 [host down]
+Nmap scan report for 192.168.1.126 [host down]
+Nmap scan report for 192.168.1.127 [host down]
+Nmap scan report for 192.168.1.128 [host down]
+Nmap scan report for 192.168.1.129 [host down]
+Nmap scan report for 192.168.1.130 [host down]
+Nmap scan report for 192.168.1.131 [host down]
+Nmap scan report for 192.168.1.132 [host down]
+Nmap scan report for 192.168.1.133 [host down]
+Nmap scan report for 192.168.1.134 [host down]
+Nmap scan report for 192.168.1.135 [host down]
+Nmap scan report for 192.168.1.136 [host down]
+Nmap scan report for 192.168.1.137 [host down]
+Nmap scan report for 192.168.1.138 [host down]
+Nmap scan report for 192.168.1.139 [host down]
+Nmap scan report for 192.168.1.140 [host down]
+Nmap scan report for 192.168.1.141 [host down]
+Nmap scan report for 192.168.1.142 [host down]
+Nmap scan report for 192.168.1.143 [host down]
+Nmap scan report for 192.168.1.144 [host down]
+Nmap scan report for 192.168.1.145 [host down]
+Nmap scan report for 192.168.1.146 [host down]
+Nmap scan report for 192.168.1.147 [host down]
+Nmap scan report for 192.168.1.148 [host down]
+Nmap scan report for 192.168.1.149 [host down]
+Nmap scan report for 192.168.1.150 [host down]
+Nmap scan report for 192.168.1.151 [host down]
+Nmap scan report for 192.168.1.152 [host down]
+Nmap scan report for 192.168.1.153 [host down]
+Nmap scan report for 192.168.1.154 [host down]
+Nmap scan report for 192.168.1.155 [host down]
+Nmap scan report for 192.168.1.156 [host down]
+Nmap scan report for 192.168.1.157 [host down]
+Nmap scan report for 192.168.1.158 [host down]
+Nmap scan report for 192.168.1.159 [host down]
+Nmap scan report for 192.168.1.160 [host down]
+Nmap scan report for 192.168.1.161 [host down]
+Nmap scan report for 192.168.1.162 [host down]
+Nmap scan report for 192.168.1.163 [host down]
+Nmap scan report for 192.168.1.164 [host down]
+Nmap scan report for 192.168.1.165 [host down]
+Nmap scan report for 192.168.1.166 [host down]
+Nmap scan report for 192.168.1.167 [host down]
+Nmap scan report for 192.168.1.168 [host down]
+Nmap scan report for 192.168.1.169 [host down]
+Nmap scan report for 192.168.1.170 [host down]
+Nmap scan report for 192.168.1.171 [host down]
+Nmap scan report for 192.168.1.172 [host down]
+Nmap scan report for 192.168.1.173 [host down]
+Nmap scan report for 192.168.1.174 [host down]
+Nmap scan report for 192.168.1.175 [host down]
+Nmap scan report for 192.168.1.176 [host down]
+Nmap scan report for 192.168.1.177 [host down]
+Nmap scan report for 192.168.1.178 [host down]
+Nmap scan report for 192.168.1.179 [host down]
+Nmap scan report for 192.168.1.180 [host down]
+Nmap scan report for 192.168.1.181 [host down]
+Nmap scan report for 192.168.1.182 [host down]
+Nmap scan report for 192.168.1.183 [host down]
+Nmap scan report for 192.168.1.184 [host down]
+Nmap scan report for 192.168.1.185 [host down]
+Nmap scan report for 192.168.1.186 [host down]
+Nmap scan report for 192.168.1.187 [host down]
+Nmap scan report for 192.168.1.188 [host down]
+Nmap scan report for 192.168.1.189 [host down]
+Nmap scan report for 192.168.1.190 [host down]
+Nmap scan report for 192.168.1.191 [host down]
+Nmap scan report for 192.168.1.192 [host down]
+Nmap scan report for 192.168.1.193 [host down]
+Nmap scan report for 192.168.1.194 [host down]
+Nmap scan report for 192.168.1.195 [host down]
+Nmap scan report for 192.168.1.196 [host down]
+Nmap scan report for 192.168.1.197 [host down]
+Nmap scan report for 192.168.1.198 [host down]
+Nmap scan report for 192.168.1.199 [host down]
+Nmap scan report for 192.168.1.200 [host down]
+Nmap scan report for 192.168.1.201 [host down]
+Nmap scan report for 192.168.1.202 [host down]
+Nmap scan report for 192.168.1.203 [host down]
+Nmap scan report for 192.168.1.204 [host down]
+Nmap scan report for 192.168.1.205 [host down]
+Nmap scan report for 192.168.1.206 [host down]
+Nmap scan report for 192.168.1.207 [host down]
+Nmap scan report for 192.168.1.208 [host down]
+Nmap scan report for 192.168.1.209 [host down]
+Nmap scan report for 192.168.1.210 [host down]
+Nmap scan report for 192.168.1.211 [host down]
+Nmap scan report for 192.168.1.212 [host down]
+Nmap scan report for 192.168.1.213 [host down]
+Nmap scan report for 192.168.1.214 [host down]
+Nmap scan report for 192.168.1.215 [host down]
+Nmap scan report for 192.168.1.216 [host down]
+Nmap scan report for 192.168.1.217 [host down]
+Nmap scan report for 192.168.1.218 [host down]
+Nmap scan report for 192.168.1.219 [host down]
+Nmap scan report for 192.168.1.220 [host down]
+Nmap scan report for 192.168.1.221 [host down]
+Nmap scan report for 192.168.1.222 [host down]
+Nmap scan report for 192.168.1.223 [host down]
+Nmap scan report for 192.168.1.224 [host down]
+Nmap scan report for 192.168.1.225 [host down]
+Nmap scan report for 192.168.1.226 [host down]
+Nmap scan report for 192.168.1.227 [host down]
+Nmap scan report for 192.168.1.228 [host down]
+Nmap scan report for 192.168.1.229 [host down]
+Nmap scan report for 192.168.1.230 [host down]
+Nmap scan report for 192.168.1.231 [host down]
+Nmap scan report for 192.168.1.232 [host down]
+Nmap scan report for 192.168.1.233 [host down]
+Nmap scan report for 192.168.1.234 [host down]
+Nmap scan report for 192.168.1.235 [host down]
+Nmap scan report for 192.168.1.236 [host down]
+Nmap scan report for 192.168.1.237 [host down]
+Nmap scan report for 192.168.1.238 [host down]
+Nmap scan report for 192.168.1.239 [host down]
+Nmap scan report for 192.168.1.240 [host down]
+Nmap scan report for 192.168.1.241 [host down]
+Nmap scan report for 192.168.1.242 [host down]
+Nmap scan report for 192.168.1.243 [host down]
+Nmap scan report for 192.168.1.244 [host down]
+Nmap scan report for 192.168.1.245 [host down]
+Nmap scan report for 192.168.1.246 [host down]
+Nmap scan report for 192.168.1.247 [host down]
+Nmap scan report for 192.168.1.248 [host down]
+Nmap scan report for 192.168.1.249 [host down]
+Nmap scan report for 192.168.1.250 [host down]
+Nmap scan report for 192.168.1.251 [host down]
+Nmap scan report for 192.168.1.252 [host down]
+Nmap scan report for 192.168.1.253 [host down]
+Nmap scan report for 192.168.1.254 [host down]
+Nmap scan report for 192.168.1.255 [host down]
+Initiating Parallel DNS resolution of 1 host. at 17:04
+Completed Parallel DNS resolution of 1 host. at 17:04, 0.01s elapsed
+Initiating SYN Stealth Scan at 17:04
+Scanning 2 hosts [2 ports/host]
+Discovered open port 445/tcp on 192.168.1.101
+Discovered open port 139/tcp on 192.168.1.101
+Completed SYN Stealth Scan at 17:04, 0.02s elapsed (4 total ports)
+Nmap scan report for 192.168.1.1
+Host is up (0.0078s latency).
+PORT    STATE  SERVICE
+139/tcp closed netbios-ssn
+445/tcp closed microsoft-ds
+MAC Address: F0:EB:D0:22:46:B4 (Shanghai Feixun Communication Co.)
+
+Nmap scan report for 192.168.1.101
+Host is up (0.00035s latency).
+PORT    STATE SERVICE
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+MAC Address: 00:5A:39:B0:ED:D2 (Shenzhen Fast Technologies CO.)
+
+Initiating SYN Stealth Scan at 17:04
+Scanning 192.168.1.107 [2 ports]
+Completed SYN Stealth Scan at 17:04, 0.00s elapsed (2 total ports)
+Nmap scan report for 192.168.1.107
+Host is up (0.00013s latency).
+PORT    STATE  SERVICE
+139/tcp closed netbios-ssn
+445/tcp closed microsoft-ds
+
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 256 IP addresses (3 hosts up) scanned in 2.47 seconds
+           Raw packets sent: 515 (14.516KB) | Rcvd: 11 (420B)
+
+
+root@kali:~# nmap -v -p 139,445 192.168.1.0/24 --open
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-06 17:07 CST
+Initiating ARP Ping Scan at 17:07
+Scanning 255 hosts [1 port/host]
+Completed ARP Ping Scan at 17:07, 2.28s elapsed (255 total hosts)
+Initiating Parallel DNS resolution of 255 hosts. at 17:07
+Completed Parallel DNS resolution of 255 hosts. at 17:07, 0.04s elapsed
+Initiating Parallel DNS resolution of 1 host. at 17:07
+Completed Parallel DNS resolution of 1 host. at 17:07, 0.01s elapsed
+Initiating SYN Stealth Scan at 17:07
+Scanning 3 hosts [2 ports/host]
+Discovered open port 139/tcp on 192.168.1.101
+Discovered open port 445/tcp on 192.168.1.101
+Completed SYN Stealth Scan at 17:07, 0.89s elapsed (6 total ports)
+Nmap scan report for 192.168.1.101
+Host is up (0.00033s latency).
+PORT    STATE SERVICE
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+MAC Address: 00:5A:39:B0:ED:D2 (Shenzhen Fast Technologies CO.)
+
+Initiating SYN Stealth Scan at 17:07
+Scanning 192.168.1.107 [2 ports]
+Completed SYN Stealth Scan at 17:07, 0.00s elapsed (2 total ports)
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 256 IP addresses (4 hosts up) scanned in 3.33 seconds
+           Raw packets sent: 517 (14.604KB) | Rcvd: 15 (556B)
+
+root@kali:~# nmap 192.168.1.132 -p139,445 --script=smb-os-discovery.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-06 17:12 CST
+Nmap scan report for 192.168.1.134
+Host is up (0.00076s latency).
+PORT    STATE SERVICE 
+139/tcp open  netbois-ssn     
+445/tcp open  microsoft-dn
+MAC Address: C8:3A:35:CA:46:91(Tenda Technology Co.)
+
+Host script results:
+|  smb-os-discovery
+|    OS: Windows 8 Pro 9200(Windows 8 Pro 6.2) 
+|    OS CPE: cpe:/o:microsoft:windows_8::-
+|    NetBIOS computer name: VV
+|    workgroup: WORKGROUP
+|_   System time: 2015-08-12T18:16:12+08:00
+
+Nmap done: 1 IP address (1 host up) scanned in 2.87 seconds
+
+
+root@kali:~# nmap -v -p 139,145 --script=smb-check-vulns --script-args=unsafe=1 1.1.1.1
+                       //扫描指定的目标,同时检测相关漏洞 
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-06 19:39 CST
+NSE: Loaded 1 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 19:39
+Completed NSE at 19:39, 0.00s elapsed
+Initiating Ping Scan at 19:39
+Scanning 1.1.1.1 [4 ports]
+Completed Ping Scan at 19:40, 3.01s elapsed (1 total hosts)
+Nmap scan report for 1.1.1.1 [host down]
+NSE: Script Post-scanning.
+Initiating NSE at 19:40
+Completed NSE at 19:40, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 3.42 seconds
+           Raw packets sent: 8 (304B) | Rcvd: 0 (0B)
+
+root@kali:~# nmap -v -p 139,145 --script=smb-check-vulns --script-args=unsafe=1 1.1.1.1 -Pn
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-06 19:40 CST
+NSE: Loaded 1 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 19:40
+Completed NSE at 19:40, 0.00s elapsed
+Initiating Parallel DNS resolution of 1 host. at 19:40
+Completed Parallel DNS resolution of 1 host. at 19:40, 0.02s elapsed
+Initiating SYN Stealth Scan at 19:40
+Scanning 1.1.1.1 [2 ports]
+Completed SYN Stealth Scan at 19:40, 3.01s elapsed (2 total ports)
+NSE: Script scanning 1.1.1.1.
+Initiating NSE at 19:40
+Completed NSE at 19:40, 0.00s elapsed
+Nmap scan report for 1.1.1.1
+Host is up.
+PORT    STATE    SERVICE
+139/tcp filtered netbios-ssn
+145/tcp filtered unknown
+
+NSE: Script Post-scanning.
+Initiating NSE at 19:40
+Completed NSE at 19:40, 0.00s elapsed
+Read data files from: /usr/bin/../share/nmap
+Nmap done: 1 IP address (1 host up) scanned in 3.34 seconds
+           Raw packets sent: 4 (176B) | Rcvd: 0 (0B)
+
+
+root@kali:~# nmap 192.168.1.133,134 -p139,445 --script=smb-os-discovery.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-06 17:12 CST
+Nmap scan report for 192.168.1.134
+Host is up (0.00076s latency).
+PORT    STATE SERVICE 
+139/tcp open  netbois-ssn     
+445/tcp open  microsoft-dn
+MAC Address: 08:00:27:FB:OB:AA(Tenda Technology Co.)
+
+Host script results:
+|  smb-os-discovery
+|    OS: Windows XP(Windows 2000 LAN Manager) 
+|    OS CPE: cpe:/o:microsoft:windows_xp:-
+|    Computer name: xp
+|    NetBIOS computer name: XP
+|    workgroup: WORKGROUP
+|_   System time: 2015-08-12T18:25:16+08:00
+
+Nmap scan report for 192.168.1.134
+Host is up (0.00076s latency).
+PORT    STATE SERVICE 
+139/tcp open  netbois-ssn     
+445/tcp open  microsoft-dn
+MAC Address: 08:00:27:FB:OB:AA(Tenda Technology Co.)
+
+Host script results:
+|  smb-os-discovery
+|    OS: Unix(Samba 3.0.20-Debian) 
+|    NetBIOS computer name: 
+|    workgroup: WORKGROUP
+|_   System time: 2015-08-12T06:48:16-04:00
+
+Nmap done: 2 IP address (1 host up) scanned in 2.87 seconds
+
+
+root@kali:~# nbtscan
+
+NBTscan version 1.5.1. Copyright (C) 1999-2003 Alla Bezroutchko.
+This is a free software and it comes with absolutely no warranty.
+You can use, distribute and modify it under terms of GNU GPL.
+
+Usage:
+nbtscan [-v] [-d] [-e] [-l] [-t timeout] [-b bandwidth] [-r] [-q] [-s separator] [-m retransmits] (-f filename)|(<scan_range>) 
+	-v		verbose output. Print all names received
+			from each host
+	-d		dump packets. Print whole packet contents.
+	-e		Format output in /etc/hosts format.
+	-l		Format output in lmhosts format.
+			Cannot be used with -v, -s or -h options.
+	-t timeout	wait timeout milliseconds for response.
+			Default 1000.
+	-b bandwidth	Output throttling. Slow down output
+			so that it uses no more that bandwidth bps.
+			Useful on slow links, so that ougoing queries
+			don't get dropped.
+	-r		use local port 137 for scans. Win95 boxes
+			respond to this only.
+			You need to be root to use this option on Unix.
+	-q		Suppress banners and error messages,
+	-s separator	Script-friendly output. Don't print
+			column and record headers, separate fields with separator.
+	-h		Print human-readable names for services.
+			Can only be used with -v option.
+	-m retransmits	Number of retransmits. Default 0.
+	-f filename	Take IP addresses to scan from file filename.
+			-f - makes nbtscan take IP addresses from stdin.
+	<scan_range>	what to scan. Can either be single IP
+			like 192.168.1.1 or
+			range of addresses in one of two forms: 
+			xxx.xxx.xxx.xxx/xx or xxx.xxx.xxx.xxx-xxx.
+Examples:
+	nbtscan -r 192.168.1.0/24
+		Scans the whole C-class network.
+	nbtscan 192.168.1.25-137
+		Scans a range from 192.168.1.25 to 192.168.1.137
+	nbtscan -v -s : 192.168.1.0/24
+		Scans C-class network. Prints results in script-friendly
+		format using colon as field separator.
+		Produces output like that:
+		192.168.0.1:NT_SERVER:00U
+		192.168.0.1:MY_DOMAIN:00G
+		192.168.0.1:ADMINISTRATOR:03U
+		192.168.0.2:OTHER_BOX:00U
+		...
+	nbtscan -f iplist
+		Scans IP addresses specified in file iplist.
+
+oot@kali:~# nbtscan -r 192.168.1.0/24
+Doing NBT name scan for addresses from 192.168.1.0/24
+
+IP address       NetBIOS Name     Server    User             MAC address      
+------------------------------------------------------------------------------
+192.168.1.0	Sendto failed: Permission denied
+192.168.1.101    ADMIN1502121657  <server>  <unknown>        00:5a:39:b0:ed:d2
+192.168.1.107    <unknown>                  <unknown>        
+192.168.1.255	Sendto failed: Permission denied
+
+root@kali:~# enum4linux -a 192.168.1.133
+Starting enum4linux v0.8.9 ( http://labs.portcullis.co.uk/application/enum4linux/ ) on Tue Oct  6 20:56:00 2015
+
+ ========================== 
+|    Target Information    |
+ ========================== 
+Target ........... 192.168.1.133
+RID Range ........ 500-550,1000-1050
+Username ......... ''
+Password ......... ''
+Known Usernames .. administrator, guest, krbtgt, domain admins, root, bin, none
+
+
+ ===================================================== 
+|    Enumerating Workgroup/Domain on 192.168.1.133    |
+ ===================================================== 
+[E] Can't find workgroup/domain
+
+
+ ============================================= 
+|    Nbtstat Information for 192.168.1.133    |
+ ============================================= 
+Looking up status of 192.168.1.133
+         xp              <00> -         B <ACTIVE> Workstation Service
+         WORKGROUP       <00> - <GROUP> B <ACTIVE> Domain/Workgroup Name
+
+         MAC Address = 08=00-27-FB-0B-AA
+
+ ====================================== 
+|    Session Check on 192.168.1.133    |
+ ====================================
+Use of uninitialized value $global_workgroup in concatenation (.) or string at ./enum4linux.pl line 437.== 
+[E] Server doesn't allow session using username '', password ''.  Aborting remainder of tests.
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃SMTP扫描                                                                                          ┃
+┃nc -nc 1.1.1.1 25                                                                                 ┃
+┃    VRFY root                                                                                     ┃
+┃nmap smtp.163.com -p25 --script=script-enum-users.nse --script-args=smtp-enum-user.methods={VRFY} ┃
+┃nmap smtp.163.com -p25 --script=script-open-relay.nse                                             ┃
+┃smtp-user-enum -M VRFY -U users.txt -t 10.0.0.1                                                   ┃
+┃./smtp.py
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╭────────────────────────────────────────────╮
+[smtp.py]
+#!/usr/bin/python
+
+import socket
+import sys
+
+if len(sys.argv)!=2"
+  print "Usage: setp.py <username>"
+  sys.exit(0)
+
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+connect=s.connect(('192.168.1.134',25))
+banner=s.recv(1024)
+print banner + 'aaaaaaaaaaaa'
+s.send('RCPT ' + sys.argv[1] + '\r\n')
+helo
+result=s.recv(1024)
+print result
+s.close
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./smtp.py zhangsan
+root@kali:~# nc smtp.163.com 25
+helo 163.com
+VRFY zhangsan
+AUTH
+root@kali:~# 

@@ -1,0 +1,208 @@
+下载
+  http://java.sun.com/javase/downloads/index.jsp
+解包拷贝
+  tar-xzvf /root/jdk-7u45-linux-x64.tar.gz
+  mv jdk1.7.0_45/opt
+  cd/opt/jdk1.7.0_45
+安装注册
+  update-alternatives --install /usr/bin/java java/opt/jdk1.7.0_45/bin/java 1
+  update-alternatives --install /usr/bin/javac javac/opt/jdk1.7.0_45/bin/javac 1
+  update-alternatives --install /usr/bin/mozilla/plugins/libjavaplgin.so mozilla-javaplugin.so/opt/jdk1.7.0_45/jre/lib/amd64/libnpjp2.so 1
+
+root@kali:~/Desktop# tar-xzvf /root/jdk-8u45-linux-x64.tar.gz    //解压安装包
+
+root@kali:~/Desktop# mv jdk1.8.0_45/ /usr/bin/     //移动dk1.8.0_45到/usr/bin/的目录里
+
+root@kali:~/Desktop# cd /usr/bin                  //打开/usr/bin目录
+
+root@kali:~/Desktop# ls -d java                  //查看java里面的文件
+
+root@kali:~/usr/bin# update-alternatives --install /usr/bin/java java/opt/jdk1.8.0_45/bin/java 1
+
+root@kali:~/usr/bin# update-alternatives --install /usr/bin/javac javac/opt/jdk1.8.0_45/bin/javac 1
+
+root@kali:~/usr/bin# update-alternatives --install /usr/bin/mozilla/plugins/libjavaplgin.so mozilla-javaplugin.so/opt/jdk1.8.0_45/jre/lib/amd64/libnpjp2.so 1
+
+默认设置
+update-alternatives --set java /opt/jdk 1.7.0_45/bin/java
+update-alternatives --set javac /opt/jdk 1.7.0_45/bin/java
+update-alternatives --set mozilla-javaplugin.so/opt/jdk1.7.0_45/jre/lib/amd64/libnpjp2.so
+验证
+java -version
+http://www.java.com/en/download/installed.jsp
+
+root@kali:~/usr/bin# update-alternatives --set java /opt/jdk 1.7.0_45/bin/java
+
+root@kali:~/usr/bin# update-alternatives --set javac /opt/jdk 1.7.0_45/bin/java
+
+root@kali:~/usr/bin# update-alternatives --set mozilla-javaplugin.so/opt/jdk1.7.0_45/jre/lib/amd64/libnpjp2.so
+
+
+root@kali:~# java -version        //查看java版本
+
+安装显卡驱动
+GPU的用途
+  Nvidia
+  Ati
+Nvidia
+  apt-get update
+  apt-get dist-upgrade
+  apt-get install -y linux-headers-$(uname -r)
+  apt-get install nvidia-kernel-dkms
+  sed's/quiet/quiet nouveau.modeset=0/g' -i /etc/default/grub
+  update-grub
+  reboot
+验证
+  glxinfo | grep -i "direct rendeing"
+       direct rendeing:Yes
+
+无线网卡补丁
+  最新版内核已经集成无线驱动补丁
+  如果你在使用老版本内核
+    cd/usr/src/
+    wget http://www.kernel.org/pub/linux/kernel/projects/backprots/stable/v3.12/backports-3.12-1.tar.bz2
+    tar xvf backport-3.12-1.tar.bz2
+    cd backports-3.12-1
+    opt-get install patch
+    wget http://patches.aircrack.org/mac80211.compat08082009.wl_frag+ack_v1.patch
+    patch -p1 < mac80211.compat08082009.wl_frag+ack_v1.patch
+    apt-get install libncurses5-dev
+    airmon-ng  （查看驱动）
+    mack defconfig-ath9k
+    mack && mack install
+
+root@kali:~# uname -a
+Linux kali 3.18.0-kali3-amd64 #1 SMP Debian 3.18.6-1-kali2(2015-03-02) x86_64 GNU/Linux
+
+并发线程限制
+  Uimite用于限制当前shell内进程的资源使用
+  查看默认值
+      Ulimite -a
+  全局配置文件 ：/etc/security/limits
+      <domain><type><item><value>
+  用途距离
+      限制堆栈大小：ulimit -s 100
+      限制shell内存使用：ulimit -m 5000 -v 5000
+  没有直接对socket数量的限制参数
+      Linux系统中一切都是文件，运行中的文件叫做进程
+      ulimite -n 800000
+
+root@kali:~# ulimite -a
+core file size            (blocks, -c) 0
+data seg size             (kbytes, -d) unlimited
+scheduling priority               (-e) 0
+file size                 (blocks, -f) unlimited
+pending signals                   (-i) 7962
+max locked memory         (kbytes, -l) 64
+max memory size           (kbytes, -m) unlimited
+open files                        (-n) 1024
+pipe size             (512 kbytes, -p) 8
+POSIX message queues      (kbytes, -q) 819200
+real-time priority                (-r) 0
+stack size                (kbytes, -s) 8192
+cpu time                 (seconds, -t) unlimited
+max user processes                (-u) 7962
+virtual memory            (kbytes, -v) unlimited
+file locks                        (-x) unlimited
+
+root@kali:~# ulimit -s 100    //限制堆栈大小
+
+root@kali:~# ulimit -m 5000 -v 5000     //限制shell内存使用
+
+root@kali:~# vi .bashrc 
+
+root@kali:~#  ulimit -n 900000      //限制文件90万
+
+电源优化
+  渗透测试系统耗电较大
+  延长电池的寿命
+     无操作挂起、关闭显示器
+     降低显示器亮度
+     不使用时关闭无线网卡
+     开启硬盘省电选项
+        hdparm -i/dev/sda if AdvancedPM=yes then hdparm -B 1 -S 12/dev/sda
+     启动笔记本模式
+
+点击root----->系统设置----->电源
+在此时间内无操作则挂起：10分钟
+关闭屏幕
+
+
+
+笔记本模式
+#!/bin/bash
+
+ currentMode=$(cat /proc/sys/vm/laptop_mode)
+
+ if[$courrentMode -eq 0]
+ then
+ echo "5"> /proc/sys/vm/laptop_mode
+ echo "Laptop Mode Enabled"
+ else
+ echo "0"> /proc/sys/vm/laptop_mode
+ echo "Laptop Mode Enabled"
+ fi
+
+root@kali:~/Desktop# vi 1.sh
+#!/bin/bash
+
+ currentMode=$(cat /proc/sys/vm/laptop_mode)
+
+ if[$courrentMode -eq 0]
+ then
+ echo "5"> /proc/sys/vm/laptop_mode
+ echo "Laptop Mode Enabled"
+ else
+ echo "0"> /proc/sys/vm/laptop_mode
+ echo "Laptop Mode Enabled"
+ fi
+按wq保存！
+
+root@kali:~/Desktop# chmod a+x 1.sh    //加上执行权限
+
+root@kali:~/Desktop# ./1.sh     
+Laotop Mode Enabled
+
+服务开关
+Kali linux 默认未开启所有网络服务
+update-rc.d ssh default
+    update-rc.d ssh start 20 2 3 4 5 .stop 20 0 1 6
+    运行级别 0 — 6
+    update-rc.d A defaults 80 20
+    update-rc.d A defaults 90 10
+/etc/init.d/ssh start
+
+0表示关机，6表示重启，1表示单用户模式，2345表示多用户模式
+
+root@kali:~/Desktop# /etc/init.d/    //大量的服务启动脚本
+
+root@kali:~/etc/init.d/# ls -l
+
+root@kali:~/etc/init.d/# ./ssh start     //打开ssh
+[ ok ] Starting OpenBSd Secure Shell Sever. sshd
+
+root@kali:~/etc/init.d/# ./ssh stop      //关闭ssh
+[ ok ] Stopping OpenBSd Secure Shell Sever. sshd
+
+root@kali:~/etc/init.d/# netstat -pantu | grep :22
+
+root@kali:~/etc/init.d/# ./ssh Strat
+[ ok ] Starting OpenBSd Secure Shell Sever. sshd
+
+root@kali:~/etc/init.d/# netstat -pantu | grep :22
+tcp         0       0 0.0.0.0:22         0.0.0.0:*          LISTEN
+6165/sshd
+tcp6        0       0 :::22              :::*               LISTEN
+6165/sshd
+
+root@kali:~/etc/init.d/# update -rc.d ssh defaults      下次启动重新开启
+insserv: warining current start runlevel(s) (empty) of script 'ssh overrides LSB defaults (2 3 4 5)
+insserv: warining current stop runlevel(s) (2 3 4 5) of script 'ssh overrides LSB defaults (empty)
+
+数值越大表示优先级越低
+
+root@kali:~/etc/init.d/# cd
+
+root@kali:~# init 6  // 重启操作系统
+
+root@kali:~# init 0  // 关闭操作系统

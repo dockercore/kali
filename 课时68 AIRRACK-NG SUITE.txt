@@ -1,0 +1,160 @@
+课时68 AIRRACK-NG SUITE
+
+╋━━━━━━━━╋
+┃AIRRACK-NG SUITE┃
+┃   其他工具     ┃
+╋━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRDECAP-NG                                         ┃
+┃去除802.11头                                        ┃
+┃    airdecap-ng -b <AP MAC> 1.pcap                  ┃
+┃解密WEP加密数据                                     ┃
+┃    airdecap-ng -w <WEP key>-b <AP MAC> 1.pcap      ┃
+┃    必须有与AP建立关联关系                          ┃
+┃解密WPA加密数据                                     ┃
+┃    airdecap-ng -e kifi -p <PSK> -b <AP MAC> 1.pcap ┃
+┃    抓包文件中必须包含4步握手信息，否则无解         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  PID Name
+  875 wpa_supplicant
+ 1580 dhclient
+
+root@kali:~# airmon-ng start wlan2
+No interfering processes found
+PHY     Interface       Dirver             Chipset
+
+phy0    wlan2           ath9k_htc          Atheros Communications, Inc. AR9271 802.11n
+                 (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                 (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# airodump-ng wlan2mon
+CH  1][ Elapsed: 3 mins ][ 2015-11-18 21:11
+
+BSSID              PWR  Beacons    #Data, #/s   CH  MB  ENC   CIPHER AUTH ESSID
+
+14:75:90:21:4F:56  -47        3        5    0    6  54e. WPA2 CCMP   PSK  TP-LINK_4F56
+08:10:79:2A:29:7A  -65        4        0    0    6  54e. WPA2 CCMP   PSK  2-1-403
+D0:C7:C0:99:ED:3A  -69        7        8    0    1  54e  WPA2 CCMP   PSK  ziroom222
+5C:63:BF:F9:74:0C  -79        3        0    0    6  54e. WPA2 CCMP   PSK  TP-D03234
+BC:14:EF:A1:97:29  -84        3        0    0    1  54e  WPA2 CCMP   PSK  gehua01141406060486797
+
+BSSID              STATION            PWR    Rate    Lost     Frames  Probe
+
+(not associated)   C8:3A:35:CA:46:91   -53     0 - 1    5          2
+14:75:90:21:4F:56  78:92:9C:03:6F:18    -1     le- 0
+
+root@kali:~# airodump-ng wlan2mon --bssid 14:75:90:21:4F:56 -c 6 -w TP-01
+
+root@kali:~# wireshark tp-01.cap
+
+root@kali:~# airdecap-ng -e TP-LINK_4F56 -b 14:75:90:21:4F:56 -p wanshuyuan123456shangdi tp-01.cap
+Total number of packets read         41609
+Total number of WEP data packets         0
+Total number of WPA data packets     15034
+Number of plaintext data packets         0
+Number of decrypted WEP  packets         0
+Number of corrupted WEP  packets         0
+Number of decrypted WPA  packets      9417
+
+root@kali:~# wireshark tp-01-dec.cap 
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃AIRSERV-NG                          ┃
+┃通过网络提供无线网卡服务器          ┃
+┃    某些网卡不支持客户点/服务器模式 ┃
+┃启动无线侦听                        ┃
+┃服务器端                            ┃
+┃    airserv-ng -p 3333 -d wlan2mon  ┃
+┃客户端                              ┃
+┃    airodump-ng 192.168.1.1:3333    ┃
+┃某些防火墙会影响C/S间的通信         ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airserv-ng -p 3333 -d wlan2mon 
+OPenng card wlan2mon
+Setting chan l
+OPening sock port 333
+serving wlan2mon chan 1 on port 3333
+
+root@kali:~# netstat -pantu | grep 3333
+tcp        0      0 0.0.0.0:3333              0.0.0.0:*            LISTEN             2694/airserv-ng
+
+root@kali:~# airodump-ng 127.0.0.1:3333
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃AIRTUN-NG                           ┃
+┃无线入侵检测wIDS                    ┃
+┃    无线密码和BSSID                 ┃
+┃    需要获取握手信息                ┃
+┃中继和重放                          ┃
+┃    Repeate/Replay                  ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRTUN-NG                                                   ┃
+┃wIDS                                                        ┃
+┃    WEP: airtun-ng -a <AP MAC> -w SKA wlan2mon              ┃
+┃    WPA: airtun-ng -a <AP MAC> -p PSK -e kifi wlan2mon      ┃
+┃    ifconfig at0 up                                         ┃
+┃    四步握手                                                ┃
+┃    理论上支持多AP的wIDS,但2个AP以上时可靠性会下降          ┃
+┃        WPA: airtun-ng -a <AP MAC> -p PSK -e kifi1 wlan2mon ┃
+┃        ifconfig at1 up                                     ┃
+┃        多AP不同信道时airodump -c 1,11 wlan2mon             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airtun-ng -a 14:75:90:21:4F:56 -p wanshuyuan123456shangdi -e TP-LINK_4F56 wlan2mon
+created tap interface at0
+WPA encryption specified Sending and receiving frame through wlan2mon
+Froms bit set in all frames.
+
+root@kali:~# ifconfig -a         //at0
+
+root@kali:~# ifcongif at0 up
+
+root@kali:~# airodump-ng wlan2mon --bssid 14:75:90:21:4F:56 -c 6 
+
+root@kali:~# driftnet -i at0    //抓取图片信息
+
+root@kali:~# dsniff -i at0     //抓取账号密码信息
+
+root@kali:~# cp ids.pcap /media/sf_D_DRIVE/     //把数据分析拷贝到D盘里
+
+另外一个渗透系统
+yuanfh@VB:~$ sudo -i
+
+root@VB:~# cp /media/sf_D_DRIVE/ids.pcap
+
+root@VB:~# tcpreplay -ieth1 -M1000 ids.pcap
+Sending out eth1
+processing file: ids.pcap
+Actual: 8497 packets (4090599 bytes) sent in 1.87 seconds
+Rated: 2187486.0 bps, 16.96 Mbps, 4543.85 pps
+Statistics for network device: eth1
+        Attempted packets:         8487
+        Successful packets:        8497
+        Failed packets:            0
+        Retried packets (ENOBUFS): 0
+        Retried packets (EAGAIN):  0
+
+
+
+
+
+
+
+
+
+
+
+
+
+

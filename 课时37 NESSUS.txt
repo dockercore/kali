@@ -1,0 +1,118 @@
+课时37 NESSUS
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃NESSUS                                                                    ┃
+┃家庭版                                                                    ┃
+┃    免费                                                                  ┃
+┃专业版                                                                    ┃
+┃    收费、无限的并发链接                                                  ┃
+┃下载                                                                      ┃
+┃    http://www.tenable.com/products/nessus/select-your-operating-system   ┃
+┃安装                                                                      ┃
+┃    dpkg -i                                                               ┃
+┃    安装路径: /opt/nessus                                                 ┃
+┃启动服务                                                                  ┃
+┃    /etc/init.d/nessusd start                                             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+Nessus Home----->Linux----->Nessus-6.4.3-debian6_i386.deb
+
+root@kali:~/下载# ls
+Ant Videos  Nessus-6.4.3-debian6_i386.deb  thc-ipv6-2.7  thc-ipv6-2.7.tar.gz
+root@kali:~/下载# dpkg -i Nessus-6.4.3-debian6_i386.deb
+正在选中未选择的软件包 nessus。
+(正在读取数据库 ... 系统当前共安装有 337644 个文件和目录。)
+正准备解包 Nessus-6.4.3-debian6_i386.deb  ...
+正在解包 nessus (6.4.3) ...
+nessusd: no process found
+nessus-service: no process found
+正在设置 nessus (6.4.3) ...
+Unpacking Nessus Core Components...
+nessusd (Nessus) 6.4.3 [build M20035] for Linux
+Copyright (C) 1998 - 2015 Tenable Network Security, Inc
+
+Processing the Nessus plugins...
+[##################################################]
+
+All plugins loaded (1sec)
+
+ - You can start nessusd by typing /etc/init.d/nessusd start
+ - Then go to https://kali:8834/ to configure your scanner
+
+正在处理用于 systemd (215-17+deb8u1) 的触发器 .
+
+root@kali:~/下载# /etc/init.d/nessusd start
+$Starting Nessus : .
+
+root@kali:~/下载# /etc/init.d/nessusd status
+Nessus is running
+
+https://kali:8834/#/
+
+    感谢您安装Nessus漏洞扫描器的世界领袖。Nessus将允许您执行:
+    高速漏洞的发现,来确定哪些主机正在运行的服务无代理审计,确保
+没有主机网络丢失的安全补丁合规检查,确认每台主机网络坚持您的安全
+政策扫描调度,自动运行扫描频率选择和更多!
+   在这个过程中,您将创建一个管理账户,注册您的扫描仪,并下载最新
+的插件
+
+继续
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃NESSUS                                            ┃
+┃管理地址                                          ┃
+┃    https://127.0.0.1:8834                        ┃
+┃注册激活码                                        ┃
+┃    http://www.tenable.com/products/nessus-home   ┃
+┃管理账号                                          ┃
+┃    更新插件                                      ┃
+┃基本配置(setting)                                 ┃
+┃    升级                                          ┃
+┃    账号                                          ┃
+┃    SMTP                                          ┃
+┃    代理                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~/下载# /etc/init.d/nessusd start
+$Starting Nessus : .
+
+root@kali:~/下载# /etc/init.d/nessusd status
+Nessus is running
+
+root@kali:~/下载# cd opt
+bash: cd: opt: 没有那个文件或目录
+
+root@kali:~/下载# cd /opt/
+
+root@kali:/opt# cd /opt/nessus/
+
+root@kali:/opt/nessus# ls
+bin  com  etc  lib  sbin  var
+
+root@kali:/opt/nessus# cd sbin/
+
+root@kali:/opt/nessus/sbin# ls
+nessus-check-signature  nessuscli  nessusd  nessus-service
+
+╋━━━━━━━━╋
+┃NESSUS          ┃
+┃策略            ┃
+┃扫描            ┃
+┃扫描主机        ┃
+┃扫描windows     ┃
+┃扫描linux       ┃
+┃扫描网络设备    ┃
+┃扫描web server  ┃
+┃报告            ┃
+┃调度            ┃
+╋━━━━━━━━╋
+
+───────────────
+CVSS score      Criticality
+───────────────
+0               Info
+<4              Low
+<7              Medium
+<10             High
+10              Critical
+───────────────

@@ -1,0 +1,470 @@
+课时27 主动信息收集-发现（四）
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃发现-----四层发现                       ┃ 
+┃  优点                                  ┃
+┃     可路由且结果可靠                   ┃
+┃     不太可能被防火墙过滤               ┃
+┃     甚至可以发现所有端口都被过滤的主机 ┃
+┃  缺点                                  ┃
+┃     基于状态过滤的防火墙可能过滤扫描   ┃
+┃     全端口扫描速度慢                   ┃
+┃  TCP                                   ┃
+┃     未经请求的ACK-----RST              ┃
+┃     SYN-----SYN/ACK、RST               ┃
+┃  UDP                                   ┃
+┃     ICMP端口不可达、一去不复返         ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃发现-----四层发现                                           ┃
+┃ACK-----TCP Port-----RST                                    ┃
+┃Scapy                                                       ┃
+┃    i=IP()                                                  ┃
+┃    i.dst"1.1.1.1"                                          ┃
+┃    t=TCP()                                                 ┃
+┃    t.flags='A'                                             ┃
+┃    r=(i/t)                                                 ┃
+┃    a=sr1(r)                                                ┃
+┃    a.display()                                             ┃
+┃a=sr1(IP(dst="1.1.1.1")/TCP(dport=80,flags='A'),timeout=1)) ┃
+┃ACK_ping.py                                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# scapy
+WARNING: No route found for IPv6 destination :: (no default route?)
+Welcome to Scapy (2.2.0)
+>>> i=IP()
+>>> t=TCP()
+>>> r=(i/t)
+>>> r[IP].dst="192.168.1.138"
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.138
+  \options\
+###[ TCP ]###
+     sport= ftp_data
+     dport= http
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= S
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}
+>>> r[TCP].flags="A"
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.138
+  \options\
+###[ TCP ]###
+     sport= ftp_data
+     dport= http
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= A
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}
+>>> a=sr1(r)
+Begin emission:
+.*Finished to send 1 packets.
+
+Received 2 packets, got 1 answers, remaining 0 packets
+>>> a.display()
+###[ IP ]###
+  version= 4L
+  ihl= 5L
+  tos= 0x0
+  len= 40
+  id= 18868
+  flags= 
+  frag= 0L
+  ttl= 128
+  proto= tcp
+  chksum= 0x20c0
+  src= 192.168.1.138
+  dst= 192.168.77.129
+  \options\
+###[ TCP ]###
+     sport= http
+     dport= ftp_data
+     seq= 0
+     ack= 0
+     dataofs= 5L
+     reserved= 0L
+     flags= R
+     window= 32767
+     chksum= 0x5f21
+     urgptr= 0
+     options= {}
+###[ Padding ]###
+        load= '\x00\x00\x00\x00\x00\x00'
+>>> r[TCP].dport=445
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.138
+  \options\
+###[ TCP ]###
+     sport= ftp_data
+     dport= microsoft_ds
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= A
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}
+>>> a1=sr1(r)
+Begin emission:
+.*Finished to send 1 packets.
+
+Received 2 packets, got 1 answers, remaining 0 packets
+>>> a1.display()
+###[ IP ]###
+  version= 4L
+  ihl= 5L
+  tos= 0x0
+  len= 40
+  id= 19321
+  flags= 
+  frag= 0L
+  ttl= 128
+  proto= tcp
+  chksum= 0x1efb
+  src= 192.168.1.138
+  dst= 192.168.77.129
+  \options\
+###[ TCP ]###
+     sport= microsoft_ds
+     dport= ftp_data
+     seq= 0
+     ack= 0
+     dataofs= 5L
+     reserved= 0L
+     flags= R
+     window= 32767
+     chksum= 0x5db4
+     urgptr= 0
+     options= {}
+###[ Padding ]###
+        load= '\x00\x00\x00\x00\x00\x00'
+>>> r[IP].dst="192.168.1.11"
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.11
+  \options\
+###[ TCP ]###
+     sport= ftp_data
+     dport= microsoft_ds
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= A
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}
+>>> a2=sr1(r,timeout=1)
+Begin emission:
+.*Finished to send 1 packets.
+
+Received 2 packets, got 1 answers, remaining 0 packets
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.11
+  \options\
+###[ TCP ]###
+     sport= ftp_data
+     dport= microsoft_ds
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= A
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}
+>>> r[IP].dst="192.168.1.1"
+>>> r[TCP].dport=23419         //数字不需要双引号
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.1
+  \options\
+###[ TCP ]###
+     sport= ftp_data
+     dport= 23419
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= A
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}
+>>> a=sr1(r)
+Begin emission:
+.*Finished to send 1 packets
+.................
+>>> a=sr1(r,timeout=1)
+Begin emission:
+.Finished to send 1 packets.
+*
+Received 2 packets, got 0 answers, remaining 1 packets
+
+>>> a=sr1(IP(dst="192.168.1.127")/TCP(dport=80,flags="A"),timeout=1)
+Begin emission:
+......*Finished to send 1 packets.
+
+Received 7 packets, got 1 answers, remaining 0 packets
+>>> a
+<IP  version=4L ihl=5L tos=0x0 len=40 id=37320 flags= frag=0L ttl=128 proto=tcp chksum=0xd8b6 src=192.168.1.127 dst=192.168.77.129 options=[] |<TCP  sport=http dport=ftp_data seq=0 ack=0 dataofs=5L reserved=0L flags=R window=32767 chksum=0x5f2c urgptr=0 |<Padding  load='\x00\x00\x00\x00\x00\x00' |>>>
+>>> a=sr1(IP(dst="192.168.1.1")/TCP(dport=80,flags="A"),timeout=1)
+Begin emission:
+*Finished to send 1 packets.
+
+Received 1 packets, got 0 answers, remaining 1 packets
+
+╭────────────────────────────────────────────╮
+[ACK_Ping.py]
+#!/usr/bin/python
+import loggging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)!=2;
+  print "Usage - ./ACK Ping.py [/24 network address]"
+  print "Example - ./ACK Ping.py 1.1.1.0"
+  print "Example will perform a TCP ACK ping scan of the 1.1.1.0/24 range"
+  sys.exit()
+
+address=str(sys.argv[1])
+prefix= address.split('.')[0]+'.'+address.split('.')[1]+'.'+address.split('.')[2]+'.'
+
+for add in range[1,254]；
+  response=sr1(IP(dst=prefix+str(addr)/TCP(dport=22222,flags='A'),timeout=0.1,verbose=0)
+  try:
+    if int(response[TCP],flags)==4;
+       print prefix+str(addr)
+   except:
+     pass
+╰────────────────────────────────────────────╯
+
+root@kali:~# chmod u+x ACK_Ping.py
+
+root@kali:~# ./ACK_Ping.py
+
+root@kali:~# ./ACK_Ping.py   192.168.1.0
+
+╋━━━━━━━━━━━━━━━━╋
+┃发现-----四层发现               ┃
+┃  UDP-----UDP Port-----ICMP     ┃
+┃  u=UDP()                       ┃
+┃  u.dport=33333                 ┃
+┃  r=(i/u)                       ┃
+┃  a-sr1(r,timeout=1,verbose=1)  ┃
+┃  A.display()                   ┃
+┃    ICMP                        ┃
+┃                                ┃
+┃ UDP_Ping.py                    ┃
+┃   UDP发现不可靠                ┃
+╋━━━━━━━━━━━━━━━━╋
+
+>>> i=IP()
+>>> u=UDP()
+>>> r=(i/u)
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= udp
+  chksum= None
+  src= 127.0.0.1
+  dst= 127.0.0.1
+  \options\
+###[ UDP ]###
+     sport= domain
+     dport= domain
+     len= None
+     chksum= None
+>>> r[IP].dst="192.168.1.138"
+>>> r[TCP].dport=7345
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+  File "/usr/lib/python2.7/dist-packages/scapy/packet.py", line 770, in __getitem__
+    raise IndexError("Layer [%s] not found" % lname)
+IndexError: Layer [TCP] not found
+>>> r[UDP].dport=7345
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= udp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.138
+  \options\
+###[ UDP ]###
+     sport= domain
+     dport= 7345
+     len= None
+     chksum= None
+>>> a=sr1(r)
+Begin emission:
+.Finished to send 1 packets.
+.*
+Received 3 packets, got 1 answers, remaining 0 packets
+>>> a.display()
+>>> r[IP].dst="192.168.1.11"
+>>> a=sr1(r,timeout=1)
+Begin emission:
+.Finished to send 1 packets.
+
+Received 1 packets, got 0 answers, remaining 1 packets
+>>> r.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= udp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.11
+  \options\
+###[ UDP ]###
+     sport= domain
+     dport= 7345
+     len= None
+     chksum= None
+>>> a=sr1(r,timeout=1)
+Begin emission:
+Finished to send 1 packets.
+
+Received 0 packets, got 0 answers, remaining 1 packets
+>>> a=sr1(IP(dst="192.168.1.138")/UDP(dport=7456),timeout=1)
+Begin emission:
+.Finished to send 1 packets.
+
+Received 1 packets, got 0 answers, remaining 1 packets
+
+╭────────────────────────────────────────────╮
+[UDP_Ping.py]
+#!/usr/bin/python
+import loggging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)!=2;
+  print "Usage - ./ACK Ping.py [/24 network address]"
+  print "Example - ./ACK Ping.py 1.1.1.0"
+  print "Example will perform a TCP ACK ping scan of the 1.1.1.0/24 range"
+  sys.exit()
+
+address=str(sys.argv[1])
+prefix= address.split('.')[0]+'.'+address.split('.')[1]+'.'+address.split('.')[2]+'.'
+
+for add in range[1,254]；
+  response=sr1(IP(dst=prefix+str(addr)/UCP(dport=33333),timeout=0.1,verbose=0)
+  try:
+    if int(response[IP],proto)==1;
+       print prefix+str(addr)
+   except:
+     pass
+╰────────────────────────────────────────────╯
+root@kali:~# ./UDP_Ping.py 192.168.1.0
+
+root@kali:~# ./UDP_Ping.py 221.144.145.0
+

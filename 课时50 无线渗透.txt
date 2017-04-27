@@ -1,0 +1,174 @@
+课时50 无线渗透
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃无线渗透                                                      ┃
+┃与其他节章独立，涵盖面广，可独立成课                          ┃
+┃无线技术变化快，难度大                                        ┃
+┃既新鲜刺激有压力山大                                          ┃
+┃    我们不会研究很深                                          ┃
+┃一半理论 一半实践                                             ┃
+┃    理论是本章最有价值的部分(aircrack-ng suite作者写的一本书) ┃
+┃无线技术是本课程难度最大的一章                                ┃
+┃    协议结构                                                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━╋
+┃无线渗透                      ┃
+┃行业迅猛发展                  ┃
+┃互联网的重要入口              ┃
+┃边界模糊                      ┃
+┃安全实施缺失而且困难          ┃
+┃对技术不了解而造成配置不当    ┃
+┃企业网络私自接入AP破坏网络边界┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━╋
+┃         802.11标准           ┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃IEE                                                                       ┃
+┃Intitue of Electrical and Electronics Engineers                           ┃
+┃    由通信航天生物电气电子等方面的科学家组成，目的是制定标准，指导行业技术┃
+┃    的发展，目前成员近40万人                                              ┃
+┃IEEE分为不同的技术委员会（Committees）,其中80委员会复制lan、man标准的制定 ┃
+┃    以太网                                                                ┃
+┃    令牌环网                                                              ┃
+┃    无线局域网                                                            ┃
+┃    网桥                                                                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━╋
+┃无线                    ┃
+┃应用层                  ┃
+┃表示层                  ┃
+┃会话层                  ┃
+┃传输层                  ┃
+┃网络层                  ┃
+┃数据链路层              ┃
+┃    逻辑链路控制子层LLC ┃
+┃    媒体访问控制子层MAC ┃
+┃物理层                  ┃
+╋━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃IEEE 802.11标准                                                             ┃
+┃802委员会下第11组负责开发无线局域网标准                                     ┃
+┃IEEE 802.1 1 The Original WLAN Standard- 1 Mbit/s and 2 Mbit/w,2.4GHz RF and┃
+┃IR                                                                          ┃
+┃IEEE 802.11 a 54 Mbit/s,5 GHz                                               ┃
+┃IEEE 802.11 b 802.11 Enhancements to Support 5.5 Mbit/s and 11 Mbit/s       ┃
+┃IEEE 802.11 c Bridge Operation Procedure                                    ┃
+┃IEEE 802.11 d International (Country to Country) Roaming Extensions         ┃
+┃IEEE 802.11 e Quality of Service (Qos),Including Packet Bursting            ┃
+┃IEEE 802.11 F Inter -Access Point Protocol                                  ┃
+┃IEEE 802.11 g 54 Mbit/s,2.4 GHz                                             ┃
+┃IEEE 802.11 h Spectrum Managed 802.11 a (5 GHz) for European Compatibility  ┃
+┃IEEE 802.11 i Enhanced Security                                             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃无线                                                                ┃
+┃IEEE 802.11 j Extensions for Japan                                  ┃
+┃IEEE 802.11 k Radio Resource Measurement Enhancements               ┃
+┃IEEE 802.11 n Higher Throughput Using Multiple Input,Multiple Ouput ┃
+┃(MIMO) Antennas                                                     ┃
+┃IEEE 802.11 p Wireless Access for the Vehicular Environment (WAVE)  ┃
+┃IEEE 802.11 r Fast BSS Transition (FT)                              ┃
+┃IEEE 802.11 s Mesh Networking,Extended Service Set (ESS)            ┃
+┃IEEE 802.11 T Wireless Performance Prediction (WPP)                 ┃
+┃IEEE 802.11 u Internetworking with Non -802 Networks (i.e.:Cellular)┃
+┃IEEE 802.11 v wrieless Network Management                           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃无线                                                                ┃
+┃IEEE 802.11 w Protected Management Frames                           ┃
+┃IEEE 802.11 y 3650 - 3700 MHz Operation in the US                   ┃
+┃IEEE 802.11 z Direct Link Setup (DLS) Extensions                    ┃
+┃IEEE 802.11 zm Maintenance of the Standard                          ┃
+┃IEEE 802.11 aa Robust Streatming of Audio Video Transport Streams   ┃
+┃IEEE 802.11 ac Very High Troughput < 6 GHz                          ┃
+┃IEEE 802.11 ad Very High Troughput, 60 GHz                          ┃
+┃IEEE 802.11 ae Qos Management                                       ┃
+┃IEEE 802.11 af TV Whitespace                                        ┃
+┃IEEE 802.11 ah SUb 1 GHz                                            ┃
+┃IEEE 802.11 ai Fast Initial Link Setip                              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃日常使用                                                                              ┃
+┃IEEE 802.11 - The original WLAN standard                                              ┃
+┃IEEE 802.11 a - UP to 54 Mbit/s on 5 GHz                                              ┃
+┃IEEE 802.11 b - 5.5 Mbit/s and 11 Mbit/s  on 2.4 GHz                                  ┃
+┃IEEE 802.11 g - Up to 54 Mbit/s  on 2.4 GHz.Backward compatible with 802.11b          ┃
+┃IEEE 802.11 i - Provides enhanced security                                            ┃
+┃IEEE 802.11 n - Provides higher throughput with Multiple Input/Multiple Output (MIMO) ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                    ┃
+┃发布于1997年                                              ┃
+┃速率1Mbps或2Mbps                                          ┃
+┃红外线传输介质（未实现）                                  ┃
+┃无线射频信号编码（调制）（radio frequencies）             ┃
+┃    Direct-Sequence Spread-Spectrum (DSSS)-----直序扩频   ┃
+┃    Frequency Hopping Spread-Spectrum (FHSS)-----跳频扩频 ┃
+┃媒体访问方式-----CSMA/CA c=b+log2 (1+s/n)                 ┃
+┃    根据算法侦听一定时长                                  ┃
+┃    发送数据前发包声明                                    ┃
+┃Request to Send/Clear to Send (RTS/CTS)                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11b                                       ┃
+┃Complementary Code Keying (CCK)-----补充代码键┃
+┃    5.5 and 11 Mbit/s                         ┃
+┃    2.4GHz band (2.4GHz - 2.485GHz)           ┃
+┃    14个重叠的信道channels                    ┃
+┃    每个信道22MHz宽带                         ┃
+┃    只有三个完全不重叠的信道                  ┃
+┃美国 -1 to 11 (2.412 GHz - 2.462 GHz)         ┃
+┃欧洲 -1 to 13 (2.412 GHz - 2.472 GHz)         ┃
+┃日本 -1 to 14 (2.412 GHz - 2.482 GHz)         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11A                                                           ┃
+┃与802.11b几乎同时发布                                             ┃
+┃    因设备价格问题一直没有得到广泛使用                            ┃
+┃使用5GHz宽带                                                      ┃
+┃    2.4GHz宽带干扰源多（微波、蓝牙、无绳电话）                    ┃
+┃    5HGz频率有更多宽带空间，可容纳更多不重叠的信道                ┃
+┃    Orthogonal Frequency-Division Multiplexing (OFDM)信号调制方法 ┃
+┃        正交频分复用技术                                          ┃
+┃    更高速率54Mbps，每个信道20MHz宽带                             ┃
+┃    变频                                                          ┃
+┃        5.15-5.35GHz室内                                          ┃
+┃        5.7-5.8GHz室外                                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11G                                                       ┃
+┃2.4GHz                                                        ┃
+┃Orthogonal Frequency-Division Multiplexing (OFDM)信号调制方法 ┃
+┃与802.11a速率相同                                             ┃
+┃可全局江苏，向后兼容802.11b,并切换为CCK信号调制方法           ┃
+┃每个信号20/22MHz宽带                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11N                                                   ┃
+┃2.4或5 GHz频率                                            ┃
+┃    300Mbps最高600Mbps                                    ┃
+┃    Multiple-Input Multiple-Output (MIMO)多进多出通信技术 ┃
+┃    多天线，多无线电波，独立收发信号                      ┃
+┃    可以使用40MHz信道款单是数据传输速率翻倍               ┃
+┃全802.11n设备网络中，可以使用新报文格式，是速率达到最大   ┃
+┃每个信道20/40MHz宽带                                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━╋
+┃      无线网络运行模式        ┃
+╋━━━━━━━━━━━━━━━╋
+

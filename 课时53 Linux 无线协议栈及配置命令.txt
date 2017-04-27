@@ -1,0 +1,507 @@
+课时53 Linux 无线协议栈及配置命令
+
+╋━━━━━━━━━━━━━━━━╋
+┃   Linux无线协议栈及配置命令    ┃
+╋━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━╋
+┃802.11协议栈                    ┃
+┃leee80211                       ┃
+┃    iwconfig                    ┃
+┃    iwlist                      ┃
+┃mac80211                        ┃
+┃    iw                          ┃
+╋━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━╋
+┃无线网卡配置                    ┃
+┃查看无线网卡                    ┃
+┃    ifconfig                    ┃
+┃    iwconfig                    ┃
+┃    iw list                     ┃
+┃信道频道                        ┃
+┃    iwlist wlan2 frequency      ┃
+┃    iw list                     ┃
+╋━━━━━━━━━━━━━━━━╋
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2    Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+         UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:1200 (0.0 B)   TX bytes:1200 (0.0 B)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# iwlist
+Usage: iwlist [interface] scanning [essid NNN] [last]
+              [interface] frequency
+              [interface] channel
+              [interface] bitrate
+              [interface] rate
+              [interface] encryption
+              [interface] keys
+              [interface] power
+              [interface] txpower
+              [interface] retry
+              [interface] ap
+              [interface] accesspionts
+              [interface] peers
+              [interface] event
+              [interface] auth
+              [interface] wpakeys
+              [interface] genie
+              [interface] modulation
+
+root@kali:~# iw list
+wiphy phy0
+        max # scan SSIDs: 4
+        max scan IEs length: 2257 bytes
+        Retry short limit: 7
+        Retry long limit: 4
+        Coverage class: 0 (up to 0m)
+        Device supports RSN- IBSS
+        Device supports T-DLS.
+        Supported Ciphers:
+                * WEP40(00-0f-ac:1)
+                * WEP104(00-0f-ac:5）
+                * TKIP(00-0f-ac:2)
+                * CCMP(00-0f-ac:4)
+                * 00-0f-ac:10
+                * GCMP(00-0f-ac:8)
+                * 00-0f-ac:9
+                * CMAC(00-0f-ac:6)
+                * 00-0f-ac:13
+                * 00-0f-ac:11
+                * 00-0f-ac:12
+        Available Antennas: TX 0x1 RX 0x1
+        Configured Antennas: TX 0x1 RX 0x1
+        Supported interface modes:
+                 * IBSS
+                 * managed
+                 * AP
+                 * AP/VLAN
+                 * monitor
+                 * mesh ponit
+                 * P2P-GO
+        Band 1:
+                Capabilities: 0x116e
+                        HT20/HT40
+                        SM Power Save disabled
+                        RX HT20 SGI
+                        RX HT40 SGI
+                        RX STBC 1-stream
+                        Max AMSDU length: 3839 btyes
+                        DSSS/CCK HT40
+                Maximum RX AMPDU lenght 65535 bytes (exponent: 0x003)
+                Minimun RX AMPDU time spacing: 8 usec (0x06)
+                HT TX/RX MCS rate indexes supported: 0-7
+                Bitrates (non-HT):
+                       * 1.0 Mbps
+                       * 2.0 Mbps (short preamble supported)
+                       * 5.5 Mbps (short preamble supported)
+                       * 11.0 Mbps (short preamble supported)
+                       * 6.0 Mbps
+                       * 9.0 Mbps
+                       * 12.0 Mbps
+                       * 18.0 Mbps
+                       * 24.0 Mbps
+                       * 36.0 Mbps
+                       * 48.0 Mbps
+                       * 54.0 Mbps
+                Frequencies:
+                       * 2412 MHz [1] (20.0 dBm)
+                       * 2417 MHz [2] (20.0 dBm)
+                       * 2422 MHz [3] (20.0 dBm)
+                       * 2427 MHz [4] (20.0 dBm)
+                       * 2432 MHz [5] (20.0 dBm)
+                       * 2437 MHz [6] (20.0 dBm)
+                       * 2442 MHz [7] (20.0 dBm)
+                       * 2447 MHz [8] (20.0 dBm)
+                       * 2452 MHz [9] (20.0 dBm)
+                       * 2457 MHz [10] (20.0 dBm)
+                       * 2462 MHz [11] (20.0 dBm)
+                       * 2467 MHz [12] (20.0 dBm)
+                       * 2472 MHz [13] (20.0 dBm)
+                       * 2484 MHz [14] (20.0 dBm)
+        Supported commands:
+                 * new_interface
+                 * set-interface
+                 * new_key
+                 * start_ap
+                 * new_station
+                 * new_mpath
+                 * set_mesh_config
+                 * set_bss
+                 * authenticate
+                 * associate
+                 * deauthenticate
+                 * disassociate
+                 * join_ibss
+                 * join_mesh
+                 * remain_on_channel
+                 * set_tx_bitrate_mask
+                 * frame
+                 * frame_wait_cancel
+                 * set_wiphy_netns
+                 * set_channel
+                 * set_wds_peer
+                 * tdls_mgnt
+                 * tdls_oper
+                 * probe_client
+                 * set_noack_map
+                 * register_beacons
+                 * start_p2p_device
+                 * set_mcast_rate
+                 * Unknown command (104)
+                 * connect
+                 * disconnect
+        Supported TX frame type:
+                 * IBSS: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * managed: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * AP: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * AP/VLAN: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * mesh point: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * P2P-client: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * P2P-GO: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+                 * P2P-device: 0x00 0x10 0x20 0x30 0x40 0x50 0x60 0x70 0x80 0x90 0xb0 0xc0 0xd0 0xe0 0xf0
+        Supported RX frame types:
+                 * IBSS: 0x40 0xb0 0xc0 0xd0
+                 * managed: 0x40 0xd0
+                 * AP: 0x00 0x20 0x40 0xa0 0xb0 0xc0 0xd0
+                 * AP/VLAN: 0x00 0x20 0x40 0xa0 0xb0 0xc0 0xd0
+                 * mesh point: 0xb0 0xd0
+                 * P2P-client: 0x40 0xd0
+                 * P2P-GO: 0x00 0x20 0x40 0xa0 0xb0 0xc0 0xd0
+                 * P2P-device: 0x40 0xd0
+        software interface modes (can always be added):
+                 * AP/VLAN
+        valid interface combiations
+                 * #{ managed, P2P-client } <= 2, # { AP, mesh point, P2P-GO } <= 2,
+                   total <= 2, #channels <=1
+        HT Capability overrides:
+                 * MCS: ff ff ff ff ff ff ff ff ff ff
+                 * maximum A-MSDU length
+                 * supported channel width
+                 * short GI for 40 MHz
+                 * max A-MPDU length exponent
+                 * min MPDU start spcaing
+        Device supported TX status socket option
+        Device supported HT-IBSS
+        Device supported SAE with AUTHENTICATE command
+        Device supported low priority scan.
+        Device supported scan flush.
+        Device supported AP scan.
+        Device supported per-vif TX power setting
+        Device supported a userspace MPM
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃无线网卡配置                                            ┃
+┃扫描附近AP                                              ┃
+┃    iw dev wlan2 scan | grep SSID                       ┃
+┃    iw dev wlan2 scan | egrep "DS\ Parameter\ set|SSID" ┃
+┃    iwlist wlan2 scanning | egrep "ESSID|Channel"       ┃
+┃添加删除帧听端口                                        ┃
+┃    service network-manager stop                        ┃
+┃    iw dev wlan2 interface add wlan2mon type monitor    ┃
+┃        tcpdump -s 0 -i wlan2mon -p                     ┃
+┃    Iw dev wlan2mon interface del                       ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# iwlist wlan2 frequency
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+
+root@kali:~# iw dev wlan2 scan
+
+root@kali:~# iw dev wlan2 scan | grep SSID 
+        SSID: ziroom222
+        SSID: TP-LINK_chenjin
+        SSID: 2- 1- 403
+        SSID: TP-LINK_4F56
+        SSID: dlink
+        SSID: MERCURY_C087DE
+        SSID: TP-D03234
+        SSID: YW170
+        SSID: genhua011414006060486797
+
+root@kali:~# w dev wlan2 scan | egrep "DS\ Parameter\ set|SSID"
+        SSID: ziroom222
+        DS Parameter set: channel 1
+        SSID: TP-LINK_chenjin
+        DS Parameter set: channel 6
+        SSID: 2- 1- 403
+        DS Parameter set: channel 6
+        SSID: TP-LINK_4F56
+        DS Parameter set: channel 11
+        SSID: dlink
+        DS Parameter set: channel 6
+        SSID: MERCURY_C087DE
+        DS Parameter set: channel 11
+        SSID: TP-D03234
+        DS Parameter set: channel 1
+        SSID: genhua011414006060486797
+        DS Parameter set: channel 11
+
+root@kali:~# iwlist wlan2 scanning | egrep "ESSID|Channel"
+                    Channel:1
+                    Frequency:2.412 GHz (Channel 1)
+                    ESSID:"ziroom222"
+                    Channel:6
+                    Frequency:2.437 GHz (Channel 1)
+                    ESSID:"TP-LINK_chenjin"
+                    Channel:6
+                    Frequency:2.437 GHz (Channel 1)
+                    ESSID:"2- 1- 403"
+                    Channel:11
+                    Frequency:2.462 GHz (Channel 1)
+                    ESSID:"TP-LINK_4F56"
+                    Channel:6
+                    Frequency:2.437 GHz (Channel 1)
+                    ESSID:"dlink"
+                    Channel:11
+                    Frequency:2.462 GHz (Channel 1)
+                    ESSID:"MERCURY_C087DE"
+                    Channel:1
+                    Frequency:2.412 GHz (Channel 1)
+                    ESSID:"TP-D03234"
+                    Channel:11
+                    Frequency:2.462 GHz (Channel 1)
+                    ESSID:"TP-D03234"
+                    Channel:11
+                    Frequency:2.462 GHz (Channel 1)
+                    ESSID:"genhua011414006060486797"
+                    Channel:1
+                    Frequency:2.412 GHz (Channel 1)
+                    ESSID:"YW170"
+
+root@kali:~# iw dev wlan2 interface add wlan2mon type monitor
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# iw dev wlan2 interface add wlan2mon type monitor
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2    Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+         UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan0mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# ifconfig wlan2mon up
+SIOCSOFFLAGS: Name not unique on network
+
+root@kali:~# ifconfig wlan0mon up
+SIOCSOFFLAGS: Name not unique on network
+
+root@kali:~# service network-manager stop
+
+root@kali:~# ifconfig -a
+
+root@kali:~# ifconfig wlan2 up
+
+root@kali:~# iw dev wlan2 interface add wlan2mon type monitor
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# ifconfig wlan2mon up
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2     Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+wlan2mon  Link encap:UNSPEC  HWaddr 08-57-00-0c-96-68-00-00-00-00-00-00-00-00-00-00
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:85 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:18257 (17.8 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# iw dev wlan2mon interface del
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions
+
+
+root@kali:~# iw dev wlan2 interface add wlan2mon type monitor
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+
+lo        no wireless extensions
+
+root@kali:~# service network-manager status
+  NetworkManager.service - Network Manager
+   Loaded: loaded (/lib/systemd/system/NetworkManager.service; enabled)
+   Active: inactive (dead) since  2015-10-14 20:10:38 CST; 9min ago
+  Process: 559 ExecStart=/usr/sbin/NetworkManager --no-deamon (code=exited, status=0/SUCCESS)
+ Main PID: 559 (code=exited, status=0/SUCCESS)
+
+Warning: Journal has been rotated since unit was started. Log output is in complete or unavailable
+
+root@kali:~# service network-manager stop
+
+root@kali:~# vi .bashrc   //添加“service network-manager stop”
+
+root@kali:~# reboot
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                  ┃
+┃协议栈                                                  ┃
+┃    http://www.kernel.org/doc/htmldocs/80211/index.html ┃
+┃无线驱动                                                ┃
+┃    http://linuxwireless.org/en/users/Drivers/          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋

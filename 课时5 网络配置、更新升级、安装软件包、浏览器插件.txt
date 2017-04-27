@@ -1,0 +1,347 @@
+root@kali:~# dhclient eth0       //用来通过 dhcp 协议配置本机的网络接口
+
+root@kali:~# ifconfig     查看现在的ip地址
+
+root@kali:~# ifconfig eth0 192.168.1.10/24        // 配置ip地址
+
+root@kali:~# ifconfig eth0                //查看配置ip地址
+
+root@kali:~# route add default gw 192.168.1.1     //设置默认路由
+
+root@kali:~# netstat -nr    //拒绝显示别名，能显示数字的全部转化成数字。显示路由信息，路由表 
+Kernl IP routing table
+Destination     Gateway           Genmask         Flags      MSS window   irtt Iface
+0.0.0.0         192.168.1.1       0.0.0.0         UG          0  0          0 eth0
+192.168.1.0     0.0.0.0           255.255.255.0   U           0  0          0 eth0
+
+root@kali:~# route add -net 172.16.0.0/24 gw 192.168.1.100 eth0     //添加路由
+
+root@kali:~# route -n      //查看路由状态
+Kernl IP routing table
+Destination     Gateway           Genmask         Flags  Metric Ref   Use Iface
+0.0.0.0         192.168.1.1       0.0.0.0         UG     0      0       0 eth0
+192.168.1.0     0.0.0.0           255.255.255.0   U      0      0       0 eth0
+172.16.1.0      192.168.1.100     255.255.255.0   UG     0      0       0 eth0
+192.168.1.0     0.0.0.0           255.255.255.0   U      0      0       0 eth0
+
+root@kali:~# vi /etc/resolv.conf     //配置dns服务器连接
+domain
+nameserver 10.10.10.10
+nameserver 102.54.16.2
+
+root@kali:~# vi /etc/network/interfaces     //配置静态网卡ip地址
+auto eth0
+iface eth0 inet static
+address 192.168.0.1
+netmask 255.255.255.0
+gateway 192.168.0.254
+dns-nameservers 192.168.1.1 192.168.1.2
+up route add -net 172.16.5.0/24 gw 192.168.10.100 eth1
+down route del-net 172.24.0.0/24
+
+root@kali:~# apt-get update       //更新软件列表
+
+root@kali:~# apt-get update --fix-missing    //更新异常索引文件
+
+root@kali:~# apt-get upgrade      //更新软件
+
+root@kali:~# apt-get dist-upgrade      //更新系统版本
+
+root@kali:~# vi /etc/apt/sources.list      //更改更新源
+#中科大kali源     更新速度很快
+deb http://mirrors.ustc.edu.cn/kali kali main non-free contrib
+deb-src http://mirrors.ustc.edu.cn/kali kali main non-free contrib
+deb http://mirrors.ustc.edu.cn/kali-security kali/updates main contrib non-free
+
+安装适合自己的软件包
+apt-get install smplays ibus ibus-pinyin flashplugin-nonfree gdebi amule pbittorrent geany stardict meld ttf-wq-microhei kchmviewer freemind netspeed mtr filezilla filezilla-common chromium monodevelop mono-gmcs -y
+
+
+root@kali:~# apt-get install fcitx-table-wbpy ttf-wqy-microhei ttf-wqy-zenhei -y && apt-get install alsa-utils -y && apt-get install tor privoxy -y && apt-get install synaptic -y && apt-get install unrar unace rar unrar p7zip zip unzip p7zip-full p7zip-rar file-roller -y && apt-get install htop nethogs -y && apt-get install network-manager-openvpn-gnome -y && apt-get install network-manager-pptp -y&&apt-get install network-manager-pptp-gnome && apt-get install network-manager-strongswan -y && apt-get install network-manager-vpnc && apt-get install network-manager-vpnc-gnome && apt-get install network-manager && apt-get install network-manager-gnome && apt-get install filezilla filezilla-common -y &&apt-get install gdebi -y && apt-get install linux-headers-$(uname -r) -y && apt-get install iceweasel-l10n-zh-cn -y && apt-get install python-dev python-greenlet python-gevent python-vte python-openssl python-crypto python-appindicator libnss3-tools -y && apt-get install wine32:i386 -y &&
+> start
+ 
+root@kali:~# dpkg -i asd.deb   //在字符下安装软件
+
+firefox浏览器插件
+fflashgot、atuoproxy、Tamper Data、cookie importer、Cookies manger、User Agent、Swircher、HackerBar、Live http header、Firebug、Download YouTube Videos as MP4、Flagfox、hashr
+https://addons.mozilla.org/en-US/firefox/addon/xss-me/
+https://addons.mozilla.org/en-US/firefox/addon/sql-inject-me/?src=ss
+
+修改sources.list文件：
+leafpad /etc/apt/sources.list
+然后选择添加以下适合自己较快的源（可自由选择，不一定要全部）： 
+#官方源
+deb http://http.kali.org/kali kali main non-free contrib
+deb-src http://http.kali.org/kali kali main non-free contrib
+deb http://security.kali.org/kali-security kali/updates main contrib non-free
+
+#激进源，新手不推荐使用这个软件源
+deb http://repo.kali.org/kali kali-bleeding-edge main
+deb-src http://repo.kali.org/kali kali-bleeding-edge main
+
+#中科大kali源
+deb http://mirrors.ustc.edu.cn/kali kali main non-free contrib
+deb-src http://mirrors.ustc.edu.cn/kali kali main non-free contrib
+deb http://mirrors.ustc.edu.cn/kali-security kali/updates main contrib non-free
+
+#阿里云kali源
+deb http://mirrors.aliyun.com/kali kali main non-free contrib
+deb-src http://mirrors.aliyun.com/kali kali main non-free contrib
+deb http://mirrors.aliyun.com/kali-security kali/updates main contrib non-free
+
+保存之后运行：
+apt-get update && apt-get upgrade && apt-get dist-upgrade
+
+kali linux 汉化iceweasel浏览器
+deb http://mozilla.debian.net/ wheezy-backports iceweasel-release #添加这个软件源
+apt-get install pkg-mozilla-archive-keyring #导入PGP KEY
+apt-get install iceweasel-l10n-zh-cn   安装
+
+--------------------------------------------------------------------------------------
+
+用Open-VM-tools代替VMware tools：
+
+这个版本在如何进行VMware用户工具的安装上，也做出了一个不同以往的改变。
+
+截至2015年9月，VMware已经发出建议，对于使用VMware客户端的用户，都要求用open-vm-tools自带的工具软件包来代替原先的软件包。我们确信，在最新的Kali Rolling内核下，安装包都能正常运行，并且看到了一些用户所需要的功能，如：文件复制，使用剪贴板进行复制，粘贴，以及自动调整屏幕等，都能很好地实现。对于这一反应，我们感到很高兴。在Kali Rolling视图中安装open-vm-tools的代码如下：
+
+apt-get update
+apt-get install open-vm-tools-desktop fuse
+reboot
+
+Kali sana 2.0更新到Kali Rolling，其实很简单。作为超级用户，你只需运行下面的代码即可。
+
+cat << EOF > /etc/apt/sources.list
+deb http://http.kali.org/kali kali-rolling main non-free contrib
+EOF
+
+apt-get update
+apt-get dis-upgrade # get a coffee, or 10.
+reboot
+
+请注意：Kali sana应用库的更新服务将于2016年4月15日停止，请尽快更新你的Kali版本。
+
+----------------------------------------------------------------------------------
+apt-get install conky-all
+
+edit ~/.conkyrc
+
+让 conky 使用其它脚本而不是默认配置，以及如何找到这些脚本？
+
+你可以编写你自己的 conky 脚本或使用来自于互联网的脚本；我们并不建议你使用从互联网中找到的具有潜在危险的任何脚本，除非你清楚你正在做什么。然而，有一些著名的主题和网页包含可信赖的 conky 脚本，例如下面所提及的：
+
+    http://ubuntuforums.org/showthread.php?t=281865
+    http://conky.sourceforge.net/screenshots.html
+
+conky开机启动的命令： /usr/bin/conky -p 10， 其中“-p 10”表示用户登录10秒后才开始载入conky，这样做的目的是防止conky的一些bug出现，并且缓解系统在开机时的资源利用紧张。
+-----------------------------------------------------------------------------
+
+metasploit更新
+msfupgrade
+
+------------------------------------------------------------------
+1、apt-get update
+2、apt-get install metasploit
+3、修改文件：/opt/metasploit/ruby/lib/ruby/1.9.1/i686-linux/rbconfig.rb
+changed the line => CONFIG[“LIBRUBYARG_STATIC”] = “-Wl,-R -Wl,$(libdir) -L$(libdir) -l$(RUBY_SO_NAME)-static” by => CONFIG[“LIBRUBYARG_STATIC”] = “-Wl,-R -Wl,$(libdir) -L$(libdir) “（其实就是去掉-l$(RUBY_SO_NAME)-static）
+4、切换至/opt/metasploit/msf3然后运行/opt/metasploit/ruby/bin/bundle install
+5、msfupdate
+实测，完美通过，不会再卡在pg (0.15.0)无法成功安装那里
+------------------------------------------------------------------
+升级
+ 
+代码:
+root@ruo:~# cd /tools/
+root@ruo:~# wget http://ruo.me/rubygems-2.0.3.zip
+解压
+ 
+代码:
+root@ruo:/tools# unzip rubygems-2.0.3.zip
+root@ruo:/tools# cd rubygems-2.0.3
+安装
+ 
+代码:
+root@ruo:/tools/rubygems-2.0.3# ruby1.9.1 setup.rb
+ok
+ 
+安装rvm
+ 
+代码:
+root@ruo:~# bash -s stable < <(curl -s https://raw.github.com/wayneeseguin/rvm/master/binscripts/rvm-installer)
+root@ruo:~# cd /usr/local/rvm/bin/
+root@ruo:/usr/local/rvm/bin# ln ./rvm /usr/bin/rvm
+root@ruo:~# source /usr/local/rvm/scripts/rvm
+ 
+
+先换淘宝源，这样快
+ 
+代码:
+root@ruo:~# gem sources --remove https://rubygems.org/
+root@ruo:~# gem sources -a http://ruby.taobao.org/
+默认使用ruby2.0.0
+ 
+代码:
+root@ruo:~# rvm install 2.0.0
+root@ruo:~# source /usr/local/rvm/scripts/rvm 
+root@ruo:~# rvm use 2.0.0 --default
+#这歩可以省略，如果出错在返回来执行这步,编辑.bash_profile
+#和这歩有关的都以"#"标出
+ 
+
+ 
+代码:
+root@ruo:~# gedit /root/.bash_profile
+#输入下面代码,保存
+ 
+代码:
+[[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" # This loads RVM into a shell session.
+安装bundler
+ 
+代码:
+root@ruo:~# gem install bundler
+最后一步，一定要在msf3目录下
+ 
+代码:
+root@ruo:/tools/msf# bundle install                     //backtrack的msf路径和我不一样，按照自己配置进入即可
+现在，msf就可以运行鸟
+ 
+代码:
+root@ruo:/tools/msf# msfconsole -L
+如果提示缺少什么什么，再次bundle install下，记住一定要在msf目录下
+ 
+再次bundle install 后 100%成功运行鸟
+ 
+代码:
+root@ruo:/tools/msf# msfconsole -L
+最后是个人建议：您不是渗透工程测试师，没必要升级！
+
+-----------------------------------------------------------------
+root@kali:~# msfconsole
+# cowsay++
+____________
+< metasploit >
+------------
+\ ,__,
+\ (oo)____
+(__) )\
+||--|| *
+
+
+Frustrated with proxy pivoting? Upgrade to layer-2 VPN pivoting with
+Metasploit Pro -- type 'go_pro' to launch it now.
+
+=[ metasploit v4.7.1-2013100901 [core:4.7 api:1.0]
++ -- --=[ 1206 exploits - 728 auxiliary - 201 post
++ -- --=[ 314 payloads - 30 encoders - 8 nops
+输入:msfupdate
+
+msf > msfupdate
+[*] exec: msfupdate
+
+[*]
+[*] Attempting to update the Metasploit Framework...
+[*]
+
+[*] Checking for updates
+[*] Updating to version 4.8.2-2014031901-1kali0
+正在读取软件包列表...
+正在分析软件包的依赖关系树...
+正在读取状态信息...
+下列软件包将被升级：
+更新完退出：exit
+然后重新打开:msfconsole
+root@kali:~# msfconsole
+Easy phishing: Set up email templates, landing pages and listeners
+in Metasploit Pro's wizard -- type 'go_pro' to launch it now.
+
+=[ metasploit v4.8.2-2014031901 [core:4.8 api:1.0] ]
++ -- --=[ 1290 exploits - 779 auxiliary - 218 post ]
++ -- --=[ 332 payloads - 33 encoders - 8 nops ]
+-----------------------------------------------------------------
+
+：git下载最新版
+#cd /opt/metasploit/
+root@bt:/opt/metasploit# #rm -rf msf3
+root@bt:/opt/metasploit# git clone https://github.com/rapid7/metasploit-framework.git msf
+
+二：问题(运行msfconsole 会出现以下错误）
+root@bt:# msfconsole 
+Could not find rake-10.1.0 in any of the sources
+Run `bundle install` to install missing gems.
+
+解决方法
+1、修改这个文件：/opt/metasploit/ruby/lib/ruby/1.9.1/i686-linux/rbconfig.rb （32bit）
+                             或 /opt/metasploit/ruby/lib/ruby/1.9.1/x86_64-linux/rbconfig.rb （64bit）
+        把这一行=> CONFIG["LIBRUBYARG_STATIC"] = "-Wl,-R -Wl,$(libdir) -L$(libdir) -l$(RUBY_SO_NAME)-static"
+        修改为=> CONFIG["LIBRUBYARG_STATIC"] = "-Wl,-R -Wl,$(libdir) -L$(libdir) "
+2、进入目录：/opt/metasploit/msf3 and
+             运行： /opt/metasploit/ruby/bin/bundle install
+
+三：打开控制台即可
+root@bt:/opt/metasploit# msfconsole 
+=====[ metasploit v4.9.0-dev [core:4.9 api:1.0] ]
++ -- --=[ 1276 exploits - 698 auxiliary - 202 post ]
+=-------[www.metasploit.cn                                   ]
++ -- --=[ 332 payloads - 33 encoders - 8 nops      ]
+
+msf > 
+-----------------------------------------------------------------
+以后Metasploit更新，请不要再使用下面的方法了
+
+1
+svn co https://www.metasploit.com/svn/framework3/trunk
+请使用GIT来进行更新
+
+1
+git clone git://github.com/rapid7/metasploit-framework
+前一阵子，你可能会发现，使用SVN更新Metasploit的时候会要求进行身份认证。如果你是在Windows下使用TortoriseSVN来检出代码，会看到类似下面的提示
+
+msfupdate
+
+使用命令行检出代码的朋友，你可能会看到类似这样的提示
+
+1
+$ svn up Updating '.':
+2
+Authentication realm: <https://www.metasploit.com:443> =[ MSF must be updated via GitHub
+3
+or a more recent msfupdate. See http://r-7.co/MSF-SVN for more ]=
+4
+Password for 'yourname':
+不必尝试任何你认为对的密码。 我们已经锁定了SVN，并且使用这种身份认证的方式来告知用户改变更新代码的地址；这个密码有一些意外，如果你没有读到这篇文章，你可能会想知道，我们为什么要这么做。
+
+从2011年11月10日起，我们就开始使用GIT来进行版本控制。并且我们使用git来修正bug，而不再使用SVN。然后，互联网上存在一个永恒的现在时。互联网上充斥着大量的文章，都写着使用SVN来更新代码，这一些文章当中，有一些是我们可控的，我们可以修改；但是还有许多是我们不可控的，所以你可能还会搜到使用SVN更新代码的方法；如果你不信，你可以尝试搜索 “svn co” metasploit
+
+正因为这个原因，我们暂时没有直接关闭SVN，而是在SVN上加入身份认证并给予用户提示。
+
+….这里不太重要就不翻译了…
+
+ 
+
+如果你仍然在使用SVN，那么现在改换为使用GIT吧，可以参考下面的方式进行。
+
+1.不要尝试使用任何密码来登陆SVN了……..
+
+2.删除已经检出的SVN代码
+
+1
+rm -rf $HOME/metasploit (或者你自己定义的metasploit路径)
+3.从git上clone最新的副本(如果速度比较慢，可以将git://换成https://)
+
+1
+git clone --depth=1  git://github.com/rapid7/metasploit-framework metasploit (metaploit是路径你也可以自己定义你的路径)
+4.进入你的metasploit检出路径，
+
+1
+cd metasploit
+然后执行更新命令
+
+1
+./msfupdate
+(这同时会给你安装gem Ruby)
+
+如果你的git:// 不能正常使用，可以尝试使用https://来代替。虽然有时候会很慢，但是还是在很多方面要好于SVN的。如果gem依赖上有问题，请先确认你是否安装了ruby支持。最好使用2.0.0。
+
+….后面几句没什么大用，就不翻译了……
+
+原文地址：http://r-7.co/MSF-SVN

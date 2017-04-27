@@ -1,0 +1,173 @@
+
+课时100 CSRF
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃CSRF                                          ┃
+┃Cross-site request forgery                    ┃
+┃与XSS经常混淆                                 ┃
+┃从信任的角度来区分                            ┃
+┃    XSS：利用用户对站点的信任                 ┃
+┃    CSRF：利用站点对已经身份认证的信任        ┃
+┃结合社工在身份认证会话过程中实现攻击          ┃
+┃    修改账号密码、个人信息（email、收获地址） ┃
+┃    发送伪造的业务请求（网银、购物、投票）    ┃
+┃    关注他人社交账号、推送博文                ┃
+┃    在用户非自愿、不知情的情况下提交请求      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃CSRF                                          ┃
+┃业务逻辑漏洞                                  ┃
+┃    对关键操作缺少确认机制                    ┃
+┃    自动扫描程序无法发现此类漏洞              ┃
+┃漏洞利用条件                                  ┃
+┃    被害用户已经完成身份认证                  ┃
+┃    新请求的提交不需要重新身份认证或确认机制  ┃
+┃    攻击者必须了解Web APP请求的参数构造       ┃
+┃    诱使用户触发攻击的指令（社工）            ┃
+┃Burpuste CSRF PoC generator                   ┃
+┃    Post/Get方法                              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@K:~# apt-get install linux-image-4.4.0-kali-amd64
+
+root@K:~# apt-get install linux-headers-4.4.0-kali-amd64
+
+root@K:~# uname -u
+Linux K 4.4.0-kali-amd64 #1 SMP Debian 4.4.6-1kali (2016-03-18) x86_64 GNU/Linux
+
+192.168.1.115/dvwa/login.php
+
+root@K:~# netstat -pantu | grep :80
+tcp        0      0 127.0.0.0:80         0.0.0.0:*                 LISTEN
+665/gsad
+tcp        0      0 127.0.0.0:8080       :::*                      LISTEN
+2081/java
+tcp        0      0 127.0.0.0:8080       127.0.0.1:60322           TIME_WAIT
+.
+
+root@K:~# Openvas-stop
+
+root@K:~# netstat -pantu | grep :80
+tcp        0      0 127.0.0.0:8080       :::*                      LISTEN
+2081/java
+tcp        0      0 127.0.0.0:8080       127.0.0.1:60322           TIME_WAIT
+.
+
+root@K:~# service apache2 start
+
+root@K:~# cd /var/www/html/
+
+root@K:~/var/www/html# gedit 1.html
+<a herf ='http://192.168.1.115/dvwa/vulnerabilities/csrf/?password_new=123&password_conf=123&Change=Change'>csrf</a>
+
+------------------------------------------------------------------------------
+低安全代码
+<?php
+
+    if (isset($_GET['Change'])){
+
+        // Turn requests into variables
+        $pass_new = $_GET['password_new'];
+        $pass_conf = $_GET['password_conf'];
+
+        if (($pass_new == $pass_conf)){
+            $pass_new = mysql_real_escape_string($pass_new);
+            $pass_new = md5(pass_new);
+
+            $insert="UPDATE 'users' SET password = '$pass_new' WHERE user = 'admin';";
+            $result=mysql_query($insert) or die ('<pre>' . mysql_error() . '</pre>' );
+
+            echo "<pre> Password Changed </pre>";
+            mysql_close();
+        }
+
+        else{
+            echo "<pre> Password did not match . </pre>";
+        }
+    }
+}
+?>
+--------------------------------------------------------------------------------
+中安全代码
+<?php
+
+    if (isset($_GET['Change'])){
+
+        // Checks the http referer header
+        if (eregi ( "127.0.0.1", $_SERVER['HTTP_REFERER'] ) ){
+
+            // Turn requests into variables
+            $pass_new = $_GET['password_new'];
+            $pass_conf = $_GET['password_conf'];
+
+            if (($pass_new == $pass_conf)){
+                $pass_new = mysql_real_escape_string($pass_new);
+                $pass_new = md5(pass_new);
+
+                $insert="UPDATE 'users' SET password = '$pass_new' WHERE user = 'admin';";
+                $result=mysql_query($insert) or die ('<pre>' . mysql_error() . '</pre>' );
+
+                echo "<pre> Password Changed </pre>";
+                mysql_close();
+            }
+
+            else{
+                echo "<pre> Password did not match . </pre>";
+            }
+        }
+    }
+}
+?>
+----------------------------------------------------------------------------------
+高安全代码
+<?php
+
+    if (isset($_GET['Change'])){
+
+        // Turn request into variables
+        $pass_curr = $_GET['password_current'];
+        $pass_new = $_GET['password_new'];
+        $pass_conf = $_GET['password_conf'];
+
+        // Snitise current password input
+        $pass_curr = stripslashed ($pass_curr );
+        $pass_curr = mysql_real_escape_string( $pass_curr );
+        $pass_curr = md5( $pass_curr );
+
+        // Check that hte  current password is corrent
+        $qry = "SELECT password FROM 'users' WHERE user='admin' AND password='$pass_curr';";
+        $result = mysql_query($qry) or die('<pre>' . mysql_error() . '</pre>' );
+
+        if (($pass_new == $pass_conf) && ( $result && mysql_num_rows( $result ) == 1 )){
+            $pass_new = mysql_real_escape_string($pass_new);
+            $pass_new = md5(pass_new);
+
+            $insert="UPDATE 'users' SET password = '$pass_new' WHERE user = 'admin';";
+            $result=mysql_query($insert) or die ('<pre>' . mysql_error() . '</pre>' );
+
+            echo "<pre> Password Changed </pre>";
+            mysql_close();
+        }
+
+        else{
+            echo "<pre> Password did not match . </pre>";
+        }
+    }
+}
+?>
+----------------------------------------------------------------------------------
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃CSRF                                                ┃
+┃自动扫描程序的检测方法                              ┃
+┃    在请求和响应过程中检查是否存在anti-CSRF token名 ┃
+┃    检查服务器是否验证anti-CSRF token的名值         ┃
+┃    检查token中可编辑的字符串                       ┃
+┃    检查referrer头是否可以伪造                      ┃
+┃对策                                                ┃
+┃    Captcha                                         ┃
+┃    anti-CSRF token                                 ┃
+┃    Referrer头                                      ┃
+┃    降低会话超时时间                                ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+

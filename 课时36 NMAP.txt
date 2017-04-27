@@ -1,0 +1,444 @@
+课时36 NMAP
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃NMAP                                                                                              ┃
+┃nmap扫描脚本                                                                                      ┃
+┃    400+                                                                                          ┃
+┃    分类                                                                                          ┃
+┃cat /usr/share/nmap/scripts/script.db                                                             ┃
+┃grep vuln /usr/share/nmap/scripts/script.db | cut -d "\'" -f 2                                    ┃
+┃cat /usr/share/nmap/scripts/smb-check-vulns.nse                                                   ┃
+┃smb-check-vulns.nse                                                                               ┃
+┃    nmap -sU -sS --script=smb-check-vulns.nse --script-args=unsafe=1 -p U:137,T:139,445 1.1.1.1   ┃
+┃    MS08-067                                                                                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/share/nmap/scripts
+
+root@kali:/usr/share/nmap/scripts# less script.db     //浏览文件内容
+
+root@kali:/usr/share/nmap/scripts# less script.db | wc -l    //查看文件数量
+495
+
+root@kali:/usr/share/nmap/scripts# less script.db | grep vuln | wc -l
+74
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃NMAP                                                                                          ┃
+┃smb-vuln-ms10-061.nse                                                                         ┃
+┃    Stuxnet蠕虫利用的4个漏洞之一                                                              ┃
+┃    Print Spooler权限不当，打印请求可在系统目录可创建文件、执行任意代码                       ┃
+┃    LANMAN API枚举共享打印机                                                                  ┃
+┃    原创共享打印机名称                                                                        ┃
+┃    smb-enum-shares枚举共享                                                                   ┃
+┃        身份认证参数-----smbuser、smbpassword                                                 ┃
+┃        nmap -p445 --script=smb-enum-shares.nse --script-args=smbuser=admin,smbpassword=pass  ┃
+┃    Windows XP,Server 2003 SP2,Vista,Server 2008,win 7                                        ┃
+┃影响扫描结果的因素                                                                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━╋
+┃扫描结果确认                      ┃
+┃目标系统版本                      ┃
+┃补丁是否按照                      ┃
+┃是否可被入侵                      ┃
+┃                                  ┃
+┃有时很难说什么才是准确的扫描结果  ┃
+┃应综合的看待漏洞威胁              ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+root@kali:/usr/share/nmap/scripts# cat smb-vuln-ms10-061.nse
+local bin = require "bin"
+local msrpc = require "msrpc"
+local smb = require "smb"
+local string = require "string"
+local vulns = require "vulns"
+local stdnse = require "stdnse"
+
+description = [[
+Tests whether target machines are vulnerable to ms10-061 Printer Spooler impersonation vulnerability.
+
+This vulnerability was used in Stuxnet worm.  The script checks for
+the vuln in a safe way without a possibility of crashing the remote
+system as this is not a memory corruption vulnerability.  In order for
+the check to work it needs access to at least one shared printer on
+the remote system.  By default it tries to enumerate printers by using
+LANMAN API which on some systems is not available by default. In that
+case user should specify printer share name as printer script
+argument.  To find a printer share, smb-enum-shares can be used.
+Also, on some systems, accessing shares requires valid credentials
+which can be specified with smb library arguments smbuser and
+smbpassword.
+
+References:
+  - http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2729
+  - http://technet.microsoft.com/en-us/security/bulletin/MS10-061
+  - http://blogs.technet.com/b/srd/archive/2010/09/14/ms10-061-printer-spooler-vulnerability.aspx
+]]
+---
+-- @usage nmap  -p 445 <target> --script=smb-vuln-ms10-061
+--
+-- @args printer Printer share name. Optional, by default script tries to enumerate available printer shares.
+--
+-- @output
+-- PORT    STATE SERVICE      REASON
+-- 445/tcp open  microsoft-ds syn-ack
+
+-- Host script results:
+-- | smb-vuln-ms10-061:
+-- |   VULNERABLE:
+-- |   Print Spooler Service Impersonation Vulnerability
+-- |     State: VULNERABLE
+-- |     IDs:  CVE:CVE-2010-2729
+-- |     Risk factor: HIGH  CVSSv2: 9.3 (HIGH) (AV:N/AC:M/Au:N/C:C/I:C/A:C)
+-- |     Description:
+-- |       The Print Spooler service in Microsoft Windows XP,Server 2003 SP2,Vista,Server 2008, and 7, when printer sharing is enabled,
+-- |       does not properly validate spooler access permissions, which allows remote attackers to create files in a system directory,
+-- |       and consequently execute arbitrary code, by sending a crafted print request over RPC, as exploited in the wild in September 2010,
+-- |       aka "Print Spooler Service Impersonation Vulnerability."
+-- |
+-- |     Disclosure date: 2010-09-5
+-- |     References:
+-- |       http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2729
+-- |       http://technet.microsoft.com/en-us/security/bulletin/MS10-061
+-- |_      http://blogs.technet.com/b/srd/archive/2010/09/14/ms10-061-printer-spooler-vulnerability.aspx
+
+author = "Aleksandar Nikolic"
+license = "Same as Nmap--See http://nmap.org/book/man-legal.html"
+categories = {"vuln","intrusive"}
+
+hostrule = function(host)
+  return smb.get_port(host) ~= nil
+end
+
+action = function(host,port)
+
+  local ms10_061  = {
+    title = "Print Spooler Service Impersonation Vulnerability",
+    IDS = {CVE = 'CVE-2010-2729'},
+    risk_factor = "HIGH",
+    scores = {
+      CVSSv2 = "9.3 (HIGH) (AV:N/AC:M/Au:N/C:C/I:C/A:C)",
+    },
+    description = [[
+The Print Spooler service in Microsoft Windows XP,Server 2003 SP2,Vista,Server 2008, and 7, when printer sharing is enabled,
+does not properly validate spooler access permissions, which allows remote attackers to create files in a system directory,
+and consequently execute arbitrary code, by sending a crafted print request over RPC, as exploited in the wild in September 2010,
+aka "Print Spooler Service Impersonation Vulnerability."
+    ]],
+    references = {
+      'http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2010-2729',
+      'http://technet.microsoft.com/en-us/security/bulletin/MS10-061',
+      'http://blogs.technet.com/b/srd/archive/2010/09/14/ms10-061-printer-spooler-vulnerability.aspx'
+    },
+    dates = {
+      disclosure = {year = '2010', month = '09', day = '5'},
+    },
+    exploit_results = {},
+  }
+  local report = vulns.Report:new(SCRIPT_NAME, host, port)
+  ms10_061.state = vulns.STATE.NOT_VULN
+  local status, smbstate
+  status, smbstate = msrpc.start_smb(host, msrpc.SPOOLSS_PATH,true)
+  if(status == false) then
+    stdnse.debug1("SMB: " .. smbstate)
+    return false, smbstate
+  end
+
+  local bind_result
+  status, bind_result = msrpc.bind(smbstate,msrpc.SPOOLSS_UUID, msrpc.SPOOLSS_VERSION, nil)
+  if(status == false) then
+    msrpc.stop_smb(smbstate)
+    stdnse.debug1("SMB: " .. bind_result)
+    return false, bind_result
+  end
+  local printer = stdnse.get_script_args(SCRIPT_NAME .. '.printer')
+  -- if printer not set find available printers
+  if not printer then
+    stdnse.debug1("No printer specified, trying to find one...")
+    local lanman_result
+    local REMSmb_NetShareEnum_P  = "WrLeh"
+    local REMSmb_share_info_1 = "B13BWz"
+    status, lanman_result = msrpc.call_lanmanapi(smbstate,0,REMSmb_NetShareEnum_P,REMSmb_share_info_1,bin.pack("ss",0x01,65406))
+    if status == false then
+      stdnse.debug1("SMB: " .. lanman_result)
+      stdnse.debug1("SMB: Looks like LANMAN API is not available. Try setting printer script arg.")
+    end
+
+    local parameters = lanman_result.parameters
+    local data = lanman_result.data
+    local pos, status, convert, entry_count, available_entries = bin.unpack("<SSSS", parameters)
+    pos = 0
+    local share_type, name, _
+    for i = 1, entry_count, 1 do
+      _,share_type = bin.unpack(">s",data,pos+14)
+      pos, name = bin.unpack("<z", data, pos)
+
+      -- pos needs to be rounded to the next even multiple of 20
+      pos = pos + ( 20 - (#name % 20) ) - 1
+      if share_type == 1 then -- share is printer
+        stdnse.debug1("Found printer share %s.", name)
+        printer = name
+      end
+    end
+  end
+  if not printer then
+    stdnse.debug1("No printer found, system may be unpatched but it needs at least one printer shared to be vulnerable.")
+    return false
+  end
+  stdnse.debug1("Using %s as printer.",printer)
+  -- call RpcOpenPrinterEx - opnum 69
+  local status, result = msrpc.spoolss_open_printer(smbstate,"\\\\"..host.ip.."\\"..printer)
+  if not status then
+    return false
+  end
+  local printer_handle = string.sub(result.data,25,#result.data-4)
+  stdnse.debug1("Printer handle %s",stdnse.tohex(printer_handle))
+  -- call RpcStartDocPrinter - opnum 17
+  status,result = msrpc.spoolss_start_doc_printer(smbstate,printer_handle,",") -- patched version will allow this
+  if not status then
+    return false
+  end
+  local print_job_id = string.sub(result.data,25,#result.data-4)
+  stdnse.debug1("Start doc printer job id %s",stdnse.tohex(print_job_id))
+
+  -- call RpcWritePrinter - 19
+  status, result = msrpc.spoolss_write_printer(smbstate,printer_handle,"aaaa")
+  if not status then
+    return false
+  end
+  local write_result = string.sub(result.data,25,#result.data-4)
+  stdnse.debug1("Written %s bytes to a file.",stdnse.tohex(write_result))
+  if stdnse.tohex(write_result) == "00000000" then -- patched version would report 4 bytes written
+    ms10_061.state = vulns.STATE.VULN -- identified by diffing patched an unpatched version
+  end
+  -- call abort_printer to stop the actual printing in case the remote system is not vulnerable
+  -- we care about the environment and don't want to spend more paper then needed :)
+  status,result = msrpc.spoolss_abort_printer(smbstate,printer_handle)
+
+  return report:make_output(ms10_061)
+end
+
+root@kali:/usr/share/nmap/scripts# nmap -p445 --script=smb-enum-shares.nse --script-args=smbuser=admin,smbpassword=pass
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-10 22:47 CST
+WARNING: No targets were specified, so 0 hosts scanned.
+Nmap done: 0 IP addresses (0 hosts up) scanned in 0.43 seconds
+
+
+root@kali:~# nmap 192.168.1.0/24 -sn       //查看有哪些机器
+
+root@kali:/usr/share/nmap/scripts# nmap -p445 --script=smb-enum-shares.nse --script-args=smbuser=admin,smbpassword=pass 1.1.1.1
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-10 22:50 CST
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 3.33 seconds
+
+root@kali:/usr/share/nmap/scripts# nmap -p445 --script=smb-enum-shares.nse 192.168.1.104
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-10 22:55 CST
+Note: Host seems down. If it is really up, but blocking our ping probes, try -Pn
+Nmap done: 1 IP address (0 hosts up) scanned in 0.71 seconds
+
+╋━━━━━━━━━━━━━━━━━╋
+┃OPENVAS                           ┃
+┃Openvas                           ┃
+┃    Nessus项目分支                ┃
+┃    管理目标系统的漏洞            ┃
+┃    免费开源                      ┃
+┃    Kali默认安装，但未配置和启动  ┃
+╋━━━━━━━━━━━━━━━━━╋
+ 
+OPENVAS
+Greenbone Security Manager:OpenVAS Framework Architecture
+
+        ←───OSP Scanner ╲      OMP Clients         Web Browser
+                              ╲       ↑                   ↑
+Target           OpenVAS        ↘  OpenVAS             Greenbone
+Systems ←─── Scanner ───→   Manager───→ Security Assistant
+                   ↑          ↗    ↑
+                  NVTs      SCAP    User      
+                            CERT    Data
+                   ↑        ↑       ↑
+Feed─────────────────┘
+
+OMP:API of OpenVAS Manager
+-CU access
+-Batch processes
+-Tool integration
+
+OSP:Unified scanner control Layer
+-Scanner integration
+
+NVTs:Netwaork Vulnerability Tests
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃OPENVAS                                       ┃
+┃OpenVAS Manager                               ┃
+┃    控制scanner和气筒manager的中心组建        ┃
+┃    控制中心数据库，保存用户配置及扫描结果    ┃
+┃    客户点使用基于XML的无状态OMP协议与其通信  ┃
+┃    集中排序筛选，使客户端获得一致展现        ┃
+┃OpenVAS Scanner                               ┃
+┃    具体执行Network Vnlerability Tests (NVTs) ┃
+┃    NVTs每天通过Feed更新                      ┃
+┃    受Manager控制                             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃OPENVAS                                       ┃
+┃OSP Scanner                                   ┃
+┃    可以统一管理多个scanner                   ┃
+┃    将一组scanner作为一个对象交给manager管理  ┃
+┃Greenbone Security Sssistant (GSA)            ┃
+┃    提供Web service                           ┃
+┃OpenVAS CU                                    ┃
+┃    amp命令行工具，可实现批处理控制manager    ┃
+┃更新很快                                      ┃
+┃    所有找得到的资料几乎都已不同程度的过时了  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━╋
+┃OPENVAS           ┃
+┃安装              ┃
+┃创建证书          ┃
+┃同步弱点数据库    ┃
+┃创建客户端证书    ┃
+┃重建数据库        ┃
+┃备份数据库        ┃
+┃启动服务装入插件  ┃
+┃创建管理员账号    ┃
+┃创建普通用户账号  ┃
+┃配置服务侦听端口  ┃
+┃安装验证          ┃
+╋━━━━━━━━━╋
+
+root@kali:~# openvas-setup
+User created with password 'd2c50877-f3e2-4cef-9ceb-77cc812dac10'.
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃OPENVAS                                           ┃
+┃初始化安装                                        ┃
+┃    openvas-setup                                 ┃
+┃检查安装结果                                      ┃
+┃    openvas-check-setup                           ┃
+┃查看当前账号                                      ┃
+┃    openvasmd --list-users                        ┃
+┃修改账号密码                                      ┃
+┃    openvasmd --user=admin --new-password=password┃
+┃升级                                              ┃
+┃    openvas-feed-update                           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃OPENVAS                                           ┃
+┃不是秘笈是经验                                    ┃
+┃vi /usr/bin/openvas-start                         ┃
+┃    Starting OpenVas Services                     ┃
+┃    Starting OpenVas Manager:openvasmd            ┃
+┃    Starting OpenVas Scanner:openvassd            ┃
+┃    Starting Greenbone Security Assistant:gsad    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# openvasmd -h
+Usage:
+  openvasmd [OPTION...] - Manager of the Open Vulnerability Assessment System
+
+Help Options:
+  -h, --help                                   Show help options
+
+Application Options:
+  --backup                                     Backup the database.
+  -d, --database=<file/name>                   Use <file/name> as database for SQLite/Postgres.
+  --disable-cmds=<commands>                    Disable comma-separated <commands>.
+  --disable-encrypted-credentials              Do not encrypt or decrypt credentials.
+  --disable-password-policy                    Do not restrict passwords to the policy.
+  --disable-scheduling                         Disable task scheduling.
+  --create-user=<username>                     Create admin user <username> and exit.
+  --delete-user=<username>                     Delete user <username> and exit.
+  --get-users                                  List users and exit.
+  --create-scanner=<scanner>                   Create global scanner <scanner> and exit.
+  --modify-scanner=<scanner-uuid>              Modify scanner <scanner-uuid> and exit.
+  --scanner-name=<name>                        Name for --modify-scanner.
+  --scanner-host=<scanner-host>                Scanner host for --create-scanner, --rebuild and --update. Default is 127.0.0.1.
+  --scanner-port=<scanner-port>                Scanner port for --create-scanner, --rebuild and --update. Default is 9391.
+  --scanner-type=<scanner-type>                Scanner type for --create-scanner. Either 'OpenVAS' or 'OSP'.
+  --scanner-ca-pub=<scanner-ca-pub>            Scanner CA Certificate path for --[create|modify]-scanner.
+  --scanner-key-pub=<scanner-key-public>       Scanner Certificate path for --[create|modify]-scanner.
+  --scanner-key-priv=<scanner-key-private>     Scanner private key path for --[create|modify]-scanner.
+  --verify-scanner=<scanner-uuid>              Verify scanner <scanner-uuid> and exit.
+  --delete-scanner=<scanner-uuid>              Delete scanner <scanner-uuid> and exit.
+  --get-scanners                               List scanners and exit.
+  -f, --foreground                             Run in foreground.
+  -a, --listen=<address>                       Listen on <address>.
+  --listen2=<address>                          Listen also on <address>.
+  --max-ips-per-target=<number>                Maximum number of IPs per target.
+  --max-email-attachment-size=<number>         Maximum size of alert email attachments, in bytes.
+  --max-email-include-size=<number>            Maximum size of inlined content in alert emails, in bytes.
+  -m, --migrate                                Migrate the database and exit.
+  --create-credentials-encryption-key          Create a key to encrypt credentials.
+  --encrypt-all-credentials                    (Re-)Encrypt all credentials.
+  --new-password=<password>                    Modify user's password and exit.
+  --optimize=<name>                            Run an optimization: vacuum, analyze, cleanup-config-prefs, remove-open-port-results or cleanup-port-names.
+  -p, --port=<number>                          Use port number <number>.
+  --port2=<number>                             Use port number <number> for address 2.
+  --progress                                   Display progress during --rebuild and --update.
+  --rebuild                                    Rebuild the NVT cache and exit.
+  --role=<role>                                Role for --create-user and --get-users.
+  -u, --update                                 Update the NVT cache and exit.
+  --user=<username>                            User for --new-password.
+  --gnutls-priorities=<priorities-string>      Sets the GnuTLS priorities for the Manager socket.
+  --dh-params=<file>                           Diffie-Hellman parameters file
+  -v, --verbose                                Print tracing messages.
+  --version                                    Print version and exit.
+
+
+
+root@kali:~# openvasmd --get-users       //查看用户名
+admin
+
+root@kali:~# openvasmd --user=admin --new-password=password      //修改账号密码
+
+root@kali:~# netstat -pantu | grep 939
+tcp        0      0 127.0.0.1:9390          0.0.0.0:*               LISTEN      3759/openvasmd  
+tcp        0      0 127.0.0.1:9391          0.0.0.0:*               LISTEN      3734/openvassd: Wai
+tcp        0      0 127.0.0.1:9392          0.0.0.0:*               LISTEN      3764/gsad       
+tcp        0      0 127.0.0.1:37695         127.0.0.1:9392          ESTABLISHED 4377/iceweasel  
+tcp        0      0 127.0.0.1:9392          127.0.0.1:37695         ESTABLISHED 3764/gsad 
+
+root@kali:~# openvas-check-setup          //检查安装结果
+
+root@kali:~# openvas-check-setup | grep FIX
+
+root@kali:~# openvas-feed-update         //升级
+
+https://127.0.0.1:9392
+
+点击I Understand the Risks
+
+root@kali:~# openvas-start
+Starting OpenVas Services
+
+╋━━━━━━━━━╋
+┃OPENVAS           ┃
+┃扫描配置          ┃
+┃    扫描windows   ┃
+┃    扫描Linux     ┃
+┃    扫描网络设备  ┃
+╋━━━━━━━━━╋
+
+╋━━━━━━━━━╋
+┃OPENVAS           ┃
+┃扫描目标          ┃
+┃    windows       ┃
+┃    Linux         ┃
+┃    路由器        ┃
+╋━━━━━━━━━╋
+
+╋━━━━━━━━━╋
+┃OPENVAS           ┃
+┃扫描配置          ┃
+┃    进度          ┃
+┃    报告          ┃
+╋━━━━━━━━━╋

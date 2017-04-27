@@ -1,0 +1,120 @@
+课时59 WPA安全系统
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WAP安全系统                                       ┃
+┃Wi-Fi Protected Access                            ┃
+┃802.11组为提高无线安全，开发两个新的链路层加密协议┃
+┃    Temporal Key Integrity Protocol (TKIP)        ┃
+┃        WPA1 (较之WEP可动态改变密钥)              ┃
+┃    Counter Mode with CBC-MAC (CCMP)              ┃
+┃        WP2                                       ┃
+┃WPA加密两种安全类型                               ┃
+┃    WPA个人: 使用预设共享密钥实现身份验证         ┃
+┃    WPA企业: 使用800.1X和Radius服务器实现AAA      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPA1                                        ┃
+┃802.11i第三版草案                           ┃
+┃与WEP比较                                   ┃
+┃    都采用逐包进行密钥加密                  ┃
+┃    128的key和48位的初向量 (IV)             ┃
+┃    RC4流加密数据                           ┃
+┃    帧技术避免重放攻击                      ┃
+┃    TKIP使用Michael算法进行完整性校验 (MIC) ┃
+┃        WEP CRC32                           ┃
+┃    兼容早期版本硬件                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPA2                                        ┃
+┃依据802.11i完全重新设计实现                 ┃
+┃    也被称为Robust Secruity Network (RSN)   ┃
+┃    CCMP代替TKIP                            ┃
+┃    AES加密算法取代了RC4                    ┃
+┃    不兼容早期版本硬件                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━╋
+┃WPA企业连接过程 ┃
+┃协商安全协议    ┃
+┃身份验证        ┃
+┃密钥分发和验证  ┃
+┃数据加密完整性  ┃
+╋━━━━━━━━╋
+   
+      STA                                   AP                               Authenticator
+
+      │          Aregerment on             │                                    │    
+      │─────────────────→│                                    │
+      │        Security protocols          │                                    │
+      │                                    │                                    │
+      │                                    │                                    │
+      │                              802.1x│authentication                      │
+      │←─────────────────│─────────────────→│
+      │                                    │                                    │
+      │                                    │                                    │
+      │                                    │                                    │
+      │         Keys distribution          │       Master Key Distribution      │
+      │←────────────────→│←────────────────→│
+      │         and venfication            │          by Radius Server          │
+      │                                    │                                    │
+      │                                    │                                    │
+      │         Data encryption            │                                    │
+      │←────────────────→│                                    │
+      │          and integnty              │                                    │
+      │                                    │                                    │
+
+╋━━━━━━━━╋
+┃WPA-PSK         ┃
+┃协商安全协议    ┃
+┃密钥分发和验证  ┃
+┃数据加密完整性  ┃
+╋━━━━━━━━╋
+
+
+      STA                                   AP
+
+      │          Aregerment on             │  
+      │─────────────────→│
+      │        Security protocols          │
+      │                                    │
+      │                                    │
+      │         Keys distribution          │
+      │←────────────────→│
+      │         and venfication            │
+      │                                    │
+      │                                    │
+      │         Data encryption            │
+      │←────────────────→│
+      │          and integnty              │
+      │                                    │ 
+
+╋━━━━━━━━━━━━━━━╋
+┃协商安全协议                  ┃
+┃协商认证方式                  ┃
+┃    PSK/802.1X                ┃
+┃单播 和 组播/广播流量加密套件 ┃
+┃    TKIP/CCMP                 ┃
+┃STA通过probe获取无线网络信息  ┃
+┃    速率                      ┃
+┃    加密                      ┃
+┃    通道                      ┃
+┃    名称                      ┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃身份验证（WPA企业）                                     ┃
+┃身份认证基于Extensible Authentication Protocol(EAP)实现 ┃
+┃    EAP-TLS，需要客户端和服务器证书                     ┃
+┃    EAP-TTLS                                            ┃
+┃    PEAP混合身份证验证，只需要服务器证书                ┃
+┃客户端选择身份认证方式                                  ┃
+┃AP发送身份验证信息给Radius Server,                      ┃
+┃Radius Server返回"Radius Accept"表示认证成功            ┃
+┃    其中包含Master Key (MK)                             ┃
+┃AP通过EAP消息通知STA认证成功                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+

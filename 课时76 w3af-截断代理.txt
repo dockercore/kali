@@ -1,0 +1,83 @@
+课时76 w3af-截断代理
+
+W3af-----身份认证
+截断代理
+HTTP header file（另类的身份认证方法—）
+
+Accept - language: en-US,en;q=0.5
+Accept - encoding: gzip, deflate
+Connection：keep-alive
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9*/*;q=0.8
+User - agent: MOT - V177/0.1 75 UP.Brower/6.2.3.9.c.12 (GUI) MMP/2.0 UP.Link/6.3.1.13.0
+Host: 192.168.20.7
+Refere: http://192.168.20.7/dvwa/vulnerabilities/sqli/
+Cookie: secrurity=low; PHPSESSID=f8c40e05267bfbb04a6053e9ec86093
+Contenr-type: application/x-www-form-urlencoded
+
+W3af-----截断代理
+W3af不支持客户端技术（Javascirpt,Flash,Java applet等）
+截断代理手动爬网
+    spider_man
+    output.exeport_requests
+    http://127.7.7.7/spider_man?terminate  #终止spider_man
+crwal.import_results
+    base64
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb
+attack-paloads         regex/                 wordlists-user-passwd/
+Discovery/             web-backdoors/
+docs/                  wordlists-misc/
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb/Discovery
+FilenameBruteforce/ PredictableRes/
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb/Discovery/FilenameBruteforce/ PredictableRes/
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/Discovery/FilenameBruteforce/ PredictableRes/# ls
+3CharExBrute.fuzz.txt       Extensions.Compressed.fuzz.txt
+copy_of.fuzz.txt            Extensions.Mostcommon.fuzz.txt
+Extensions.Backup.fuzz.txt  Extensions.Skipfish.fuzz.txt
+Extensions.Common.fuzz.txt  wordlistSkopfish.fuzz.txt
+
+
+W3af-----其他特性
+exploit
+Fuzzy Requests
+    Numbers from 0 to 4: $rang(5)$
+    Frist ten letters: $string.lowercase[:10]$
+    The words spam and eggs: $['span','eggs']$
+    The content of a file: $[1.strip() for 1 in file('input.txt')]$
+Cluster responses
+
+sqlmap@db> help
+sqlmap@db> Available commands:
+      help                          Display this information
+
+      lsp                           List payloads
+      payload <payload>             Execute "payload" and get the result
+      read <file>                   Read the remote server <file> and echo to this console
+      download <remote> <local>     Download <remote> file to <local> file system location
+
+      dbs                           List DBMS databases
+      table                         List DBMS tables for the current database
+      users                         List DBMS users
+      dump                          Dump table information
+
+      slqmap                        Run a sqlmap command. For example, the "dbs" command
+                                    is an alias for "sqlmap --dbs".
+
+      exit                          Exit this shell session
+
+
+sqlmap@db> read /etc/passwd
+
+sqlmap@db> dbs
+
+sqlmap@db> lsp
+
+sqlmap@db> payload users
+
+
+
+
+

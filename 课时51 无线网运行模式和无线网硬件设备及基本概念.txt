@@ -1,0 +1,117 @@
+课时51 无线网运行模式和无线网硬件设备及基本概念
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃无线网络运行模式                      ┃
+┃Infrastructure                        ┃
+┃    AP 维护SSID                       ┃
+┃Ad-Hoc                                ┃
+┃    STA 维护SSID                      ┃
+┃Service Set Identifier(SSID)          ┃
+┃    AP每秒钟约10次通过Beacon帧广播SSID┃
+┃    客户端连接到无线网络后也会宣告SSID┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                          ┃
+┃Infrastructure                                                  ┃
+┃    至少包含一个AP和一个STATION，形成一个Basic Service Set (BSS)┃
+┃    AP练级到有限网络，称为Distribution System (DS)              ┃
+┃    连接到同一个DS的多个AP形成一个Extend Service Set (ESS)      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+┃AD-HOC                                      ┃
+┃也被称为Independent Basic Service Set (IBSS)┃
+┃有至少2个STAs直接通信组成                   ┃
+┃也称为peer to peer模式                      ┃
+┃其中一个STA负责AP的工作                     ┃
+┃    通过beacon广播SSID                      ┃
+┃    对其他STAs进行身份验证                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WIRELESS DISTRIBUTION SYSTEM (WDS)              ┃
+┃与有线DS类似，只是通过无线连接的多个AP组成的网络┃
+┃    Bridging------只有AP间彼此通信              ┃
+┃    Repeating-----允许所有AP和STA进行通信       ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃MONITOR MODR                                        ┃
+┃Monitor不是一种真的无线模式                         ┃
+┃    但是对无线渗透至关重要                          ┃
+┃    允许无线网卡没有任何筛选的(802.11包头)          ┃
+┃    与有线网络的混杂模式可以类比                    ┃
+┃    合适的网卡和驱动不但可以monitor，更可以injection┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+Ommnipeek  抓包软件
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃      无线网硬件设备及基础概念        ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━╋
+┃无线网卡准备              ┃
+┃物理机运行kali            ┃
+┃虚拟机运行kali            ┃
+┃    外置USB无线网卡       ┃
+┃    TL-WN722N （个人建议）┃
+┃    dmesg                 ┃
+┃    iwconfig              ┃
+╋━━━━━━━━━━━━━╋
+
+虚拟机映射USB网卡
+
+root@kali:~# ifconfig -a
+
+root@kali:~# desmg -T         //硬件设备的变化
+
+root@kali:~# iwconfig
+eth0       no wireless extensions.
+
+wlan2      IEEE 802.11bgn  ESSID:off/any
+           Mode:Managed  Access Point: Not-Associated   Tx-Power=20 dBm
+           Retry short limit:7  RTS thr:off    Fragment thr:off
+           Encryption key:off
+           Power Management:off
+
+lo         no wireless extensions.
+
+╋━━━━━━━━━━━━━━━━━╋
+┃选择无线网卡                      ┃
+┃这是个痛苦或受挫的过程            ┃
+┃无线网卡的芯片信号成败的关键      ┃
+┃台式机                            ┃
+┃    USB无线网卡（不支持扩展天线） ┃
+┃    PCMCIA (16bit已停产802.11b)   ┃
+┃    Cardbus (32bit PCMCIA 8.0标准)┃
+┃    Express Cards                 ┃
+┃    MiniPCI                       ┃
+┃    MINIpCI Express               ┃
+┃    PCI接口卡                     ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃选择无线网卡                                                                            ┃
+┃发送功率：远程连接                                                                      ┃
+┃接收灵敏性：适当降低灵敏度，接收效果更佳                                                ┃
+┃经验但不是铁律                                                                          ┃
+┃    Atheros或Realtek芯片                                                                ┃
+┃    没有神器                                                                            ┃
+┃    兼容aircrack-ng suite                                                               ┃
+┃http://www.aircrack-ng.org/doku.php?id=compatibility_drivers#list_of_compatible_adapters┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃选择无线网卡                                                ┃
+┃无线渗透网卡没有所谓标准，但是Aircrack-ng suite 作者给出建议┃
+┃Alfa Networks AWUS036H无线网卡                              ┃
+┃    Realtek 8187芯片                                        ┃
+┃    1000mW发送功率                                          ┃
+┃    天线: RP-SMA                                            ┃
+┃        可扩展                                              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+ 长江七号精华版
+

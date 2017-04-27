@@ -1,0 +1,36 @@
+课时81 Burpsuite-repeater，Sequencer，编码，代理截断工具
+
+Burpsuite-----repeater
+Repeater
+    Request History
+    Change request method
+    Change body encoding
+    Copy as curl command
+    Convert selsction
+    Repeater菜单
+        Engagement tools-----generate csrf PoC
+        Follow redirections
+        Process cookies in redirections
+
+Burpsuite-----Sequencer
+分析程序中可预测的数据
+    Session cookies
+    anti-CSRF tokens
+    Start live capture
+        Analyz（数据越多分析越准确）
+        伪随机数算法
+        Character-level
+        Bit-level
+FIPS--美国联邦信息处理标准(Federal Information Processing Standard)
+
+Burpsuite-----编码*
+Decoder
+    使用各种编码绕过服务器端输入过滤
+    smart decode
+
+代理截断工具
+Paros
+Webscarab
+Burpsuite
+
+web程序----->paros

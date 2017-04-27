@@ -1,0 +1,176 @@
+课时77 Arachni
+
+root@kali:~# apt-get install kali
+kali                  kali-desktop-lxde      kali-linux-pwtools
+kali-archive-keyring  kali-desktop-xfce      kali-linux-rfid
+kalibrate-rtl         kalign                 kali-linux-sdr
+kali-debtags          kali-linux             kali-linux-top10
+kali-defaults         kali-linux-all         kali-linux-voip
+kali-desktop-commmon  kali-linux-forensic    kali-linux-web
+kali-desktop-gnome    kali-linux-full        kali-linux-wireless
+kali-desktop-kde      kali-linux-gpu         kali-menu
+kali-desktop-live     kali-linux-nethunter   kali-root-login
+
+root@kali:~# apt-get install kali-linux
+kali-linux            kali-linux-nethunter   kali-linux-voip
+kali-linux-all        kali-linux-pwtools     kali-linux-web
+kali-linux-forensic   kali-linux-rfid        kali-linux-wireless
+kali-linux-full       kali-linux-sdr
+kali- linux-gpu       kali-linux-top10
+
+root@kali:~# apt-get install kali-linux-all
+
+root@kali:~# apt-get build-pep python-lxml   //然后安装这个工具包
+
+Arachni
+Kali自带了旧的arachni阉割版
+安装
+    http://www.arachni-scanner.com/download/#Linux
+    tar xvf arachni.tar.gz
+    http://localhost:9292/
+        admin@admin.admin / administrator
+--------------------------------------------------------------------------------------------
+[课外拓展]
+1，arachni简介 
+
+arachni是一个用ruby语言编写的针对web应用的安全漏洞扫描软件，可以扫描的漏洞类型比较多，都是一个个的模块。项目主页https://github.com/Arachni/arachni 
+
+新版本的arachni应该是需要ruby版本在1.9.2以上。下面是在centos上面安装arachni的简单过程： 
+
+2.，安装 
+
+
+安装依赖包
+
+yum -y install libxslt-devel libyaml-devel libxml2-devel gdbm-devel libffi-devel zlib-devel openssl-devel libyaml-devel readline-devel curl-devel openssl-devel pcre-devel git memcached-devel valgrind-devel mysql-devel ImageMagick-devel ImageMagick
+
+
+下载新版本ruby源码
+
+wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p385.tar.bz2
+tar xf ruby-1.9.3-p385.tar.bz2
+cd ruby-1.9.3-p385/
+./configure
+make
+make install
+
+
+下面安装新版本rubygems，其实1.9以上的ruby已经集成了rubygems的
+
+version=1.8.25
+wget http://production.cf.rubygems.org/rubygems/rubygems-$version.tgz
+tar xf rubygems-1.8.25.tgz
+cd rubygems-1.8.25/
+/usr/local/bin/ruby setup.rb
+
+
+下面配置gem源，使用淘宝提供的镜像，速度快，感谢淘宝。
+
+gem source -a http://ruby.taobao.org
+gem source -r http://rubygems.org/
+gem source -r http://gems.rubyforge.org/
+
+
+可以用gem source -l 查看一下
+
+
+下面安装bundler
+
+gem install bundler
+
+
+clone最新版本的arachni
+
+git clone git://github.com/Arachni/arachni.git
+cd arachni
+bundle install
+
+
+到这里安装运行arachni需要的环境就ok了。 
+
+3，启动web 
+
+/usr/local/bin/arachni_web_autostart
+
+启动后web会监听到http://127.0.0.1:4567/，打开里面可以配置modules，按照自己的需求配置好之后点‘start a scan’，填入需要检查的目标网站url地址，就可以开工了。
+
+上面的安装过程是arachni的master分支，如果需要使用最新的开发版本，可以按照下面的步骤：https://github.com/Arachni/arachni-ui-web/tree/experimental#getting-started
+
+experimental分支里面包含了所有最新的改动，有些测试阶段的改动并没有合并到master分支里面去，这个分支和master最大的区别是把web ui独立出来了，重新基于rails构建了全新的web ui。如果嫌麻烦的话也可以下载，所有东西都在一个包里面，不需要安装其他东西了，十分方便。
+------------------------------------------------------------------------------------------------
+
+root@kali:~# cp /media/sf_D_DRIVE/软件/arachni-1.3.2-0.5.9-linux-x86_64.tar.gz
+
+root@kali:~# tar xvf arachni-1.3.2-0.5.9-linux-x86_64.tar.gz
+
+root@kali:~# ls
+arachni-1.3.2-0.5.9                      公共   视频   文档   音乐
+arachni-1.3.2-0.5.9-linux-x86_64.tar.gz  模板   图片   下载   桌面
+
+root@kali:~# cd arachni-1.3.2-0.5.9/
+
+root@kali:/arachni-1.3.2-0.5.9# ls
+bin   LICENSE  README  system  TROUBLESHOOTING  VERSION
+
+root@kali:/arachni-1.3.2-0.5.9# gedit README
+
+root@kali:/arachni-1.3.2-0.5.9# cd bin
+
+root@kali:/arachni-1.3.2-0.5.9/bin# ls
+arachni          arachni_rpc            arachni_web                  arachni_web_script
+arachni_console  arachni_rpcd           arachni_web_change_password  arachni_web_task
+arachni_multi    arachni_rpcd_monitor   arachni_web_create_user      readlink_f.sh
+arachni_reporter arachni_script         arachni_web_import
+arachni_restore  arachni_shell          arachni_web_scan_import
+
+root@kali:/arachni-1.3.2-0.5.9/bin# ./arachni_console    //命令行界面
+
+root@kali:/arachni-1.3.2-0.5.9/bin# ./arachni_web      //web界面
+
+Email:
+admin@admin.admin
+Password:
+administrator
+
+Arachni
+Profile
+    Import
+    Export
+    New
+Dispatcher
+    ./arachni_rpcd --address=127.0.0.1 --port=1111 --nickname=test1
+Grid
+    ./arachni_rpcd --nickname=test2 --address=127.0.0.1 --neighbour=127.0.0.1:1111
+Scan
+
+root@kali:/arachni-1.3.2-0.5.9/bin# ./arachni_rpcd --address=127.0.0.1 --port=1111 --nickname=test1
+Arachni - web Applicaiton Security Scanner Framework v1.3.2
+    Author: Tasos "Zapotek" Laskos <tasos.laskos@arachni-scanner.com
+
+            (With the support of the community and the Arachni Team.)
+    Website:       http://arachni-scanner.com
+    Documentation: http://arachni-scanner.com/wiki
+
+I, [2015-12-22T20:43:40.991264 #3557] INFO -- System: RPC Server started.
+I, [2015-12-22T20:43:40.991533 #3557] INFO -- System: Listening on 127.0.0.1:1111
+......
+
+root@kali:/arachni-1.3.2-0.5.9/bin# ./arachni_rpcd --nickname=test2 --address=127.0.0.1 --neighbour=127.0.0.1:1111
+Arachni - web Applicaiton Security Scanner Framework v1.3.2
+    Author: Tasos "Zapotek" Laskos <tasos.laskos@arachni-scanner.com
+
+            (With the support of the community and the Arachni Team.)
+    Website:       http://arachni-scanner.com
+    Documentation: http://arachni-scanner.com/wiki
+
+I, [2015-12-22T20:43:40.991264 #3557] INFO -- System: RPC Server started.
+I, [2015-12-22T20:43:40.991533 #3557] INFO -- System: Listening on 127.0.0.1:1111
+......
+
+
+
+
+
+
+
+

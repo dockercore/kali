@@ -1,0 +1,72 @@
+课时11 基本工具-NETCAT(传输文件/目录、流媒体服务、端口扫描、远程克隆硬盘)
+
+NC----传输文件/目录
+传输文件
+    A: nc -lp 333 > 1.mp4
+    B: nc -nv 1.1.1.1. 333 < 1.mp4 - q 1
+    或
+    A: nc -q -lp 333 < a.mp4
+    B: nc -nv 1.1.1.1 333 > 2.mp4
+传输目录
+    A: tar -cvf - music/ | nc -lp 333 - q 1
+    B: nc -nv 1.1.1.1 333 | tar -xvf -
+加密传文件
+    A: nc -lp 333 | mcrypt --flush -Fbqd -a rijndael-256 -m ecb > 1.mp4          文件解密
+    B:  mcrypt --flush -Fbq -a rijndael-256 -m ecb < a.mp4 | nc -nv 1.1.1.1 333 -q 1     文件加密
+
+
+A:
+root:~/Desktop# nc -lp 333 | mcrypt --flush -Fbqd -a rijndael-256 -m ecb > 1.mp4 
+Enter passphrase: xxxx 
+
+B:
+root:~/Desktop# mcrypt --flush -Fbq -a rijndael-256 -m ecb < a.mp4 | nc -nv 1.1.1.1 333 -q 1
+Enter the passphrase (maximum of 512 characters)
+Please use a combination of upper and lower case letters and numbers.
+Enter passhrase: (UNKNOWN) [10.1.1.12] 333 (?) open
+en
+
+Enter passphrase: xxxx
+
+NC不自带mcrypt,需要自己安装！
+
+NC-----流媒体服务
+    A: cat 1.mp4 | nc -lp 333
+    B: nc -nv 1.1.1.1 333 | mplayer -vo x11 -cache 3000 -
+
+NC-----端口扫描
+  nc -nvz 1.1.1.1 -65536
+  nc -vnzu 1.1.1.1 1-1024
+
+root@1kali:~# nc -h
+[v1.10-38]
+connect to somewhere:   nc [-options] hostname port[s] [ports] ... 
+listen for inbound: nc -l -p port [-options] [hostname] [port]
+options:
+    -c shell commands   as `-e'; use /bin/sh to exec [dangerous!!]
+    -e filename     program to exec after connect [dangerous!!]
+    -b          allow broadcasts
+    -g gateway      source-routing hop point[s], up to 8                          设置路由器跃程通信网关，最高可设置8个。
+    -G num          source-routing pointer: 4, 8, 12, ...                         设置来源路由指向器，其数值为4的倍数。
+    -h          this cruft 
+    -i secs         delay interval for lines sent, ports sca                      延时的间隔
+        -k                      set keepalive option on socket
+    -l          listen mode, for inbound connects                             监听模式,入站连接
+    -n          numeric-only IP addresses, no DNS                             直接使用ip地址,而不用域名服务器
+    -o file         hex dump of traffic                                           指定文件名称，把往来传输的数据以16进制字码倾倒成该文件保存。
+    -p port         local port number                                             本地端口
+    -r          randomize local and remote ports                              随机本地和远程端口 
+    -q secs         quit after EOF on stdin and delay of secs
+    -s addr         local source address  
+    -T tos          set Type Of Service
+    -t          answer TELNET negotiation   
+    -u          UDP mode                                                      udp  模式
+    -v          verbose [use twice to be more verbose]                        显示过程,vv 更多
+    -w secs         timeout for connects and final net reads                      等待连接超时
+    -z          zero-I/O mode [used for scanning]                             使用输入/输出模式，只在扫描通信端口时使用。
+
+NC-----远程克隆硬盘
+     A: nc -lp 333 | dd of=/dev/sda
+     B: dd if=/dev/sda | nc -nv 1.1.1.1 333 -q 1
+
+远程电子取证，可以讲目标服务器远程复制，或者内存。

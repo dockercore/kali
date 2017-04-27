@@ -1,0 +1,289 @@
+课时24 主动信息收集-发现
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃主动信息收集                              ┃
+┃无法避免留下访问的痕迹                    ┃
+┃使用受控的第三方电脑进行探测              ┃         
+┃  使用代理或已经被控制的主机              ┃
+┃  做好被封杀的准备                        ┃
+┃  使用噪声迷惑目标，淹没真是的探测流量    ┃
+┃扫描                                      ┃
+┃  发送不同的探测，根据返回根据判断目标状态┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━╋
+┃识别活着的主机      ┃
+┃  潜在的被攻击目标  ┃
+┃输出一个IP地址列表  ┃
+┃2、3、4层发现       ┃
+╋━━━━━━━━━━╋
+
+┌───────────────────────────────────────────────┐
+│OSI model                 Layer description                                    Protocols      │
+├───────────────────────────────────────────────┤
+│Layer 7 - Application     This layer involves the application software that    HTTP,FTP       │
+│                          is sending and receiving data                        and Telnet     │ 
+│Layer 6 - Presentation    This layer deines how data is formatted              ASCII,JPEG,PDF │
+│                          or organized                                         PNG,and DOCX   │
+│Layer 5 - Session         This layer involves application session control      NetBIOS,PPTP   │
+│                          management,synchronization                           RPC,and SOCKS  │
+│Layer 4 - Transport       This layer involves and-to-end                       TCP and UDP    │
+│                          communication services                                              │
+│Layer 3 - Network         This layer involes logical system addressing         IPv4,IPv6,ICMP,│
+│                                                                               and IPSec      │
+│Layer 2 - Data link       This layer involes physical system addressing        ARP            │
+│Layer 1 - Pysical         This layer involes the data stream that is                          │
+│                          passed over the wire                                                │
+└───────────────────────────────────────────────┘
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃发现-----二层发现                                                                           ┃
+┃  arping                                                                                    ┃
+┃  arping 1.1.1.1 -c 1                                                                       ┃   
+┃  arping 1.1.1.1 -d                                                                         ┃
+┃  arping -c 1.1.1.1 | grep "bytes from" | cut -d"" -f 5 | cut -d "(" -f 2 | cut -d")" -f 1 ┃
+┃  脚本                                                                                      ┃
+┃      arping1.sh eth0 > addrs                                                               ┃
+┃      arping2.sh addrs                                                                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+
+[课后拓展]关于kali linux中无RPM命令无法使用的问题，本人在自己的机器上通过以下方法修正了，
+　　身为kali linux的初学者，如果你用了我的方法将问题解决了最好，如果没有解决请见谅。
+　　------------------------------------------
+　　RPM是RedHat Package Manager(RedHat软件包管理工具)。
+　　在进入kali linux 终端输入RPM，如果提示没有安装的情况的时候
+　　那么这个命令是不能使用的。解决方法是通过改用163的源，更新后使用RPM。
+　　下载163的源
+　　wget http://mirrors.163.com/.help/sources.list.squeeze
+　　注释后面3行
+　　vi sources.list.squeeze
+　　复制到该位置
+　　cp sources.list.squeeze /etc/apt/sources.list
+　　apt-get update
+　　上述操作结束后重启客户端即可使用RPM命令。
+
+root@kali:~# ifconfig
+
+root@kali:~# vi /etc/network/interfaces
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface eth0 inet dhcp
+#        address 192.168.20.8
+#        netmask 255.255.255.0
+#        network 192.168.20.0
+#        broadcast 192.168.20.255
+#        gateway 192.168.20.2
+         # dns-* options are implemented by the resolvconf package, if installed
+#        dns-nameservers 192.168.60.101 192.168.60.102
+
+root@kali:~# dhclient eth0
+
+root@kali:~# arping 192.168.1.110
+
+root@kali:~# arping 192.168.1.110 -c 1
+
+root@kali:~# arping -h
+ARPing 2.14, by Thomas Habets <thomas@habets.se>
+usage: arping [ -0aAbdDeFpPqrRuUv ] [ -w <us> ] [ -W <sec> ] [ -S <host/ip> ]
+              [ -T <host/ip ] [ -s <MAC> ] [ -t <MAC> ] [ -c <count> ]
+              [ -C <count> ] [ -i <interface> ] <host/ip/MAC | -B>
+For complete usage info, use --help or check the manpage.
+
+root@kali:~# arping 192.168.1.1 -d
+
+root@kali:~# arping -c 192.168.1.1 | grep "bytes from" | cut -d" " -f 5 | cut -d "(" -f 2 | cut -d")" -f 1
+
+root@kali:~# arping 192.168.1.1
+ARPING 192.168.1.1
+60 bytes from f0:eb:d0:22:46:b4 (192.168.1.1): index=0 time=8.086 msec
+60 bytes from f0:eb:d0:22:46:b4 (192.168.1.1): index=1 time=13.558 msec
+60 bytes from f0:eb:d0:22:46:b4 (192.168.1.1): index=2 time=7.545 msec
+60 bytes from f0:eb:d0:22:46:b4 (192.168.1.1): index=3 time=13.376 msec
+^C
+--- 192.168.1.1 statistics ---
+4 packets transmitted, 4 packets received,   0% unanswered (0 extra)
+rtt min/avg/max/std-dev = 7.545/10.641/13.558/2.833 ms
+
+╭────────────────────────────────────────────╮
+[arping1.sh]
+#!/bin/bash
+if{"$#"-ne 1};then
+  echo"Usage - ./arping.sh {interface}"
+  echo"Example - ./arping.sh eth0"
+  echo"Example will perform an ARP scan of the local subnet to which eth0 is assigned"
+  exit
+fi
+interface=$1
+prefix=$(ifconfig sinterface | grep 'inter addr' | cut -d ':' -f 2 | cut -d ' ' -f 1 | cut -d '.' -f 1-3)
+for addr in$(seq 1 254);do
+   arping -c | Sprefix.Saddr | grep "bytes from" | cut -d ' ' -f 5 | cut -d '(' -f 2 | cut -d ')' -f 1 >> addr.txt
+done
+╰────────────────────────────────────────────╯
+
+root@kali:~# ifconfig eth0 | grep 'inter addr' | cut -d ':' -f 2 | cut -d ' ' -f 1 | cut -d '.' -f 1-3
+
+root@kali:~# arping1.sh eth0 
+
+╭────────────────────────────────────────────╮
+[arping2.sh]
+#!/bin/bash
+if{"$#"-ne 1};then
+  echo"Usage - ./arping.sh {interface}"
+  echo"Example - ./arping.sh eth0"
+  echo"Example will perform an ARP scan of the local subnet to which eth0 is assigned"
+  exit
+fi
+file=$1
+for addr in $(cat $file); do
+   arping -c 1 $addr | grep "bytes from" | cut -d ' ' -f 5 | cut -d '(' -f 2 | cut -d ')' -f 1 
+╰────────────────────────────────────────────╯
+
+root@kali:~# arping2.sh addr
+
+╋━━━━━━━━━━━━╋
+┃发现-----二层发现       ┃
+┃nmap 1.1.1.1-254-sn     ┃
+┃nmap -iL iplist.txt -sn ┃
+┃                        ┃
+┃Nmap很轻大，后面单独介绍┃
+╋━━━━━━━━━━━━╋
+
+root@kali:~# nmap
+Nmap 6.49BETA4 ( https://nmap.org )
+Usage: nmap [Scan Type(s)] [Options] {target specification}
+TARGET SPECIFICATION:
+  Can pass hostnames, IP addresses, networks, etc.
+  Ex: scanme.nmap.org, microsoft.com/24, 192.168.0.1; 10.0.0-255.1-254
+  -iL <inputfilename>: Input from list of hosts/networks
+  -iR <num hosts>: Choose random targets
+  --exclude <host1[,host2][,host3],...>: Exclude hosts/networks
+  --excludefile <exclude_file>: Exclude list from file
+HOST DISCOVERY:
+  -sL: List Scan - simply list targets to scan
+  -sn: Ping Scan - disable port scan
+  -Pn: Treat all hosts as online -- skip host discovery
+  -PS/PA/PU/PY[portlist]: TCP SYN/ACK, UDP or SCTP discovery to given ports
+  -PE/PP/PM: ICMP echo, timestamp, and netmask request discovery probes
+  -PO[protocol list]: IP Protocol Ping
+  -n/-R: Never do DNS resolution/Always resolve [default: sometimes]
+  --dns-servers <serv1[,serv2],...>: Specify custom DNS servers
+  --system-dns: Use OS's DNS resolver
+  --traceroute: Trace hop path to each host
+SCAN TECHNIQUES:
+  -sS/sT/sA/sW/sM: TCP SYN/Connect()/ACK/Window/Maimon scans
+  -sU: UDP Scan
+  -sN/sF/sX: TCP Null, FIN, and Xmas scans
+  --scanflags <flags>: Customize TCP scan flags
+  -sI <zombie host[:probeport]>: Idle scan
+  -sY/sZ: SCTP INIT/COOKIE-ECHO scans
+  -sO: IP protocol scan
+  -b <FTP relay host>: FTP bounce scan
+PORT SPECIFICATION AND SCAN ORDER:
+  -p <port ranges>: Only scan specified ports
+    Ex: -p22; -p1-65535; -p U:53,111,137,T:21-25,80,139,8080,S:9
+  --exclude-ports <port ranges>: Exclude the specified ports from scanning
+  -F: Fast mode - Scan fewer ports than the default scan
+  -r: Scan ports consecutively - don't randomize
+  --top-ports <number>: Scan <number> most common ports
+  --port-ratio <ratio>: Scan ports more common than <ratio>
+SERVICE/VERSION DETECTION:
+  -sV: Probe open ports to determine service/version info
+  --version-intensity <level>: Set from 0 (light) to 9 (try all probes)
+  --version-light: Limit to most likely probes (intensity 2)
+  --version-all: Try every single probe (intensity 9)
+  --version-trace: Show detailed version scan activity (for debugging)
+SCRIPT SCAN:
+  -sC: equivalent to --script=default
+  --script=<Lua scripts>: <Lua scripts> is a comma separated list of
+           directories, script-files or script-categories
+  --script-args=<n1=v1,[n2=v2,...]>: provide arguments to scripts
+  --script-args-file=filename: provide NSE script args in a file
+  --script-trace: Show all data sent and received
+  --script-updatedb: Update the script database.
+  --script-help=<Lua scripts>: Show help about scripts.
+           <Lua scripts> is a comma-separated list of script-files or
+           script-categories.
+OS DETECTION:
+  -O: Enable OS detection
+  --osscan-limit: Limit OS detection to promising targets
+  --osscan-guess: Guess OS more aggressively
+TIMING AND PERFORMANCE:
+  Options which take <time> are in seconds, or append 'ms' (milliseconds),
+  's' (seconds), 'm' (minutes), or 'h' (hours) to the value (e.g. 30m).
+  -T<0-5>: Set timing template (higher is faster)
+  --min-hostgroup/max-hostgroup <size>: Parallel host scan group sizes
+  --min-parallelism/max-parallelism <numprobes>: Probe parallelization
+  --min-rtt-timeout/max-rtt-timeout/initial-rtt-timeout <time>: Specifies
+      probe round trip time.
+  --max-retries <tries>: Caps number of port scan probe retransmissions.
+  --host-timeout <time>: Give up on target after this long
+  --scan-delay/--max-scan-delay <time>: Adjust delay between probes
+  --min-rate <number>: Send packets no slower than <number> per second
+  --max-rate <number>: Send packets no faster than <number> per second
+FIREWALL/IDS EVASION AND SPOOFING:
+  -f; --mtu <val>: fragment packets (optionally w/given MTU)
+  -D <decoy1,decoy2[,ME],...>: Cloak a scan with decoys
+  -S <IP_Address>: Spoof source address
+  -e <iface>: Use specified interface
+  -g/--source-port <portnum>: Use given port number
+  --proxies <url1,[url2],...>: Relay connections through HTTP/SOCKS4 proxies
+  --data <hex string>: Append a custom payload to sent packets
+  --data-string <string>: Append a custom ASCII string to sent packets
+  --data-length <num>: Append random data to sent packets
+  --ip-options <options>: Send packets with specified ip options
+  --ttl <val>: Set IP time-to-live field
+  --spoof-mac <mac address/prefix/vendor name>: Spoof your MAC address
+  --badsum: Send packets with a bogus TCP/UDP/SCTP checksum
+OUTPUT:
+  -oN/-oX/-oS/-oG <file>: Output scan in normal, XML, s|<rIpt kIddi3,
+     and Grepable format, respectively, to the given filename.
+  -oA <basename>: Output in the three major formats at once
+  -v: Increase verbosity level (use -vv or more for greater effect)
+  -d: Increase debugging level (use -dd or more for greater effect)
+  --reason: Display the reason a port is in a particular state
+  --open: Only show open (or possibly open) ports
+  --packet-trace: Show all packets sent and received
+  --iflist: Print host interfaces and routes (for debugging)
+  --append-output: Append to rather than clobber specified output files
+  --resume <filename>: Resume an aborted scan
+  --stylesheet <path/URL>: XSL stylesheet to transform XML output to HTML
+  --webxml: Reference stylesheet from Nmap.Org for more portable XML
+  --no-stylesheet: Prevent associating of XSL stylesheet w/XML output
+MISC:
+  -6: Enable IPv6 scanning
+  -A: Enable OS detection, version detection, script scanning, and traceroute
+  --datadir <dirname>: Specify custom Nmap data file location
+  --send-eth/--send-ip: Send using raw ethernet frames or IP packets
+  --privileged: Assume that the user is fully privileged
+  --unprivileged: Assume the user lacks raw socket privileges
+  -V: Print version number
+  -h: Print this help summary page.
+EXAMPLES:
+  nmap -v -A scanme.nmap.org
+  nmap -v -sn 192.168.0.0/16 10.0.0.0/8
+  nmap -v -iR 10000 -Pn -p 80
+SEE THE MAN PAGE (https://nmap.org/book/man.html) FOR MORE OPTIONS AND EXAMPLES
+
+root@kali:~# nmap -sn 192.168.1.0/24
+
+Starting Nmap 6.49BETA4 ( https://nmap.org ) at 2015-09-24 14:04 CST
+Nmap scan report for 192.168.1.1
+Host is up (0.0055s latency).
+MAC Address: F0:EB:D0:22:46:B4 (Shanghai Feixun Communication Co.)
+Nmap scan report for 192.168.1.101
+Host is up (0.00030s latency).
+MAC Address: 00:5A:39:B0:ED:D2 (Shenzhen Fast Technologies CO.)
+Nmap scan report for 192.168.1.110
+Host is up.
+Nmap done: 256 IP addresses (3 hosts up) scanned in 2.09 seconds
+
+
+root@kali:~# nmap -iL addr -sn

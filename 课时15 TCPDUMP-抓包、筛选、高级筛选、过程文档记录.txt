@@ -1,0 +1,156 @@
+课时15 TCPDUMP-抓包、筛选、高级筛选、过程文档记录
+
+TCPDUMP
+  No-GUI的抓包分析工具
+  Linux、Unix系统默认安装
+
+TCPdump-----抓包
+抓包
+  默认只抓68个字节
+  tcpdump -i eth0 -s 0 -w file.pcap
+  tcpdump -i eth0 port 22
+读取抓包文件
+  Tcpdump -r file.pcap
+
+
+选项介绍
+
+-A 以ASCII格式打印出所有分组，并将链路层的头最小化。 
+-c 在收到指定的数量的分组后，tcpdump就会停止。 
+-C 在将一个原始分组写入文件之前，检查文件当前的大小是否超过了参数file_size 中指定的大小。如果超过了指定大小，则关闭当前文件，然后在打开一个新的文件。参数 file_size 的单位是兆字节（是1,000,000字节，而不是1,048,576字节）。 
+-d 将匹配信息包的代码以人们能够理解的汇编格式给出。 
+-dd 将匹配信息包的代码以c语言程序段的格式给出。 
+-ddd 将匹配信息包的代码以十进制的形式给出。 
+-D 打印出系统中所有可以用tcpdump截包的网络接口。 
+-e 在输出行打印出数据链路层的头部信息。 
+-E 用spi@ipaddr algo:secret解密那些以addr作为地址，并且包含了安全参数索引值spi的IPsec ESP分组。 
+-f 将外部的Internet地址以数字的形式打印出来。 
+-F 从指定的文件中读取表达式，忽略命令行中给出的表达式。 
+-i 指定监听的网络接口。 
+-l 使标准输出变为缓冲行形式，可以把数据导出到文件。 
+-L 列出网络接口的已知数据链路。 
+-m 从文件module中导入SMI MIB模块定义。该参数可以被使用多次，以导入多个MIB模块。 
+-M 如果tcp报文中存在TCP-MD5选项，则需要用secret作为共享的验证码用于验证TCP-MD5选选项摘要（详情可参考RFC 2385）。 
+-b 在数据-链路层上选择协议，包括ip、arp、rarp、ipx都是这一层的。
+-n 不把网络地址转换成名字。
+-nn 不进行端口名称的转换。
+-N 不输出主机名中的域名部分。例如，‘nic.ddn.mil‘只输出’nic‘。 
+-t 在输出的每一行不打印时间戳。 
+-O 不运行分组分组匹配（packet-matching）代码优化程序。 
+-P 不将网络接口设置成混杂模式。 
+-q 快速输出。只输出较少的协议信息。 
+-r 从指定的文件中读取包(这些包一般通过-w选项产生)。 
+-S 将tcp的序列号以绝对值形式输出，而不是相对值。 
+-s 从每个分组中读取最开始的snaplen个字节，而不是默认的68个字节。 
+-T 将监听到的包直接解释为指定的类型的报文，常见的类型有rpc远程过程调用）和snmp（简单网络管理协议；）。 
+-t 不在每一行中输出时间戳。 
+-tt 在每一行中输出非格式化的时间戳。 
+-ttt 输出本行和前面一行之间的时间差。 
+-tttt 在每一行中输出由date处理的默认格式的时间戳。 
+-u 输出未解码的NFS句柄。 
+-v 输出一个稍微详细的信息，例如在ip包中可以包括ttl和服务类型的信息。 
+-vv 输出详细的报文信息。 
+-w 直接将分组写入文件中，而不是不分析并打印出来。
+
+
+
+root:～# tcpdump -h          
+tcpdump version 4.3.0
+libpcap version 1.3.0
+Usage: tcpdump [-aAbdDefhHIJKlLnNOpqRStuUvxX] [ -B size ] [ -c count ]
+                 [ -C file_size ] [ -E algo:secret ] [ -F file ] [ -G seconds]
+                 [ -i interface ] [ -j tstamptype ] [ -M secret ]
+                 [ -r file ] [ -s snaplen ] [ -T type ] [ -w file ]
+                 [ -W filecount ] [ -y datalinktype] [ -z command ]
+                 [ -Z user ] [ expression ]
+
+root:～# tcpdump -i eth0 -s 0 -w a.cap     //监听网络接口字节为0保存到a.cap文件中
+tcpdump: listening on eth0, link-type EN10MB(Ethernet), capture size 65535 bytes
+^C15 packets captured
+15 packets receiced by filter
+0 packets drodded by kernel
+
+root:～# tcpdump -r a.cap                  //读取a.cap文件内容
+
+root:～# tcpdump -A -r a.cap               //以ASCII格式打印出所有的分组并且读取此文件
+
+root:～# tcpdump -X -r a.cap               //以十六进制格式打印出所有的分组并且读取此文件
+
+root:～# tcpdump -i eth0 tcp port 22
+
+TCPDUMP------筛选
+  tcpdump -n -r http.cap | awk '{print $3}'| sort -u
+  tcpdump -n src host 145.254.160.237 -r http.cap
+  tcpdump -n dst host 145.254.160.237 -r http.cap
+  tcpdump -n port 53 -r http.cap
+  tcpdump -nX port 80 -r http.cap
+
+root:～/Downloads# tcpdump -n -r http.cap | awk '{print $3}'| sort -u
+reading from file http.cap, link type En10MB(Ethernet)
+145.253.2.203.53
+145.254.160.237.3009
+145.254.160.237.3371
+145.254.160.237.3372
+216.239.59.99.80
+65.208.228.223.80
+
+
+0                  1                    2                   3
+
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|          Source Port          |     Destination Port          |
+         
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|                        Sequence Number                        |
+         
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|                      Acknowledgment Nuber                     |
+         
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|  Date  |      |C|E|U|A|P|R|A|F|                               |
+ 
+| Offset |  Res.|W|C|R|C|S|S|Y|I|         Windwos               |
+
+|        |      |R|E|G|K|H|T|N|N|                               |
+         
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|            Checksum           |     Urgent Pointer            |
+         
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|                      Options               |     Padding      |
+         
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+|                                data                           |
+          
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+CEUAPRSF
+00011000 = 24 in decimal
+
+TCPDUMP------高级筛选
+  tcpdump -A -n 'tcp[13]=24' -r http.cap
+
+过程文档记录
+  Dradis
+    短期临时小团队资源共享
+    各种插件导入文件
+  keepnote
+  Truecrypt
+
+
+应用程序----->报告工具库----->Documentation----->dradis
+
+应用程序----->Office----->KeepNote
+New Notebook
+新建一个keepnote
+
+TrueCrypt，是一款免费开源的加密软件，同时支持Windows Vista,7/XP, Mac OS X, Linux 等操作系统。TrueCrypt不需要生成任何文件即可在硬盘上建立虚拟磁盘，用户可以按照盘符进行访问，所有虚拟磁盘上的文件都被自动加密，需要通过密码来进行访问。TrueCrypt 提供多种加密算法，包括：AES-256, Blowfish (448-bit key), CAST5, Serpent, Triple DES, and Twofish，其他特性还有支持FAT32和NTFS分区、隐藏卷标、热键启动等。

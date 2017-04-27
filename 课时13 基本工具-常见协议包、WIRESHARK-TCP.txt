@@ -1,0 +1,71 @@
+WIRESHARK-常见协议包
+数据包的分层结构
+arp
+icmp
+tcp-三次握手
+udp
+dns
+http
+ftp
+例:arp
+ 第一层包的相关信息。多少帧，大小，传输时间等统计信息
+ 第二层数据包的内容字段。首先是目标地址，源地址。上层协议类型。  占位地段
+ 第三arp包头。 硬件地址类型1表示以太网    协议类型ip解析成arp地址  硬件地址长度   ip地址4字节32位   操作代码  arp包头内容包含发送端的mac和ip目标端的mac和ip
+例：ssdp
+ 第一层汇总信息
+ 第二层二层包头 目标地址，源地址   上一层协议是ip协议  
+ 第三层。ip版本号  头长度  dsf  total长度（ip头到数据字段）   identification:0*7b52(31570)=大文件传输时会分割成小块，这是标记号段接收端
+ 根据号顺序重组    ragment offset:0 =偏移量    time to live:1 =生存时间  protocol:UDP (17)=上层四层协议（共1-255种协议)
+ header chechsum:0*8cf3[correct]=ip头的校验值，数据包被修改后校验值为错误的
+ 第四层 user Datagram protocol,src port:56253(56253),Dst port:ssdp(1900)  =源端口目标端口
+tcp包三次会话以syn标号1为开始连接。目标返回ack值并发syn值。 我再次发送ack值确认。然后开始发送信息,每发送包都要确认
+dns三层都走ip四层是基于udp协议
+http三层ip四层tcp  repuest method:get=请求方法get  request url:http://dict.cn/ws.php=请求地址    request version:http:/1.1=请求版本1.1
+  user-agent:mozilla/4.0(compatible:msie 5.00;windows 98)\r\n=客户端信息
+
+wireshark通过端口区分协议  http如果以非80端口传输则认不出，不能解析。数据包右键-Decode As-Transport-选择http并应用就可以了
+数据流
+http smtp pop3 ssl
+http smtp pop3 大部分以明文传送容易被查看    ssl四层同样基于tcp应用变成了ssl
+许多数据包为了访问一个页面产生。为了解决一个一个查看数据包而用数据流  包右键--Follow TCP Stream--
+
+
+
+
+                    14wireshark---信息统计。实践
+
+
+wireshark官网有供学习的例子文件
+
+
+统计功能位于statistics菜单下
+  summary数据包的摘要信息
+  endpoints查看数据包列表里一共有多少ip地址通信  ethernet 2 二层包头  可以排序可看哪个ip大量发送接收包大量小包可以造成网络性能弱化
+  protocol hierarchy查看什么类型的协议包占比
+  packet lengths  按包的长度查看流量
+  conversations 查看通讯 的机器之间流量
+  解码类型按端口区分协议
+
+Analyze菜单下expert info专家信息可以给出当前网络出现的信息
+
+    实践
+抓包对比nc ncat加密与不加密的流量
+dhclinent eth0   强制重新获取dhcp ip地址
+wireshark对大流量数据分析有所欠缺
+企业抓包布置方案 sniffer     cace/riverbed---基于wireshark开发
+已有自动抓包分析告警的商业软件
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

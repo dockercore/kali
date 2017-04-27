@@ -1,0 +1,252 @@
+øŒ ±25 ÷˜∂Ø–≈œ¢ ’ºØ-∑¢œ÷£®∂˛£©
+
+©Ô©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©Ô
+©ß∑¢œ÷-----∂˛≤„∑¢œ÷                   ©ß
+©ßNetdiscover                         ©ß
+©ß  ◊®√≈”⁄∂˛≤„∑¢œ÷                    ©ß
+©ß  ø…”√”⁄Œﬁœﬂ∫ÕΩªªªÕ¯¬Áª∑æ≥          ©ß
+©ß  ÷˜∂Ø∫Õ±ª∂ØÃΩ≤‚                    ©ß
+©ß÷˜∂Ø                                ©ß
+©ß  netdiscover -i eth0 -r 1.1.1.0/24 ©ß
+©ß  netdiscover -l iplist.txt         ©ß
+©ß±ª∂Ø                                ©ß
+©ß  netdiscover -p                    ©ß
+©ß  ÷˜∂Øarp»›“◊¥•∑¢±®æØ               ©ß
+©Ô©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©Ô
+
+root@kali:~# netdiscover -i eth0 -r 1.1.1.0/24
+[3;J
+ Currently scanning: Finished!   |   Screen View: Unique Hosts                 
+                                                                               
+ 3 Captured ARP Req/Rep packets, from 1 hosts.   Total size: 180               
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.1.1     f0:eb:d0:22:46:b4    03    180   Unknown vendor     
+
+
+root@kali:~# netdiscover -p
+[3;J
+ Currently scanning: (passive)   |   Screen View: Unique Hosts                 
+                                                                               
+ 36 Captured ARP Req/Rep packets, from 1 hosts.   Total size: 2160             
+ _____________________________________________________________________________
+   IP            At MAC Address      Count  Len   MAC Vendor                   
+ ----------------------------------------------------------------------------- 
+ 192.168.1.1     f0:eb:d0:22:46:b4    36    2160   Unknown vendor        
+
+root@kali:~# arping 192.168.1.1
+
+©Ô©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©Ô
+©ß∑¢œ÷-----∂˛≤„∑¢œ÷                     ©ß
+©ßScapy                                 ©ß
+©ß  ◊˜Œ™Pythonø‚Ω¯––µ˜”√                ©ß
+©ß  “≤ø…◊˜Œ™µ•∂¿µƒπ§æﬂ π”√              ©ß
+©ß  ◊•∞¸°¢∑÷Œˆ°¢¥¥Ω®°¢–ﬁ∏ƒ°¢◊¢»ÎÕ¯¬Á¡˜¡ø©ß
+©ßapt-get install python-gnuplot        ©ß
+©ßScapy                                 ©ß
+©ß  ARP().display()                     ©ß
+©ß  Sr1()                               ©ß
+©ßPythonΩ≈±æ                            ©ß
+©ß  Arp1.py                             ©ß
+©ß  Arp2.py                             ©ß
+©Ô©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©•©Ô
+
+root@kali:~# scapy
+INFO: Can't import python gnuplot wrapper . Won't be able to plot.
+WARNING: No route found for IPv6 destination :: (no default route?)
+Welcome to Scapy (2.2.0)
+>>> exit()
+"WARNING: No route found for IPv6 destination"’‚∏ˆ–≈œ¢±Ì æ»±…Ÿgnuplot
+
+root@kali:~# apt-get install python-gnuplot
+’˝‘⁄∂¡»°»Ìº˛∞¸¡–±Ì... ÕÍ≥…
+’˝‘⁄∑÷Œˆ»Ìº˛∞¸µƒ“¿¿µπÿœµ ˜       
+’˝‘⁄∂¡»°◊¥Ã¨–≈œ¢... ÕÍ≥…       
+Ω´ª·∞≤◊∞œ¬¡–∂ÓÕ‚µƒ»Ìº˛∞¸£∫
+  python-central
+œ¬¡–°æ–¬°ø»Ìº˛∞¸Ω´±ª∞≤◊∞£∫
+  python-central python-gnuplot
+…˝º∂¡À 0 ∏ˆ»Ìº˛∞¸£¨–¬∞≤◊∞¡À 2 ∏ˆ»Ìº˛∞¸£¨“™–∂‘ÿ 0 ∏ˆ»Ìº˛∞¸£¨”– 1 ∏ˆ»Ìº˛∞¸Œ¥±ª…˝º∂°£
+–Ë“™œ¬‘ÿ 153 kB µƒ»Ìº˛∞¸°£
+Ω‚—πÀı∫Ûª·œ˚∫ƒµÙ 1,229 kB µƒ∂ÓÕ‚ø’º‰°£
+ƒ˙œ£Õ˚ºÃ–¯÷¥––¬£ø [Y/n] y
+ªÒ»°£∫1 http://mirrors.163.com/debian/ squeeze/main python-central all 0.6.16+nmu1 [47.4 kB]
+ªÒ»°£∫2 http://mirrors.163.com/debian/ squeeze/main python-gnuplot all 1.8-1.1 [106 kB]
+œ¬‘ÿ 153 kB£¨∫ƒ ± 0√Î (400 kB/s)    
+’˝‘⁄—°÷–Œ¥—°‘Òµƒ»Ìº˛∞¸ python-central°£
+(’˝‘⁄∂¡»° ˝æ›ø‚ ... œµÕ≥µ±«∞π≤∞≤◊∞”– 337367 ∏ˆŒƒº˛∫Õƒø¬º°£)
+’˝◊º±∏Ω‚∞¸ .../python-central_0.6.16+nmu1_all.deb  ...
+’˝‘⁄Ω‚∞¸ python-central (0.6.16+nmu1) ...
+’˝‘⁄—°÷–Œ¥—°‘Òµƒ»Ìº˛∞¸ python-gnuplot°£
+’˝◊º±∏Ω‚∞¸ .../python-gnuplot_1.8-1.1_all.deb  ...
+’˝‘⁄Ω‚∞¸ python-gnuplot (1.8-1.1) ...
+’˝‘⁄¥¶¿Ì”√”⁄ man-db (2.7.0.2-5) µƒ¥•∑¢∆˜ ...
+’˝‘⁄…Ë÷√ python-central (0.6.16+nmu1) ...
+’˝‘⁄…Ë÷√ python-gnuplot (1.8-1.1) ...
+’˝‘⁄¥¶¿Ì”√”⁄ python-central (0.6.16+nmu1) µƒ¥•∑¢∆˜ ...
+
+root@kali:~# scapy
+WARNING: No route found for IPv6 destination :: (no default route?)
+Welcome to Scapy (2.2.0)
+>>> ARP()
+<ARP  |>
+>>> ARP().display()
+###[ ARP ]###
+  hwtype= 0x1
+  ptype= 0x800
+  hwlen= 6
+  plen= 4
+  op= who-has
+  hwsrc= 00:0c:29:c6:89:56
+  psrc= 192.168.1.110
+  hwdst= 00:00:00:00:00:00
+  pdst= 0.0.0.0
+
+®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T
+Hardware type: Ethernet (1)
+Protocol type: IP(0x0800)
+Hardware size: 6
+Protocol size: 4
+Opcode: request (1)
+Sender MAC address: CadmusCo_a7:ce:cd(08:00:27:a7:ce:cd)
+Sender IP address: 192.168.1.132(192.168.1.132)
+Target Mac address: 00:00:00_00:00:00 (00:00:00:00:00:00)
+Target IP address: 192.168.1.118(192.168.1.118)
+®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T®T
+
+>>> arp=ARP()
+>>> arp.display()
+###[ ARP ]###
+  hwtype= 0x1
+  ptype= 0x800
+  hwlen= 6
+  plen= 4
+  op= who-has
+  hwsrc= 00:0c:29:c6:89:56
+  psrc= 192.168.1.110
+  hwdst= 00:00:00:00:00:00
+  pdst= 0.0.0.0
+>>> arp.pdst="192.168.1.1"
+>>> arp.display()
+###[ ARP ]###
+  hwtype= 0x1
+  ptype= 0x800
+  hwlen= 6
+  plen= 4
+  op= who-has
+  hwsrc= 00:0c:29:c6:89:56
+  psrc= 192.168.1.110
+  hwdst= 00:00:00:00:00:00
+  pdst= 192.168.1.1
+>> sr1(arp)
+Begin emission:
+*Finished to send 1 packets.
+
+Received 1 packets, got 1 answers, remaining 0 packets
+<ARP  hwtype=0x1 ptype=0x800 hwlen=6 plen=4 op=is-at hwsrc=f0:eb:d0:22:46:b4 psrc=192.168.1.1 hwdst=00:0c:29:c6:89:56 pdst=192.168.1.110 |<Padding  load='\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' |>>
+>>> answer=sr1(arp)
+Begin emission:
+*Finished to send 1 packets.
+
+Received 1 packets, got 1 answers, remaining 0 packets
+>> answer.display()
+###[ ARP ]###
+  hwtype= 0x1
+  ptype= 0x800
+  hwlen= 6
+  plen= 4
+  op= is-at
+  hwsrc= f0:eb:d0:22:46:b4
+  psrc= 192.168.1.1
+  hwdst= 00:0c:29:c6:89:56
+  pdst= 192.168.1.110
+###[ Padding ]###
+     load= '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+>>> arp=ARP()
+>>> (ARP(pdst="192.168.1.1"))
+<ARP  pdst=192.168.1.1 |>
+>>>> sr1(ARP(pdst="192.168.1.11"))
+Begin emission:
+WARNING: Mac address to reach destination not found. Using broadcast.
+Finished to send 1 packets.
+.^C
+Received 1 packets, got 0 answers, remaining 1 packets
+
+>>> sr1(ARP(pdst="192.168.1.11"),timeout=1,verbose=1)
+Begin emission:
+WARNING: Mac address to reach destination not found. Using broadcast.
+Finished to send 1 packets.
+
+Received 0 packets, got 0 answers, remaining 1 packets
+
+®q©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§®r
+[arp1.py]
+#!/usr/bin/python
+
+import logging
+import subprocess
+logging.getLogger("scapy.runting).setLeve(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)1=2;
+  print"Usage - ./arp_disc.py {interface}"
+  print"Example - ./arping.sh eth0"
+  print"Example will perform an ARP scan of the local subnet to which eth0 is assigned"
+  sys.exit()
+
+interface=str(sys.argv[1])
+
+ip=subprocess.check_output("ifconfig"+interfac.e+" | grep 'inet addr' | cut -d ':' -f 2 | cut -d ' ' -f 1",shell=True).strip() prefix=ip.split('.')[0]+ ''+ip.split('.')[1]+ '.'+ip.split('.')[2]+ '.'
+
+for addr in range(0.254)
+  anser = sr1(ARP(pdst=prefix+str(addr)),timeout=0.1,verbose=0)
+  if answer == None;
+    pass
+  else:
+    print prefix+str(addr)
+®t©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§®s
+
+root@kali:~# chmod u+x arp1.py   //∏≥”Ë÷¥––»®œﬁ
+
+root@kali:~#  python arp1.py    //’‚—˘“≤ø…“‘÷¥––
+
+root@kali:~# ./arp1.py
+sage - ./arp_disc.py {interface}
+Example - ./arping.sh eth0
+Example will perform an ARP scan of the local subnet to which eth0 is assigned
+
+root@kali:~# ./arp1.py eth0
+192.168.1.1
+
+®q©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§®r
+arp2.py]
+#!/usr/bin/python
+
+import logging
+logging.getLogger("scapy.runting).setLeve(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)1=2;
+  print"Usage - ./arp_disc.py {interface}"
+  print"Example - ./arping.sh eth0"
+  print"Example will perform an ARP scan of the local subnet to which eth0 is assigned"
+  sys.exit()
+
+filename = str(sys.argv[])
+file = open(filename,'r')
+
+for addr in file
+  anser = sr1(ARP(pdst=prefix+str(addr)),timeout=0.1,verbose=0)
+  if answer == None;
+    pass
+  else:
+    print addr.strip()
+®t©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§©§®s
+
+root@kali:~# chmod u+x arp2.py   //∏≥”Ë÷¥––»®œﬁ
+
+root@kali:~# ./arp2.py adds
+
+
+

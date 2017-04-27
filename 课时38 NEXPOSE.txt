@@ -1,0 +1,121 @@
+课时38 NEXPOSE
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃NEXPOSE                                                                     ┃
+┃Rapid 7                                                                     ┃
+┃    Nexpose                                                                 ┃
+┃    完整的漏洞管理实现                                                      ┃
+┃环境准备                                                                    ┃
+┃    建议VM 4G内存                                                           ┃
+┃    http://download2.rapid7.com/download/NeXpose-v4/NexposeVA.ova           ┃
+┃    http://IP_addr:3780  (nxadmin / nxpassword)                             ┃
+┃    操作系统账号密码：nexpose                                               ┃
+┃    http://www.rapid7.com/products/nexpose/virtual-appliance-enterpirse.jsp ┃
+┃    K3LQ-5PPS-RTS5-LTS5 (14天后过期)                                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+nexpose@NexposeVA:~$ ifconfig
+
+nexpose@NexposeVA:~$ sevrice nexposeconsole.rc restart
+
+╋━━━━━━━━╋
+┃扫描结果分析    ┃
+┃False positive: ┃
+┃    误报        ┃
+┃False negative  ┃
+┃    漏报        ┃
+╋━━━━━━━━╋
+
+ 漏洞扫描工具NexPose安装使用
+
+　　Nexpose 是一款极佳的漏洞扫描工具，跟一般的扫描工具不同，Nexpose自身的功能非常强大。可以更新其漏洞数据库，以保证最新的漏洞被扫描到。可以给出哪那些漏洞可以被Metasploit Exploit，哪些漏洞在Exploit-db里面有exploit的方案。可以生成非常详细的，非常强大的Report，涵盖了很多统计功能和漏洞的详细信息。
+
+　　可以给出漏洞的解决方案。
+
+　　软件安装 (选择免费版本)
+
+　　下载地址：http://www.rapid7.com/vulnerability-scanner.jsp
+
+　　下载完毕后
+
+　　chmod +x NeXposeSetup-Linux64.bin
+
+　　./NeXposeSetup-Linux64.bin
+
+　　在安装期间需要一个企业的邮箱，来注册验证码。这个邮箱不能是免费的GMAIL，126之类的，必须是企业账户，我用@139.com是可以的。
+
+　　安装完毕后:
+
+　　cd /opt/rapid7/nexpose/nsc 然后执行./nsc
+
+　　https://ip:3780 登录页面出来后就ok了。
+
+　　软件使用
+
+　　https://ip:3780 首先要登录成功，安装期间已经建立过用户了，输入用户名和密码。
+
+　　HOME->new static stie =>
+
+　　General ,name :10.20.10.128
+
+　　Assets:included assets:10.20.10.128
+
+　　Scan setup:Full audit
+
+　　==>Save
+
+　　回到HOME，site listing =>Scan
+
+　　然后静等结果出来就好了.
+------------------------------------------------------------------------------------------
+Nexpose是领先的漏洞评估工具之一。Nexpose社区版是一个免费的程序，其他版本是收费的。在这篇文章中，我们将使用Nexpose免费社区版，里面有扫描32主机的能力。用户界面干净、报告强大。像大多数我们看到的产品，Nexpose sports一个易于使用的，组织良好的仪表盘，它支持范围广泛的报告包括PCI 法规遵从性。若要下载Nexpose，只需自己在网站上注册并下载它。
+
+注：该扫描工具必须运行在64位系统上。
+
+打开浏览器并转到http://localhost:3780，我们将看到Nexpose主页。
+
+在主页上，我们可以看到有一个“站点列表”部分，点击“New Static Site”，它将给“Site Configuration”设置。
+
+第一个配置设置是“一般信息。 ”我们可以在上面的图中看到,我们给一个名称为“Site”设置的重要性”很高”并添加一些关于网站的描述,现在我们点击“Next”。
+
+“Assets”配置页面有两个部分,上面的图中可以看到:“Included Assets”和“Excluded Assets.”。在“Included Assets”中我们将提供两个目标IP地址。 如果你要扫描整个网络范围,那么你会给整个IP范围:192.168.0.1-254。 如果你有一些选择的IP列表，那么你可以通过使用“导入列表”功能导入该文件。 “Excluded Assets”是用来从扫描中排除Assets。 如果你要扫描整个IP范围,你想排除一些IPs的扫描,把这些IPs排除。 完成后,点击“Next”为下一个配置。
+
+接下来配置的是为“Scan Setup”里的第一个选项为“Scan Template”选择扫描模板，以满足您的需求。这里我们使用的是“Full audit”模板为我们的扫描。
+
+“Enable schedule”是在Nexpose一个独特的功能，它提供了基于计划的审核。它允许你设置一个起始日期和时间，以及扫描的时间。如果您使用的是常规的审计，那么安全审计这是一个完美的功能。完成设置后“Scan Setup”，点击“Next.”。
+
+接下来的配置是“Credentials Listing”，基本上，在这里我们可以执行基于系统用户名和密码证书扫描。对于Windows系统，我们必须给予中小企业SMB帐户凭据，Linux 系统,我们必须给SSH凭证。在这里我们不给予任何凭据，以便只跳过它，然后单击“Next”。
+
+接下来的配置是“Web Applications”。我们不需要在这里设置，所以点击“Next”。
+
+接下来的配置是有关组织的，而我们将要进行脆弱性评估的信息; Nexpose将使用此信息在报告中。填写表格或跳过它，然后单击“Next”。
+
+最后一个配置为“Access Listing”如果有多个 Nexpose 控制台用户，我们可以设置用户权限以访问此站点。单击”Save”，将保存配置。
+
+在这里我们可以看到网站列表,我们创建了网站,添加Oscorp公司并准备扫描。 点击“Scan”,在右侧有一个播放按钮。
+
+它将在一个新窗口提示开始一个新的扫描;在这里,我们能看到我们的目标IP地址。 点击“Start”。
+
+正如在上面的图中可以看出，我们的扫描已经开始，在“Discovered Assets”中，我们可以看到我们的目标IP的系统名称和操作系统正在运行。
+
+一旦扫描完成后会我们可以在这里看到“Assets Listing”，我们已经看到“Assets by Operating System”。在本节中，Nexpose按操作系统列出了所有assets。在这里，我这里显示微软Windows 7旗舰版,另一个是微软Windows XP。 另一个是“Assets by Software”,Nexpose列出所有安装在目标IP的软件。
+
+接下来点击“Vulnerabilities”选项卡,查看所有的漏洞。 在这里我们可以看到“Exposures”。 第一个图标意味着容易受到恶意软件的攻击,第二个是metasploit可以利用的,第三个是已发布的漏洞。 现在让我们检查这三个图标做什么。 单击“M”图标。
+
+它显示的利用方式是metasploit所提供的， 这意味着我们可以通过使用 metasploit 利用此漏洞。其他图标显示漏洞已发布的exp，所以我们可以从 exploit-db下载这些漏洞并利用此漏洞 。
+
+接下来点击恶意软件的图标，看看它给了什么样的信息。
+
+它显示了可用的恶意软件工具包，从中我们可以利用此漏洞。
+
+我们可以在上图中看到一些可用于此漏洞的恶意软件套件。
+
+现在我们将进入报告部分，单击“Reports”选项卡上。
+
+给一个报告名字，并选择一个报告模板类型。
+
+接下来选择报告格式。在这里，我们选择的PDF格式。然后选择“sites”，然后点击加号图标。
+
+从“Select Report Scope”在这里，我们选择我们Oscorp公司的站点，然后单击“Done”。
+
+我们的报告在这里生成;点击报告进行查看。

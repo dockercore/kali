@@ -1,0 +1,480 @@
+课时71 扫描工具-Nikto
+
+╋━━━━━━━╋
+┃实验环境      ┃
+┃Metasploitable┃
+┃    Dvwa      ┃
+╋━━━━━━━╋
+
+Username admin
+password password
+
+╋━━━━━━━━━━━╋
+┃侦查                  ┃
+┃Httrack               ┃
+┃    减少与目标系统互  ┃ 
+╋━━━━━━━━━━━╋
+
+root@kali:~# mkdir dvwa
+
+root@kali:~# httrack
+
+welcom to HTTrack Website Coier (Offline Brower) 3.48-20
+Copyright (C) 1998-2014 Xavier Roche and other contributors
+To see the option list, enter a blank line or try httrack --help
+
+Enter project name :dvwa
+
+Base path (return=/root/websites/) :/root/dvwa
+
+Enter URLs (separated by commas or blank spaces) :http://192.168.1.109/dvwa/
+
+Action:
+(enter) 1        Mirror Web Site(s)
+        2        Mirror Web Site(s) with Wizard
+        3        Just Get Files Indicated
+        4        Mirror ALL links in URLs (Multiple Mirror)
+        5        Test Links In URLs (Bookmark Test)
+        0        Quit
+:2
+
+Proxy (return=none) :
+
+You can define wildcards, like: -*.gif +www.*.com/*.zip -*img_*.zip
+Wildcards (return=none) :*
+
+You can define additional options, such as recurse leve (-r<number>),separedy blank space
+To see the option list, type help
+Additional options (return=none) :
+
+---> Wizard command line: httrack http://192.168.1.109/dvwa/ -W -O "/root/dvwa/dvwa" -%v  *
+
+Ready to lauch the mirror? (Y/n) :
+
+WARNING! You are runing this program as root!
+It might be a good idea to run as a differrnt user
+Mirror launched to Thu, 03 Dec 2015 19:47:12 by HTTrack Website Copier/3.48-20 [XR&CO'2014]
+Mirroring http:192.168.1.109/dvwa/ * with the wizard help..
+
+╋━━━━━━━╋
+┃扫描工具      ┃
+┃Nikto         ┃
+┃Vega          ┃
+┃Skipfish      ┃
+┃W3af          ┃
+┃Arachni       ┃
+┃Owasp-zap     ┃
+╋━━━━━━━╋
+
+推荐《web Pentration Testing with Kali Linux》
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃NIKTO                                                     ┃
+┃Perl语言开发的开源web安全扫描器                           ┃
+┃软件版本                                                  ┃
+┃搜索存在安全隐患的文件                                    ┃
+┃服务器配置漏洞                                            ┃
+┃WEB Application层面的安全隐患                             ┃
+┃避免404误判                                               ┃
+┃    很多服务器不遵守RFC标准，对于不存在的对象返回200响应码┃
+┃    依据响应文件内容判断，不同扩展名的文件404响应内容不同 ┃
+┃    去除时间信息后的内容取MD5值                           ┃
+┃    -no404                                                ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# nikto
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ ERROR: No host specified
+
+       -config+            Use this config file
+       -Display+           Turn on/off display outputs
+       -dbcheck            check database and other key files for syntax errors
+       -Format+            save file (-o) format
+       -Help               Extended help information
+       -host+              target host
+       -id+                Host authentication to use, format is id:pass or id:pass:realm
+       -list-plugins       List all available plugins
+       -output+            Write output to this file
+       -nossl              Disables using SSL
+       -no404              Disables 404 checks
+       -Plugins+           List of plugins to run (default: ALL)
+       -port+              Port to use (default 80)
+       -root+              Prepend root value to all requests, format is /directory 
+       -ssl                Force ssl mode on port
+       -Tuning+            Scan tuning
+       -timeout+           Timeout for requests (default 10 seconds)
+       -update             Update databases and plugins from CIRT.net
+       -Version            Print plugin and database versions
+       -vhost+             Virtual host (for Host header)
+   		+ requires a value
+
+	Note: This is the short help output. Use -H for full help text.
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃nikto -list-plugins                                     ┃
+┃nikto -update                                           ┃
+┃    cirt.net                                            ┃
+┃    http://cirt.net/nikto/UPDATES                       ┃     192.168.60.90:80
+┃nikto -host http://1.1.1.1                              ┃     https://192.168.60.90:443
+┃nikto -host 192.168.1.1 -ssl -port 443,8443,995         ┃     192.168.60.90
+┃nikto -host host.txt                                    ┃
+┃nmap -p80 192.168.1.0/24 -oG - | nikto -host -          ┃
+┃nikto -host 192.168.1.1 -useproxy http://localhost:8087 ┃
+┃-vhost                                                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# nikto -update
++ ERROR (302): Unable to get cirt.net/nikto/UPDATES/2.1.6/versions.txt
+
+root@kali:~# nikto -list-plugins
+Plugin: auth
+ Guess authentication - Attempt to guess authentication realms
+ Written by Sullo/Tautology, Copyright (C) 2010 CIRT Inc
+
+Plugin: put_del_test
+ Put/Delete test - Attempts to upload and delete files through the PUT and DELETE HTTP methods.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: clientaccesspolicy
+ clientaccesspolicy.xml - Checks whether a client access file exists, and if it contains a wildcard entry.
+ Written by Sullo, Dirk, Copyright (C) 2012 CIRT, Inc. and Dr. Wetter IT-Consulting
+
+Plugin: apache_expect_xss
+ Apache Expect XSS - Checks whether the web servers has a cross-site scripting vulnerability through the Expect: HTTP header
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: fileops
+ File Operations - Saves results to a text file.
+ Written by Sullo, Copyright (C) 2012 CIRT Inc.
+
+Plugin: msgs
+ Server Messages - Checks the server version against known issues.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: report_nbe
+ NBE reports - Produces a NBE report.
+ Written by Seccubus, Copyright (C) 2010 CIRT Inc.
+
+Plugin: embedded
+ Embedded Detection - Checks to see whether the host is an embedded server.
+ Written by Tautology, Copyright (C) 2009 CIRT Inc.
+
+Plugin: report_csv
+ CSV reports - Produces a CSV report.
+ Written by Tautology, Copyright (C) 2008 CIRT Inc.
+
+Plugin: drupal
+ Drupal Specific Tests - Performs a selection of drupal specific tests
+ Written by Tautology, Copyright (C) 2014 CIRT Inc.
+ Options:
+  0: Flag to tell plugin to enumerate modules
+  path: Basic path for modules (can usually be found in page source).
+
+Plugin: ssl
+ SSL and cert checks - Perform checks on SSL/Certificates
+ Written by Sullo, Copyright (C) 2010 CIRT Inc.
+
+Plugin: subdomain
+ Sub-domain forcer - Attempts to bruteforce commonly known sub-domains
+ Written by Ryan Dewhurst, Copyright (C) 2009 Ryan Dewhurst
+
+Plugin: mutiple_index
+ Multiple Index - Checks for multiple index files
+ Written by Tautology, Copyright (C) 2009 CIRT Inc
+
+Plugin: cgi
+ CGI - Enumerates possible CGI directories.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: report_xml
+ Report as XML - Produces an XML report.
+ Written by Sullo/Jabra, Copyright (C) 2008 CIRT Inc.
+
+Plugin: apacheusers
+ Apache Users - Checks whether we can enumerate usernames directly from the web server
+ Written by Javier Fernandez-Sanguinoi Pena, Copyright (C) 2008 CIRT Inc.
+ Options:
+  dictionary: Filename for a dictionary file of users
+  home: Look for ~user to enumerate
+  size: Maximum size of username if bruteforcing
+  enumerate: Flag to indicate whether to attempt to enumerate users
+  cgiwrap: User cgi-bin/cgiwrap to enumerate
+
+Plugin: report_text
+ Text reports - Produces a text report.
+ Written by Tautology, Copyright (C) 2008 CIRT Inc.
+
+Plugin: shellshock
+ shellshock - Look for the bash 'shellshock' vulnerability.
+ Written by sullo, Copyright (C) 2014 CIRT Inc
+ Options:
+  uri: uri to assess
+
+Plugin: outdated
+ Outdated - Checks to see whether the web server is the latest version.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: report_sqlg
+ Generic SQL reports - Produces SQL inserts into a generic database.
+ Written by Sullo, Copyright (C) 2013 CIRT Inc.
+
+Plugin: robots
+ Robots - Checks whether there's anything within the robots.txt file and analyses it for other paths to pass to other scripts.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+ Options:
+  nocheck: Flag to disable checking entries in robots file.
+
+Plugin: report_html
+ Report as HTML - Produces an HTML report.
+ Written by Sullo/Jabra, Copyright (C) 2008 CIRT Inc.
+
+Plugin: sitefiles
+ Site Files - Look for interesting files based on the site's IP/name
+ Written by sullo, Copyright (C) 2014 CIRT Inc
+
+Plugin: httpoptions
+ HTTP Options - Performs a variety of checks against the HTTP options returned from the server.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: parked
+ Parked Detection - Checks to see whether the host is parked at a registrar or ad location.
+ Written by Sullo, Copyright (C) 2011 CIRT Inc.
+
+Plugin: negotiate
+ Negotiate - Checks the mod_negotiation MultiViews.
+ Written by Sullo, Copyright (C) 2013 CIRT Inc.
+
+Plugin: dictionary
+ Dictionary attack - Attempts to dictionary attack commonly known directories/files
+ Written by Tautology, Copyright (C) 2009 CIRT Inc
+ Options:
+  method: Method to use to enumerate.
+  dictionary: Dictionary of paths to look for.
+
+Plugin: favicon
+ Favicon - Checks the web server's favicon against known favicons.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Plugin: siebel
+ Siebel Checks - Performs a set of checks against an installed Siebel application
+ Written by Tautology, Copyright (C) 2011 CIRT Inc.
+ Options:
+  languages: List of Languages
+  enumerate: Flag to indicate whether we shall attempt to enumerate known apps
+  applications: List of applications
+  application: Application to attack
+
+Plugin: cookies
+ HTTP Cookie Internal IP - Looks for internal IP addresses in cookies returned from an HTTP request.
+ Written by Sullo, Copyright (C) 2010 CIRT Inc.
+
+Plugin: paths
+ Path Search - Look at link paths to help populate variables
+ Written by Sullo, Copyright (C) 2012 CIRT Inc.
+
+Plugin: ms10_070
+ http://www.microsoft.com/technet/security/bulletin/ms10-070.asp Check - Determine if a site is vulnerable to http://www.microsoft.com/technet/security/bulletin/ms10-070.asp
+ Written by Sullo, Copyright (C) 2013 CIRT Inc
+
+Plugin: content_search
+ Content Search - Search resultant content for interesting strings
+ Written by Sullo, Copyright (C) 2010 CIRT Inc
+
+Plugin: tests
+ Nikto Tests - Test host with the standard Nikto tests
+ Written by Sullo, Tautology, Copyright (C) 2008 CIRT Inc.
+ Options:
+  tids: A range of testids that will only be run
+  passfiles: Flag to indicate whether to check for common password files
+  report: Report a status after the passed number of tests
+  all: Flag to indicate whether to check all files with all directories
+
+Plugin: headers
+ HTTP Headers - Performs various checks against the headers returned from an HTTP request.
+ Written by Sullo, Copyright (C) 2008 CIRT Inc.
+
+Defined plugin macros:
+ @@MUTATE = "dictionary;subdomain"
+ @@DEFAULT = "@@ALL;-@@MUTATE;tests(report:500)"
+  (expanded) = "apacheusers;mutiple_index;put_del_test;tests(report:500);report_nbe;parked;report_html;apache_expect_xss;content_search;cookies;shellshock;fileops;negotiate;msgs;siebel;outdated;drupal;report_sqlg;sitefiles;auth;headers;favicon;ms10_070;clientaccesspolicy;report_csv;embedded;paths;report_text;report_xml;httpoptions;cgi;ssl;robots"
+ @@NONE = ""
+ @@ALL = "auth;put_del_test;clientaccesspolicy;apache_expect_xss;fileops;msgs;report_nbe;embedded;report_csv;drupal;ssl;subdomain;mutiple_index;cgi;report_xml;apacheusers;report_text;shellshock;outdated;report_sqlg;robots;report_html;sitefiles;httpoptions;parked;negotiate;dictionary;favicon;siebel;cookies;paths;ms10_070;content_search;tests;headers"
+
+root@kali:~# nikto -host http://192.168.1.109/dvwa/
+
+root@kali:~# nikto -host 192.168.1.109 -port 80
+
+root@kali:~# nikto -host www.baidu.com -port 443 -ssl
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          180.97.33.107
++ Target Hostname:    www.baidu.com
++ Target Port:        443
+---------------------------------------------------------------------------
++ SSL Info:        Subject:  /C=CN/ST=Beijing/L=Beijing/O=Beijing Baidu Netcom Science Technology Co., Ltd./OU=service operation department/CN=baidu.com
+                   Ciphers:  ECDHE-RSA-AES128-GCM-SHA256
+                   Issuer:   /C=US/O=VeriSign, Inc./OU=VeriSign Trust Network/OU=Terms of use at https://www.verisign.com/rpa (c)10/CN=VeriSign Class 3 International Server CA - G3
++ Start Time:         2016-03-03 14:42:02 (GMT8)
+---------------------------------------------------------------------------
++ Server: bfe/1.0.8.14
++ Cookie BAIDUID created without the secure flag
++ Cookie BAIDUID created without the httponly flag
++ Cookie BIDUPSID created without the secure flag
++ Cookie BIDUPSID created without the httponly flag
++ Cookie PSTM created without the secure flag
++ Cookie PSTM created without the httponly flag
++ Cookie BDSVRTM created without the secure flag
++ Cookie BDSVRTM created without the httponly flag
++ Cookie __bsi created without the secure flag
++ Cookie __bsi created without the httponly flag
++ IP address found in the 'server' header. The IP is "1.0.8.14".
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ Uncommon header 'bdqid' found, with contents: 0xd83f739e00019f43
++ Uncommon header 'bdpagetype' found, with contents: 1
++ Uncommon header 'bduserid' found, with contents: 0
++ The site uses SSL and the Strict-Transport-Security HTTP header is not defined.
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ Server leaks inodes via ETags, header found with file /crossdomain.xml, fields: 0x54532a74 0x131 
++ /crossdomain.xml contains 2 lines which include the following domains: *.baidu.com *.bdstatic.com 
++ Cookie BD_NOT_HTTPS created without the secure flag
++ Cookie BD_NOT_HTTPS created without the httponly flag
+......
+
+root@kali:~# nmap -p80 192.168.1.0/24 -oG - | nikto -host -
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ nmap Input Queued: 192.168.1.1:80
++ nmap Input Queued: 192.168.1.103:80
++ Target IP:          192.168.1.1
++ Target Hostname:    192.168.1.1
++ Target Port:        80
++ Start Time:         2016-03-03 16:45:55 (GMT8)
+---------------------------------------------------------------------------
++ Server: No banner retrieved
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ No CGI Directiories found (use '-C all' to force check all possible dirs)
++ Web Server returns a valid response with junk HTTP methonds, this may cause false positives.
+......
+
+root@kali:~# nikto -host http://www.baidu.com -useproxy http://localhost:8087
+
+root@kali:~# -vhost
+
+╋━━━━━━━━━━━━━━━━╋
+┃Nikto-interactive               ┃
+┃Space-report current scan status┃
+┃v - verbose mode on/off         ┃
+┃d - debug mode on/off           ┃
+┃e - error reporting on/off      ┃
+┃p - progress reporting on/off   ┃
+┃r - redirect display on/off     ┃
+┃c - cookie display on/off       ┃
+┃a - auth display on/off         ┃
+┃q - quit                        ┃
+┃N - next host                   ┃
+┃p - Pause                       ┃
+╋━━━━━━━━━━━━━━━━╋
+
+root@kali:~# vi /etc/nikto.conf
+#########################################################################################################
+# CONFIG STUFF
+# $Id: config.txt 94 2009-01-21 22:47:25Z deity $
+#########################################################################################################
+
+# default command line options, can't be an option that requires a value.  used for ALL runs.
+# CLIOPTS=-g -a
+
+# ports never to scan
+SKIPPORTS=21 111
+
+# User-Agent variables:
+ # @VERSION     - Nikto version
+ # @TESTID      - Test identifier
+ # @EVASIONS    - List of active evasions
+USERAGENT=Mozilla/5.00 (Nikto/@VERSION) (Evasions:@EVASIONS) (Test:@TESTID)
+
+# RFI URL. This remote file should return a phpinfo call, for example: <?php phpinfo(); ?>
+# You may use the one below, if you like.
+RFIURL=http://cirt.net/rfiinc.txt?
+
+# IDs never to alert on (Note: this only works for IDs loaded from db_tests)
+#SKIPIDS=
+
+# The DTD
+NIKTODTD=/var/lib/nikto/docs/nikto.dtd
+
+# the default HTTP version to try... can/will be changed as necessary
+DEFAULTHTTPVER=1.0
+
+# Nikto can submit updated version strings to CIRT.net. It won't do this w/o permission. You should
+# send updates because it makes the data better for everyone ;)  *NO* server specific information
+# such as IP or name is sent, just the relevant version information.
+# UPDATES=yes   - ask before each submission if it should send
+# UPDATES=no    - don't ask, don't send
+# UPDATES=auto  - automatically attempt submission *without prompting*
+UPDATES=yes
+
+# Warning if MAX_WARN OK or MOVED responses are retrieved
+MAX_WARN=20
+
+# Prompt... if set to 'no' you'll never be asked for anything. Good for automation.
+#PROMPTS=no
+
+# cirt.net : set the IP so that updates can work without name resolution -- just in case
+
+# Proxy settings -- still must be enabled by -useproxy
+#PROXYHOST=127.0.0.1
+#PROXYPORT=8080
+#PROXYUSER=proxyuserid
+#PROXYPASS=proxypassword
+
+# Cookies: send cookies with all requests
+# Multiple can be set by separating with a semi-colon, e.g.:
+# "cookie1"="cookie value";"cookie2"="cookie val"
+#STATIC-COOKIE=
+
+# The below allows you to vary which HTTP methods are used to check whether an HTTP(s) server
+# is running. Some web servers, such as the autopsy web server do not implement the HEAD method
+CHECKMETHODS=HEAD GET
+
+# If you want to specify the location of any of the files, specify them here
+EXECDIR=/var/lib/nikto                          # Location of Nikto
+PLUGINDIR=/var/lib/nikto/plugins                        # Location of plugin dir
+DBDIR=/var/lib//nikto/databases                 # Location of database dir
+TEMPLATEDIR=/var/lib/nikto/templates            # Location of template dir
+DOCDIR=/var/lib/nikto/docs                      # Location of docs dir
+
+# Default plugin macros
+@@MUTATE=dictionary;subdomain
+@@DEFAULT=@@ALL;-@@MUTATE;tests(report:500)
+
+# Choose SSL libs:
+# SSLeay        - use Net::SSLeay
+# SSL           - use Net::SSL
+# auto          - automatically choose whats available
+#                 (SSLeay wins if both are available)
+LW_SSL_ENGINE=auto
+
+# Number of failures before giving up
+FAILURES=20
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃nikto                                                             ┃
+┃配置文件                                                          ┃
+┃    /etc/nikto.conf                                               ┃
+┃    STATIC-COOKIE="cookie1"="cookie value";"cookie2"="cookie valu"┃
+┃-evasion : 使用LibWhisker中对IDS的躲避技术，可使用以下几种类型:   ┃
+┃    1 随机URL编码（非UTF-8方式）                                  ┃
+┃    2 自选择路径（/./）                                           ┃
+┃    3 过早结束的URL                                               ┃
+┃    4 优先考虑长随机字符串                                        ┃
+┃    5 参数欺骗                                                    ┃
+┃    6 使用TAB作为命令的分隔符                                     ┃
+┃    7 使用变化的URL                                               ┃
+┃    8 使用Windows路径分隔符"\"                                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋

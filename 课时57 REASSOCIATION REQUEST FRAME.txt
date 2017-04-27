@@ -1,0 +1,242 @@
+课时57 REASSOCIATION REQUEST FRAME
+
+╋━━━━━━━━━━━━╋
+┃ASSOCIATION REQUEST     ┃
+┃AP对STA的关联请求的响应 ┃
+┃状态码：关联成功/失败   ┃
+╋━━━━━━━━━━━━╋
+
+
+           24                    Variable           4
+┌───────────┬──────────┬────┐
+│       Header         │     Frame body     │   FCS  │
+└───────────┴──────────┴────┘
+                       ↙                      ↘
+
+
+ ↙     2             2                 6                  Variable   ↘
+┌──────┬──────┬───────────┬─────────┐
+│ Capability │ Status Code│ Association ID (AID) │ Supported  rates │ 
+│ information│            │                      │                  │
+└──────┴──────┴───────────┴─────────┘
+
+╋━━━━━━━━━━━━━╋
+┃ASSOCIATION/REASSOCIATION ┃
+┃由AP发出                  ┃
+┃    2个字节               ┃
+╋━━━━━━━━━━━━━╋
+
+           24               2        4
+┌───────────┬───┬────┐
+│       Header         │ Body │   FCS  │
+└───────────┴───┴────┘
+                        │      │
+                        │      │
+                       ╱   2    ╲
+                     ┌──────┐
+                     │ Reason code│
+                     └──────┘
+
+┌────┬──────────────┬──────────────────────────┐
+│ Reason │        Description         │                      Meaning                       │
+│  Code  │                            │                                                    │
+├────┼──────────────┼──────────────────────────┤
+│   0    │      No Reason Code        │                NOrmal operation                    │
+├────┼──────────────┼──────────────────────────┤
+│   1    │    Unspecified Reason      │  Client associated but no longer au thorized       │
+├────┼──────────────┼──────────────────────────┤
+│   2    │ Previous Authentication no │     Client associated but not authorized           │
+│        │       longer valid         │                                                    │
+├────┼──────────────┼──────────────────────────┤
+│   3    │  Deauthentication Leaving  │Deauthentication because sending STA is leaving IBSS│
+│        │                            │                     or ESS                         │
+├────┼──────────────┼──────────────────────────┤
+│   4    │    Disassociation Due to   │          Client session timeout exceeded           │
+│        │        Inactivity          │                                                    │
+├────┼──────────────┼──────────────────────────┤
+│   5    │   Disassociation AP Busy   │AP is busy and unable to handle currently associated│
+│        │                            │                      clients                       │
+├────┼──────────────┼──────────────────────────┤
+│   6    │   Class2 Frame from Non-   │  Client attempted to transfer data before it was   │
+│        │   Authenticated Station    │                   authenticated                    │
+├────┼──────────────┼──────────────────────────┤
+│   7    │   Class3 Frame from Non-   │  Client attempted to transfer data before it was   │
+│        │   Authenticated Station    │                    associated                      │
+├────┼──────────────┼──────────────────────────┤
+│   8    │Disassociation STA has Left │           STA is leaving or has left BSS           │
+├────┼──────────────┼──────────────────────────┤
+│   9    │  STA Request Association   │   STA (re)association is not authenticated with    │
+│        │  Without Authentication    │                    responding station              │
+├────┼──────────────┼──────────────────────────┤
+│  …    │           …               │                       …                           │
+├────┼──────────────┼──────────────────────────┤
+│  99    │    Missing Reason Code     │       Client monentarily in an unknown state       │
+└────┴──────────────┴──────────────────────────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃ATIM FRAMES                                   ┃
+┃只在ad-hoc网络下使用                          ┃
+┃    STA使用此帧通知接收者其有缓存的数据要发送 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+                                         24               4
+                                ┌─────────┬────┐
+                                │      Header      │   FCS  │
+                                └─────────┴────┘
+                                ↙                   ↘
+
+
+     ↙     2           2             6             6          6           2   ↘
+      ┌──────┬──────┬──────┬────┬────┬─────┐
+      │    Frame   │  Duration  │ Destination│ Source │ BSS ID │ Sequence │
+      │   control  │            │   Address  │ Address│        │ Control  │
+      │            │            │            │        │        │          │
+      └──────┴──────┴──────┴────┴────┴─────┘
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃DATA FRAMES                         ┃
+┃传输用户数据                        ┃
+┃    DATA Frame                      ┃
+┃空数据帧                            ┃
+┃    Null data frame                 ┃
+┃    只包含MAC头和FCS                ┃
+┃    STA用于声明自己将要进入省电模式 ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━╋
+┃     无线通信过程       ┃
+╋━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃连接到无线网络                      ┃
+┃Probe                               ┃
+┃    STA向所有信道发出probe帧，发现AP┃
+┃    AP应道Response                  ┃
+┃Authentication                      ┃
+┃    STA向AP发出验证请求             ┃
+┃    发生认证过程(步骤可变)          ┃
+┃    AP响应STA的认证结果             ┃
+┃Association                         ┃
+┃    STA发出关联请求                 ┃
+┃    AP响应关联请求                  ┃
+┃    关联成功，开始通信              ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+
+    STA    │       Probe request          │    AP
+           │──────────────→│
+           │                              │
+           │                              │
+           │        Probe response        │
+           │←──────────────│
+           │                              │
+           │                              │
+           │    Authenticaiton request    │
+           │──────────────→│
+           │                              │
+           │                              │
+           │    Authenticaiton Process    │
+           │←─────────────→│
+           │                              │
+           │                              │
+           │    Authenticaiton response   │
+           │←──────────────│
+           │                              │
+           │                              │
+           │     Association request      │
+           │──────────────→│
+           │                              │
+           │                              │
+           │     Association response     │
+           │←──────────────│
+           │                              │
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃WEP探测过程                             ┃
+┃Beacon标识使用WEP加密                   ┃
+┃STA发送普通Probe帧                      ┃
+┃AP响应Probe Response帧声明其采用WEP加密 ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPA探测过程                                     ┃
+┃两个AP的Beacon包内容不同，但都声明采用了WPA加密 ┃
+┃    不同厂商对802.11标准的实现方式不同          ┃
+┃包头包含WPA1字段信息                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WEP OPEN认证过程                                ┃
+┃WEP Open认证与open认证通信过程相同              ┃
+┃正确认证后通信数据被WEP加密                     ┃
+┃如果认证时客户端输入错误密码                    ┃
+┃    认证依然可以通过                            ┃
+┃    AP将丢弃该STA的数据包                       ┃
+┃        起始向量被错误地密钥解密后完整性被破坏  ┃
+┃        但数据传输将失败                        ┃
+┃认证响应正确，身份验证成功                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WEP PSK认证过程                                 ┃
+┃STA发认证请求                                   ┃
+┃AP返回随机Challenge消息                         ┃
+┃STA使用PSK加密Cha并发回给AP                     ┃
+┃AP使用PSK解密密文获得Cha并与原始Cha对比，       ┃
+┃相同则验证成功，不同则验证失败；                ┃
+┃                                                ┃
+┃                                                ┃
+┃大部分无线驱动首先尝试open验证，如失败则尝试PSK ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+    STA    │       Authenticaiton         │    AP
+           │──────────────→│
+           │          request             │
+           │                              │
+           │                              │
+           │          Challenge           │
+           │←──────────────│
+           │             Text             │
+           │                              │
+           │                              │
+           │    Encrypt Challenge Text    │
+           │──────────────→│
+           │      then send it to AP      │
+           │                              │
+           │                              │
+           │       Decrypt and crrect     │
+           │←──────────────│
+           │     Authenticate client      │
+           │                              │
+
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃WEP共享密钥认证过程                   ┃
+┃无论使用什么加密架构，关联过程完全相同┃
+┃    STA向AP发送关联请求               ┃
+┃    AP向STA发送关联成功或失败结果     ┃
+┃隐藏AP                                ┃
+┃    STA关联包中必须包含目标AP的ESSID  ┃
+┃    嗅探到此关联包，说明有隐藏AP存在  ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃加密                                  ┃
+┃无线安全根源                          ┃
+┃    802.11基于无线电波发射信息        ┃
+┃    嗅探侦听是主要问题                ┃
+┃    加密机制是必须手段                ┃
+┃wireless Equivalent Privacy (WEP)     ┃
+┃    802.11标准的一部分                ┃
+┃    发布后不久被发现存在安全漏洞      ┃
+┃Wi-Fi Protected Access (WPA) 取代WEP  ┃
+┃    WPA2 (802.11i标准)                ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃OPEN无加密网络                        ┃
+┃无任何加密机制                        ┃
+┃所有书籍都可以被嗅探                  ┃
+┃STA和AP只协商拼配参数即可连入网络     ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+

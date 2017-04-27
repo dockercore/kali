@@ -1,0 +1,40 @@
+在键盘上按“ATL”键----->Tools----->Add-ons----->搜索框里面搜索“shodan"
+
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃SHODAN                              ┃
+┃  200 OK cisco country:JP           ┃
+┃  user:admin pass:password          ┃
+┃  http://1.179.177.109:81/index.htm ┃
+┃  linux upup avtech                 ┃
+┃                                    ┃
+┃  http://account.shodan.io/         ┃
+┃  http//www.shodan.io/explore       ┃
+┃  Add-Ons                           ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+chmod 700 VBosLinuxAddition.run
+./VBoxLinuxAddition.run
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃GOOGLE搜索                                                            ┃
+┃  +充值-支付                                                          ┃
+┃  北京的电子商务公司-----北京intitle:电子商务 intext:法人 intext:电话 ┃
+┃  阿里网站上的背脊公司联系人-----北京 site:alibaba.com inurl:contact  ┃
+┃  塞班司法方案的PDF文档-----SOX filetype:pdf                          ┃
+┃  法国的支付相关页面-----payment site:fr                              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+北京 intitle:电子商务 intext:法人 intext:电话
+
+
+intitle:"netbotz appliance""OK"
+
+inurl:ftp filetype:xls site:microsoft.com "password"
+
+inurl:Server.pwd
+
+http://exploit-db.com/google-dorks
+
+

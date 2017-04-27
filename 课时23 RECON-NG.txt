@@ -1,0 +1,733 @@
+课时23 RECON-NG
+
+╋━━━━━━━━━━━╋
+┃RECON-NG              ┃
+┃  全特性的web侦查框架 ┃
+┃  给予Python开发      ┃
+╋━━━━━━━━━━━╋
+
+
+╋━━━━━━━━━━━╋
+┃RECON-NG              ┃
+┃  web信息搜索框架     ┃
+┃  命令格式与msf一致   ┃
+┃  基于python开发      ┃
+┃  使用方法：          ┃
+┃      模块            ┃
+┃      数据库          ┃
+┃      报告            ┃
+╋━━━━━━━━━━━╋
+
+
+root@kali:~# recon-ng
+                                                                                        
+    _/_/_/    _/_/_/_/    _/_/_/    _/_/_/    _/      _/            _/      _/    _/_/_/
+   _/    _/  _/        _/        _/      _/  _/_/    _/            _/_/    _/  _/       
+  _/_/_/    _/_/_/    _/        _/      _/  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/  _/_/_/
+ _/    _/  _/        _/        _/      _/  _/    _/_/            _/    _/_/  _/      _/ 
+_/    _/  _/_/_/_/    _/_/_/    _/_/_/    _/      _/            _/      _/    _/_/_/    
+                                                                                        
+     +---------------------------------------------------------------------------+      
+     |  _                     ___    _                        __                 |      
+     | |_)| _  _|_  |_|.|| _   |  _ |_ _  _ _  _ _|_o _  _   (_  _  _    _o_|_   |      
+     | |_)|(_|(_|\  | ||||_\  _|_| || (_)| |||(_| | |(_)| |  __)(/_(_|_|| | | \/ |      
+     |                                                                        /  |      
+     |              Consulting | Research | Development | Training               |      
+     |                     http://www.blackhillsinfosec.com                      |      
+     +---------------------------------------------------------------------------+      
+
+                      [recon-ng v4.6.3, Tim Tomes (@LaNMaSteR53)]                       
+
+[71] Recon modules
+[7]  Reporting modules
+[2]  Import modules
+[2]  Exploitation modules
+[2]  Discovery modules
+
+[recon-ng][default] > help
+
+Commands (type [help|?] <topic>):
+---------------------------------
+add             Adds records to the database           //添加添加记录到数据库
+back            Exits the current context              //退出当前上下文
+delete          Deletes records from the database      //从数据库中删除删除记录
+exit            Exits the framework                    //退出这个框架
+help            Displays this menu                     //帮助显示这个菜单
+keys            Manages framework API keys             //密钥管理框架API密钥
+load            Loads specified module                 //负载加载指定的模块
+pdb             Starts a Python Debugger session       //pdb Python调试器会话开始
+query           Queries the database                   //查询查询数据库
+record          Records commands to a resource file    //记录记录命令一个资源文件
+reload          Reloads all modules                    //重载重新加载所有模块
+resource        Executes commands from a resource file //资源从资源文件执行命令
+search          Searches available modules             //搜索搜索可用的模块
+set             Sets module options                    //设置集模块选项
+shell           Executes shell commands                //shell执行shell命令
+show            Shows various framework items          //显示,可以显示各种框架的内容
+snapshots       Manages workspace snapshots            //快照管理工作区快照
+spool           Spools output to a file                //短管线轴输出到一个文件
+unset           Unsets module options                  //设置附件模块选择
+use             Loads specified module                 //使用指定加载模块
+workspaces      Manages workspaces                     //工作区管理工作区
+
+[recon-ng][default] > exit
+
+root@kali:~# recon-ng -h
+usage: recon-ng [-h] [-v] [-w workspace] [-r filename] [--no-check]
+                [--no-analytics]
+
+recon-ng - Tim Tomes (@LaNMaSteR53) tjt1980[at]gmail.com
+
+optional arguments:
+  -h, --help      show this help message and exit        //显示帮助信息和退出
+  -v, --version   show program's version number and exit //显示程序的版本号并退出
+  -w workspace    load/create a workspace                //加载/创建一个工作区
+  -r filename     load commands from a resource file     //加载资源文件中的命令
+  --no-check      disable version check                  //禁用版本检查
+  --no-analytics  disable analytics reporting            //禁用分析报告
+
+root@kali:~# recon-ng -w sina
+                                                                                        
+    _/_/_/    _/_/_/_/    _/_/_/    _/_/_/    _/      _/            _/      _/    _/_/_/
+   _/    _/  _/        _/        _/      _/  _/_/    _/            _/_/    _/  _/       
+  _/_/_/    _/_/_/    _/        _/      _/  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/  _/_/_/
+ _/    _/  _/        _/        _/      _/  _/    _/_/            _/    _/_/  _/      _/ 
+_/    _/  _/_/_/_/    _/_/_/    _/_/_/    _/      _/            _/      _/    _/_/_/    
+                                                                                        
+     +---------------------------------------------------------------------------+      
+     |  _                     ___    _                        __                 |      
+     | |_)| _  _|_  |_|.|| _   |  _ |_ _  _ _  _ _|_o _  _   (_  _  _    _o_|_   |      
+     | |_)|(_|(_|\  | ||||_\  _|_| || (_)| |||(_| | |(_)| |  __)(/_(_|_|| | | \/ |      
+     |                                                                        /  |      
+     |              Consulting | Research | Development | Training               |      
+     |                     http://www.blackhillsinfosec.com                      |      
+     +---------------------------------------------------------------------------+      
+
+                      [recon-ng v4.6.3, Tim Tomes (@LaNMaSteR53)]                       
+
+[71] Recon modules
+[7]  Reporting modules
+[2]  Import modules
+[2]  Exploitation modules
+[2]  Discovery modules
+
+[recon-ng][sina] > help
+
+Commands (type [help|?] <topic>):
+---------------------------------
+add             Adds records to the database           //添加添加记录到数据库
+back            Exits the current context              //退出当前上下文
+delete          Deletes records from the database      //从数据库中删除删除记录
+exit            Exits the framework                    //退出这个框架
+help            Displays this menu                     //帮助显示这个菜单
+keys            Manages framework API keys             //密钥管理框架API密钥
+load            Loads specified module                 //负载加载指定的模块
+pdb             Starts a Python Debugger session       //pdb Python调试器会话开始
+query           Queries the database                   //查询查询数据库
+record          Records commands to a resource file    //记录记录命令一个资源文件
+reload          Reloads all modules                    //重载重新加载所有模块
+resource        Executes commands from a resource file //资源从资源文件执行命令
+search          Searches available modules             //搜索搜索可用的模块
+set             Sets module options                    //设置集模块选项
+shell           Executes shell commands                //shell执行shell命令
+show            Shows various framework items          //显示,可以显示各种框架的内容
+snapshots       Manages workspace snapshots            //快照管理工作区快照
+spool           Spools output to a file                //短管线轴输出到一个文件
+unset           Unsets module options                  //设置附件模块选择
+use             Loads specified module                 //使用指定加载模块
+workspaces      Manages workspaces                     //工作区管理工作区
+
+[recon-ng][sina] > workspaces
+add    delete     list   select
+
+[recon-ng][sina] > workspaces list
+
+  +------------+
+  | Workspaces |
+  +------------+
+  | sina       |
+  | default    |
+  +------------+
+
+
+[recon-ng][sina] > keys
+Manages framework API keys
+
+Usage: keys [list|add|delete]
+
+[recon-ng][sina] > keys list
+
+  +---------------------------+
+  |        Name       | Value |
+  +---------------------------+
+  | bing_api          |       |
+  | builtwith_api     |       |
+  | facebook_api      |       |
+  | facebook_password |       |
+  | facebook_secret   |       |
+  | facebook_username |       |
+  | flickr_api        |       |
+  | fullcontact_api   |       |
+  | google_api        |       |
+  | google_cse        |       |
+  | instagram_api     |       |
+  | instagram_secret  |       |
+  | ipinfodb_api      |       |
+  | jigsaw_api        |       |
+  | jigsaw_password   |       |
+  | jigsaw_username   |       |
+  | linkedin_api      |       |
+  | linkedin_secret   |       |
+  | pwnedlist_api     |       |
+  | pwnedlist_iv      |       |
+  | pwnedlist_secret  |       |
+  | shodan_api        |       |
+  | twitter_api       |       |
+  | twitter_secret    |       |
+  +---------------------------+
+
+[recon-ng][sina] > keys
+Manages framework API keys
+
+Usage: keys [list|add|delete]
+
+[recon-ng][sina] > keys add
+
+Usage: keys add <name> <value>
+
+[recon-ng][sina] > keys add twitter_api
+
+Usage: keys add <name> <value>
+
+[recon-ng][sina] > keys add twitter_api asdjhaskuiowufijs
+[*] Key 'twitter_api' added.
+
+[recon-ng][sina] > search google
+[*] Searching for 'google'...
+
+  Recon
+  -----
+    recon/domains-hosts/google_site_api
+    recon/domains-hosts/google_site_web
+
+[recon-ng][sina] > shell ls
+[*] Command: ls
+data
+modules
+recon
+recon-cli
+recon-ng
+recon-rpc
+VERSION
+
+[recon-ng][sina] > show options
+
+  Name        Current Value  Required  Description
+  ----------  -------------  --------  -----------
+  DEBUG       False          yes       enable debugging output            //启用调试输出
+  NAMESERVER  8.8.8.8        yes       nameserver for DNS interrogation   //命名服务器的DNS审讯
+  PROXY                      no        proxy server (address:port)        //代理服务器(地址:端口)
+  THREADS     10             yes       number of threads (where applicable)//的线程数量(如适用)
+  TIMEOUT     10             yes       socket timeout (seconds)          //套接字超时(秒)
+  USER-AGENT  Recon-ng/v4    yes       user-agent string               //用户代理字符串
+  VERBOSE     True           yes       enable verbose output       // 启用详细输出
+
+[recon-ng][sina] > set PROXY 127.0.0.1:8087     //设置代理
+PROXY => 127.0.0.1:8087
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RECON-NG                                                              ┃
+┃全局选项                                                              ┃
+┃  SUER-AGENT                                                          ┃
+┃  Proxy                                                               ┃
+┃  Workspace                                                           ┃
+┃  Snapshot                                                            ┃
+┃                                                                      ┃
+┃Show schema                                                           ┃
+┃Help                                                                  ┃
+┃  Select*from hosts where host like '%baidu.com%' order by ip address ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+[recon-ng][sina] > set USER-AGENT Mozilla/4.0  //设置用户代理字符串
+USER-AGENT => Mozilla/4.0
+[recon-ng][sina] > 
+[recon-ng][sina] > 
+[recon-ng][sina] > 
+[recon-ng][sina] > shop
+[*] Command: shop
+/bin/sh: 1: shop: not found
+[recon-ng][sina] > show options
+
+  Name        Current Value   Required  Description
+  ----------  -------------   --------  -----------
+  DEBUG       False          yes       enable debugging output            //启用调试输出
+  NAMESERVER  8.8.8.8        yes       nameserver for DNS interrogation   //命名服务器的DNS审讯
+  PROXY                      no        proxy server (address:port)        //代理服务器(地址:端口)
+  THREADS     10             yes       number of threads (where applicable)//的线程数量(如适用)
+  TIMEOUT     10             yes       socket timeout (seconds)          //套接字超时(秒)
+  USER-AGENT  Recon-ng/v4    yes       user-agent string               //用户代理字符串
+  VERBOSE     True           yes       enable verbose output       // 启用详细输出
+[recon-ng][sina] > show 
+Shows various framework items
+
+Usage: show [banner|companies|contacts|credentials|dashboard|domains|hosts|leaks|locations|modules|netblocks|options|ports|profiles|pushpins|schema|vulnerabilities]
+
+[recon-ng][sina] > show schema    //显示模式
+
+  +---------------+
+  |    domains    |
+  +---------------+
+  | domain | TEXT |
+  | module | TEXT |
+  +---------------+
+
+
+  +--------------------+
+  |     companies      |
+  +--------------------+
+  | company     | TEXT |
+  | description | TEXT |
+  | module      | TEXT |
+  +--------------------+
+
+
+  +-----------------+
+  |    netblocks    |
+  +-----------------+
+  | netblock | TEXT |
+  | module   | TEXT |
+  +-----------------+
+
+
+  +-----------------------+
+  |       locations       |
+  +-----------------------+
+  | latitude       | TEXT |
+  | longitude      | TEXT |
+  | street_address | TEXT |
+  | module         | TEXT |
+  +-----------------------+
+
+
+  +---------------------+
+  |   vulnerabilities   |
+  +---------------------+
+  | host         | TEXT |
+  | reference    | TEXT |
+  | example      | TEXT |
+  | publish_date | TEXT |
+  | category     | TEXT |
+  | status       | TEXT |
+  | module       | TEXT |
+  +---------------------+
+
+
+  +-------------------+
+  |       ports       |
+  +-------------------+
+  | ip_address | TEXT |
+  | host       | TEXT |
+  | port       | TEXT |
+  | protocol   | TEXT |
+  | module     | TEXT |
+  +-------------------+
+
+
+  +-------------------+
+  |       hosts       |
+  +-------------------+
+  | host       | TEXT |
+  | ip_address | TEXT |
+  | region     | TEXT |
+  | country    | TEXT |
+  | latitude   | TEXT |
+  | longitude  | TEXT |
+  | module     | TEXT |
+  +-------------------+
+
+
+  +--------------------+
+  |      contacts      |
+  +--------------------+
+  | first_name  | TEXT |
+  | middle_name | TEXT |
+  | last_name   | TEXT |
+  | email       | TEXT |
+  | title       | TEXT |
+  | region      | TEXT |
+  | country     | TEXT |
+  | module      | TEXT |
+  +--------------------+
+
+
+  +-----------------+
+  |   credentials   |
+  +-----------------+
+  | username | TEXT |
+  | password | TEXT |
+  | hash     | TEXT |
+  | type     | TEXT |
+  | leak     | TEXT |
+  | module   | TEXT |
+  +-----------------+
+
+
+  +-----------------------------+
+  |            leaks            |
+  +-----------------------------+
+  | leak_id              | TEXT |
+  | description          | TEXT |
+  | source_refs          | TEXT |
+  | leak_type            | TEXT |
+  | title                | TEXT |
+  | import_date          | TEXT |
+  | leak_date            | TEXT |
+  | attackers            | TEXT |
+  | num_entries          | TEXT |
+  | score                | TEXT |
+  | num_domains_affected | TEXT |
+  | attack_method        | TEXT |
+  | target_industries    | TEXT |
+  | password_hash        | TEXT |
+  | targets              | TEXT |
+  | media_refs           | TEXT |
+  | module               | TEXT |
+  +-----------------------------+
+
+
+  +---------------------+
+  |       pushpins      |
+  +---------------------+
+  | source       | TEXT |
+  | screen_name  | TEXT |
+  | profile_name | TEXT |
+  | profile_url  | TEXT |
+  | media_url    | TEXT |
+  | thumb_url    | TEXT |
+  | message      | TEXT |
+  | latitude     | TEXT |
+  | longitude    | TEXT |
+  | time         | TEXT |
+  | module       | TEXT |
+  +---------------------+
+
+
+  +-----------------+
+  |     profiles    |
+  +-----------------+
+  | username | TEXT |
+  | resource | TEXT |
+  | url      | TEXT |
+  | category | TEXT |
+  | notes    | TEXT |
+  | module   | TEXT |
+  +-----------------+
+
+[recon-ng][sina] > snapshots           //快照使用参数
+Manages workspace snapshots
+   管理工作区快照
+Usage: snapshots [list|take|load|delete]
+   用法:快照      [列表| 获取|加载|删除]
+
+[recon-ng][sina] > snapshots list      //快照列表
+[*] This workspace has no snaphosts
+
+[recon-ng][sina] > snapshots take      //获取快照
+[*] Snapshot created: snapshot_20150923113739.db
+
+[recon-ng][sina] > snapshots           //快照使用参数
+Manages workspace snapshots
+   管理工作区快照
+Usage: snapshots [list|take|load|delete]
+   用法:快照      [列表| 获取|加载|删除]
+
+[recon-ng][sina] > snapshots load snapshot_20150923113739.db       //加载快照
+[*] Snapshot loaded: snapshot_20150923113739.db
+
+[recon-ng][sina] >  snapshots delete snapshot_20150923113739.db    //删除快照
+[*] Snapshot removed: snapshot_20150923113739.db
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RECON-NG                                                              ┃
+┃DNS                                                                   ┃
+┃  GOOgle                                                              ┃
+┃  baidu                                                               ┃
+┃  bing                                                                ┃
+┃  Yahoo                                                               ┃
+┃  Brute tarce                                                         ┃
+┃解析IP地址（查询数据库）                                              ┃
+┃联系人                                                                ┃
+┃报告                                                                  ┃
+┃API                                                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+[recon-ng][sina] > search google
+[*] Searching for 'google'...
+
+  Recon
+  -----
+    recon/domains-hosts/google_site_api
+    recon/domains-hosts/google_site_web
+
+[[recon-ng][sina] > use recon/domains-hosts/google_site_web
+[recon-ng][sina][google_site_web] > show
+Shows various framework items
+
+Usage: show [companies|contacts|credentials|dashboard|domains|globals|hosts|info|inputs|leaks|locations|modules|netblocks|options|ports|profiles|pushpins|schema|source|vulnerabilities]
+
+[recon-ng][sina][google_site_web] > show options
+
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  default        yes       source of input (see 'show info' for details)
+
+[recon-ng][sina][google_site_web] > show info
+
+      Name: Google Hostname Enumerator
+      Path: modules/recon/domains-hosts/google_site_web.py
+    Author: Tim Tomes (@LaNMaSteR53)
+
+Description:
+  Harvests hosts from Google.com by using the 'site' search operator. Updates the 'hosts' table with
+  the results.
+
+Options:
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  default        yes       source of input (see 'show info' for details)
+
+Source Options:
+  default        SELECT DISTINCT domain FROM domains WHERE domain IS NOT NULL ORDER BY domain
+  <string>       string representing a single input
+  <path>         path to a file containing a list of inputs
+  query <sql>    database query returning one column of inputs
+
+[recon-ng][sina][google_site_web] > set SOURCE sina.com    //指定源为sina.com
+SOURCE => sina.com
+
+[recon-ng][sina][google_site_web] > show options
+
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  sina.com       yes       source of input (see 'show info' for details)
+
+[recon-ng][sina][google_site_web] > back
+[recon-ng][sina] > show options
+
+  Name        Current Value   Required  Description
+  ----------  -------------   --------  -----------
+  DEBUG       False           yes       enable debugging output
+  NAMESERVER  8.8.8.8         yes       nameserver for DNS interrogation
+  PROXY       127.0.0.1:8087  no        proxy server (address:port)
+  THREADS     10              yes       number of threads (where applicable)
+  TIMEOUT     10              yes       socket timeout (seconds)
+  USER-AGENT  Mozilla/4.0     yes       user-agent string
+  VERBOSE     True            yes       enable verbose output
+
+[recon-ng][sina] > search google
+[*] Searching for 'google'...
+
+  Recon
+  -----
+    recon/domains-hosts/google_site_api
+    recon/domains-hosts/google_site_web
+
+[recon-ng][sina] > use recon/domains-hosts/google_site_web
+[recon-ng][sina][google_site_web] > show options
+
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  sina.com       yes       source of input (see 'show info' for details)
+
+[recon-ng][sina][google_site_web] > run
+
+--------
+SINA.COM
+--------
+[*] URL: https://www.google.com/search?start=0&filter=0&q=site%3Asina.com
+[!] URLError: <urlopen error [Errno 111] Connection refused>.
+
+[recon-ng][sina][google_site_web] > search baidu           //查询百度
+[*] Searching for 'baidu'...
+
+  Recon
+  -----
+    recon/domains-hosts/baidu_site
+
+[recon-ng][sina][google_site_web] > use recon/domains-hosts/baidu_site
+[recon-ng][sina][baidu_site] > show options
+
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  default        yes       source of input (see 'show info' for details)
+
+[recon-ng][sina][baidu_site] > show hosts
+
+[recon-ng][sina][baidu_site] > show > query select * from host
+
+recon-ng][sina] > search bing
+[*] Searching for 'bing'...
+
+  Recon
+  -----
+    recon/companies-profiles/bing_linkedin
+    recon/domains-hosts/bing_domain_api
+    recon/domains-hosts/bing_domain_web
+    recon/hosts-hosts/bing_ip
+
+[recon-ng][sina] > use recon/domains-hosts/bing_domain_web
+
+[recon-ng][sina][bing_domain_web] > set SOURCE sina.com
+SOURCE => sina.com
+[recon-ng][sina][bing_domain_web] > run
+
+[recon-ng][sina][bing_domain_web] > query select * from hosts
+
+[recon-ng][sina][bing_domain_web] > query select * from hosts where host like '%www%'
+
+
+[recon-ng][sina][bing_domain_web] > search brut
+[*] Searching for 'brut'...
+
+  Exploitation
+  ------------
+    exploitation/injection/xpath_bruter
+
+  Recon
+  -----
+    recon/domains-domains/brute_suffix
+    recon/domains-hosts/brute_hosts
+
+[recon-ng][sina][bing_domain_web] > use recon/domains-hosts/brute_hosts
+[recon-ng][sina][brute_hosts] > show options
+
+  Name      Current Value                           Required  Description
+  --------  -------------                           --------  -----------
+  SOURCE    default                                 yes       source of input (see 'show info' for details)
+  WORDLIST  /usr/share/recon-ng/data/hostnames.txt  yes       path to hostname wordlist
+
+[recon-ng][sina][brute_hosts] > set SOURCE sina
+SOURCE => sina
+[recon-ng][sina][brute_hosts] > run
+
+[recon-ng][sina][brute_hosts] > query select * from hosts where host like '%www%'
+
+[recon-ng][sina][brute_hosts] > query select * from hosts
+
+[recon-ng][sina][brute_hosts] > query select * from hosts where host like '%sina.com.cn%'
+
+[recon-ng][sina][brute_hosts] > search res
+[*] Searching for 'res'...
+
+  Discovery
+  ---------
+    discovery/info_disclosure/interesting_files
+
+  Recon
+  -----
+    recon/hosts-hosts/resolve
+    recon/hosts-hosts/reverse_resolve
+    recon/netblocks-hosts/reverse_resolve
+
+[recon-ng][sina][brute_hosts] > use recon/hosts-hosts/resolve
+[recon-ng][sina][resolve] > show options
+
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  default        yes       source of input (see 'show info' for details)
+
+[recon-ng][sina][resolve] > show info
+
+      Name: Hostname Resolver
+      Path: modules/recon/hosts-hosts/resolve.py
+    Author: Tim Tomes (@LaNMaSteR53)
+
+Description:
+  Resolves the IP address for a host. Updates the 'hosts' table with the results.
+
+Options:
+  Name    Current Value  Required  Description
+  ------  -------------  --------  -----------
+  SOURCE  default        yes       source of input (see 'show info' for details)
+
+Source Options:
+  default        SELECT DISTINCT host FROM hosts WHERE host IS NOT NULL AND ip_address IS NULL
+  <string>       string representing a single input
+  <path>         path to a file containing a list of inputs
+  query <sql>    database query returning one column of inputs
+
+Comments:
+  * Note: Nameserver must be in IP form.
+
+[recon-ng][sina][resolve] > set SOURCE query select hosts from host where host like '%sina.com.cn%'
+SOURCE => query select hosts from host where host like '%sina.com.cn%'
+
+[recon-ng][sina][resolve] > run
+
+[recon-ng][sina][resolve] > show hosts
+
+[recon-ng][sina][resolve] > search report
+[*] Searching for 'report'...
+
+  Reporting
+  ---------
+    reporting/csv
+    reporting/html
+    reporting/json
+    reporting/list
+    reporting/pushpin
+    reporting/xlsx
+    reporting/xml
+
+[recon-ng][sina][resolve] > use reporting/html
+[recon-ng][sina][html] > show options
+
+  Name      Current Value                                    Required  Description
+  --------  -------------                                    --------  -----------
+  CREATOR                                                    yes       creator name for the report footer
+  CUSTOMER                                                   yes       customer name for the report header
+  FILENAME  /root/.recon-ng/workspaces/default/results.html  yes       path and filename for report output
+  SANITIZE  True                                             yes       mask sensitive data in the report
+
+[recon-ng][sina][html] > set CREATOR Fanghong.yuan
+CREATOR => Fanghong.yuan
+[recon-ng][sina][html] > set CUSTOMER SINA.COM
+CUSTOMER => SINA.COM
+[recon-ng][sina][html] > set  FILENAME  /root/Desktop/sina.html
+FILENAME => /root/Desktop/sina.html
+[recon-ng][sina][html] > show options
+
+  Name      Current Value            Required  Description
+  --------  -------------            --------  -----------
+  CREATOR   Fanghong.yuan            yes       creator name for the report footer
+  CUSTOMER  SINA.COM                 yes       customer name for the report header
+  FILENAME  /root/Desktop/sina.html  yes       path and filename for report output
+  SANITIZE  True                     yes       mask sensitive data in the report
+
+[recon-ng][sina][html] > run
+
+[recon-ng][sina][html] > search contac    //联系人
+[*] Searching for 'contac'...
+
+  Recon
+  -----
+    recon/companies-contacts/facebook
+    recon/companies-contacts/jigsaw/point_usage
+    recon/companies-contacts/jigsaw/purchase_contact
+    recon/companies-contacts/jigsaw/search_contacts
+    recon/companies-contacts/jigsaw_auth
+    recon/companies-contacts/linkedin_auth
+    recon/contacts-contacts/mailtester
+    recon/contacts-contacts/mangle
+    recon/contacts-contacts/unmangle
+    recon/contacts-credentials/hibp_breach
+    recon/contacts-credentials/hibp_paste
+    recon/contacts-credentials/pwnedlist
+    recon/contacts-domains/migrate_contacts
+    recon/contacts-profiles/fullcontact
+    recon/domains-contacts/pgp_search
+    recon/domains-contacts/salesmaple
+    recon/domains-contacts/whois_pocs
+    recon/profiles-contacts/dev_diver
+    recon/profiles-contacts/linkedin

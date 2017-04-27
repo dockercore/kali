@@ -1,0 +1,330 @@
+课时16 被动信息收集：信息收集内容、信息用途、信息收集DNS、DNS信息收集-NSLOOKUP
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃被动信息收集                                                                    ┃
+┃  公开渠道可获得的信息                                                          ┃
+┃  与目标系统不产生直接交互                                                      ┃
+┃  尽量避免留下一切痕迹                                                          ┃
+┃  OSINT：                                                                       ┃
+┃      美国军方：http:www.fas.org/irp/doddir/army/atp2-22-9.pdf                  ┃
+┃      北大西洋公约组织 ：http://information-retrieval.info/docs/NATO-OSINT.html ┃
+┃                                                                                ┃
+┃  Passiva                                                                       ┃
+┃  reconnaissance                                                                ┃
+┃  (no direct                    Active                                          ┃
+┃  interaction             reconnaissance |╲                                    ┃
+┃ ────────────────────   ╲                                  ┃  
+┃ ╲                                           ╲  More information              ┃
+┃   >   ●            ●          ●             > greater chance of             ┃
+┃ ╱                                           ╱     detection                  ┃
+┃ ────────────────────   ╱                                  ┃
+┃            Normal intercation           |╱                                    ┃
+┃                                                                                ┃
+┃                                                                                ┃
+┃信息收集内容                                                                    ┃
+┃  IP地址段                                                                      ┃
+┃  域名信息                                                                      ┃
+┃  邮件地址                                                                      ┃
+┃  文档图片数据                                                                  ┃
+┃  公司地址                                                                      ┃
+┃  公司组织架构                                                                  ┃
+┃  联系电话/传真号码                                                             ┃
+┃  人员姓名/职务                                                                 ┃
+┃  目标系统使用的技术架构                                                        ┃
+┃  公开的商业信息                                                                ┃
+┃                                                                                ┃
+┃信息用途                                                                        ┃
+┃  用信息描述目标                                                                ┃
+┃  发现                                                                          ┃
+┃  社会工程学攻击                                                                ┃
+┃  物理缺口                                                                      ┃
+┃                                                                                ┃
+┃信息收集------DNS                                                               ┃
+┃  域名解析成IP地址                                                              ┃
+┃     域名与FQDN的区别                                                           ┃
+┃     域名记录：A、C nmae、NS、MX、MX、ptr                                       ┃
+┃                                                                                ┃
+┃                                                                                ┃
+┃                      递归查询流程                                              ┃
+┃                                                                                ┃
+┃                              2                                                 ┃
+┃                    ┌─────────→                                      ┃
+┃                    │        3            根域服务器                           ┃
+┃                    │┌────────→                                      ┃
+┃            1       ││      4                                                 ┃
+┃DNS客户端 ──→DNS服务器───────→                                       ┃
+┃          ←──    ↑│      5            com 服务器                           ┃
+┃                    ││ ───────→                                       ┃
+┃                    ││                                                        ┃
+┃                    ││                                                        ┃
+┃                    ││      6                                                 ┃
+┃                    │└────────→example.com                           ┃
+┃                    │        7                                                 ┃
+┃                    └─────────→  服务器                              ┃
+┃                                                                                ┃
+┃                                                                                ┃
+┃DNS信息收集-----NSLOOKUP                                                        ┃
+┃  nslookup www.sina.com                                                         ┃
+┃  server                                                                        ┃
+┃  type=a、mx、ns、any                                                           ┃
+┃  nslookup -type=ns example.com 156.154.70.22                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root:~# nslookup
+> www.sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+www.sina.com	canonical name = us.sina.com.cn.
+us.sina.com.cn	canonical name = news.sina.com.cn.
+news.sina.com.cn	canonical name = jupiter.sina.com.cn.
+jupiter.sina.com.cn	canonical name = newsnj.sina.com.cn.
+Name:	newsnj.sina.com.cn
+Address: 202.102.75.147
+> us.sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+us.sina.com.cn	canonical name = wwwus.sina.com.
+Name:	wwwus.sina.com
+Address: 66.102.251.33
+> news.sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+news.sina.com	canonical name = us.cdn.sina.com.
+us.cdn.sina.com	canonical name = region.sina.usgcac.cdnetworks.net.
+region.sina.usgcac.cdnetworks.net	canonical name = n2.panthercdn.com.
+Name:	n2.panthercdn.com
+Address: 14.0.42.71
+Name:	n2.panthercdn.com
+Address: 14.0.44.72
+> jupiter.sina.com.cn
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+jupiter.sina.com.cn	canonical name = newsnj.sina.com.cn.
+Name:	newsnj.sina.com.cn
+Address: 202.102.75.147
+> set type=a      //只查a记录
+> www.sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+www.sina.com	canonical name = us.sina.com.cn.
+us.sina.com.cn	canonical name = news.sina.com.cn.
+news.sina.com.cn	canonical name = jupiter.sina.com.cn.
+jupiter.sina.com.cn	canonical name = newsnj.sina.com.cn.
+Name:	newsnj.sina.com.cn
+Address: 202.102.75.147
+> set type=mx
+> sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+sina.com	mail exchanger = 10 freemx2.sinamail.sina.com.cn.
+sina.com	mail exchanger = 5 freemx1.sinamail.sina.com.cn.
+sina.com	mail exchanger = 10 freemx3.sinamail.sina.com.cn.
+
+Authoritative answers can be found from:
+> freemx1.sinamail.sina.com.cn.
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+*** Can't find freemx1.sinamail.sina.com.cn.: No answer
+
+Authoritative answers can be found from:
+sinamail.sina.com.cn
+	origin = ns1.sina.com.cn
+	mail addr = zhihao.staff.sina.com.cn
+	serial = 20060825
+	refresh = 1800
+	retry = 600
+	expire = 604801
+	minimum = 600
+> set type=a
+> > freemx1.sinamail.sina.com.cn.
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+*** Can't find freemx1.sinamail.sina.com.cn.: No answer
+
+Authoritative answers can be found from:
+sinamail.sina.com.cn
+	origin = ns1.sina.com.cn
+	mail addr = zhihao.staff.sina.com.cn
+	serial = 20060825
+	refresh = 1800
+	retry = 600
+	expire = 604801
+	minimum = 600
+;; connection timed out; no servers could be reached
+> freemx2.sinamail.sina.com.cn.
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+> freemx1.sinamail.sina.com.cn.
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+> freemx3.sinamail.sina.com.cn.
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+> set type=ns
+> sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+sina.com	nameserver = ns3.sina.com.
+sina.com	nameserver = ns2.sina.com.cn.
+sina.com	nameserver = ns2.sina.com.
+sina.com	nameserver = ns3.sina.com.cn.
+sina.com	nameserver = ns4.sina.com.cn.
+sina.com	nameserver = ns4.sina.com.
+sina.com	nameserver = ns1.sina.com.
+sina.com	nameserver = ns1.sina.com.cn.
+
+Authoritative answers can be found from
+> set type=a
+> ns2.sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+Name:	ns2.sina.com.cn
+Address: 61.172.201.254
+> set q=ptr
+> 202.108.3.242
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+242.3.108.202.in-addr.arpa	name = mail3-242.sinamail.sina.com.cn.
+
+Authoritative answers can be found from:
+> set q=a
+> mail3-242.sinamail.sina.com.cn.
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+** server can't find mail3-242.sinamail.sina.com.cn: NXDOMAIN
+> sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+Name:	sina.com
+Address: 66.102.251.33
+> www.sina.com
+Server:		192.168.198.2
+Address:	192.168.198.2#53
+
+Non-authoritative answer:
+www.sina.com	canonical name = us.sina.com.cn.
+us.sina.com.cn	canonical name = news.sina.com.cn.
+news.sina.com.cn	canonical name = jupiter.sina.com.cn.
+jupiter.sina.com.cn	canonical name = newsnj.sina.com.cn.
+Name:	newsnj.sina.com.cn
+Address: 202.102.75.147
+> server 202.106.0.20
+Default server: 202.106.0.20
+Address: 202.106.0.20#53
+> www.sina.com
+Server:		202.106.0.20
+Address:	202.106.0.20#53
+
+Non-authoritative answer:
+www.sina.com	canonical name = us.sina.com.cn.
+us.sina.com.cn	canonical name = news.sina.com.cn.
+news.sina.com.cn	canonical name = jupiter.sina.com.cn.
+jupiter.sina.com.cn	canonical name = polaris.sina.com.cn.
+Name:	polaris.sina.com.cn
+Address: 202.108.33.60
+> server 8.8.8.8                        //谷歌的IP地址
+Default server: 8.8.8.8
+Address: 8.8.8.8#53
+> www.sina.com
+Server:		8.8.8.8
+Address:	8.8.8.8#53
+
+Non-authoritative answer:
+www.sina.com	canonical name = us.sina.com.cn.
+us.sina.com.cn	canonical name = wwwus.sina.com.
+Name:	wwwus.sina.com
+Address: 66.102.251.33
+
+
+现在的互联网上大部分的网站都会采用智能DNS
+智能DNS的意思是：终端用户所处的网络不同,DNS查询结果是不一样的
+
+
+> set q=any
+> sina.com
+Server:		8.8.8.8
+Address:	8.8.8.8#53
+
+Non-authoritative answer:
+Name:	sina.com
+Address: 66.102.251.33
+sina.com	text = "v=spf1 include:spf.sinamail.sina.com.cn -all"    //spf记录，它的作用反垃圾邮件
+sina.com
+	origin = ns1.sina.com.cn
+	mail addr = zhihao.staff.sina.com.cn
+	serial = 2005042601
+	refresh = 900
+	retry = 300
+	expire = 604800
+	minimum = 300
+sina.com	nameserver = ns4.sina.com.cn.
+sina.com	nameserver = ns4.sina.com.
+sina.com	nameserver = ns2.sina.com.cn.
+sina.com	nameserver = ns1.sina.com.
+sina.com	nameserver = ns1.sina.com.cn.
+sina.com	nameserver = ns2.sina.com.
+sina.com	nameserver = ns3.sina.com.cn.
+sina.com	nameserver = ns3.sina.com.
+sina.com	mail exchanger = 10 freemx2.sinamail.sina.com.cn.
+sina.com	mail exchanger = 10 freemx3.sinamail.sina.com.cn.
+sina.com	mail exchanger = 5 freemx1.sinamail.sina.com.cn.
+
+Authoritative answers can be found from:
+
+
+
+root@kali:~# nslookup -q=any 163.com 114.114.114.114
+Server:		114.114.114.114
+Address:	114.114.114.114#53
+
+Non-authoritative answer:
+163.com	text = "v=spf1 include:spf.163.com -all"
+163.com	mail exchanger = 50 163mx00.mxmail.netease.com.
+163.com	mail exchanger = 10 163mx02.mxmail.netease.com.
+163.com	mail exchanger = 10 163mx01.mxmail.netease.com.
+163.com	mail exchanger = 10 163mx03.mxmail.netease.com.
+Name:	163.com
+Address: 123.58.180.7
+Name:	163.com
+Address: 123.58.180.8
+163.com	nameserver = ns8.nease.net.
+163.com	nameserver = ns5.nease.net.
+163.com	nameserver = ns7.nease.net.
+163.com	nameserver = ns1.nease.net.
+163.com	nameserver = ns3.nease.net.
+163.com	nameserver = ns2.nease.net.
+163.com	nameserver = ns4.nease.net.
+163.com	nameserver = ns6.nease.net.
+
+Authoritative answers can be found from:

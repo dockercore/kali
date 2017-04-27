@@ -1,0 +1,715 @@
+课时34 SMTP扫描
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃防火墙                                        ┃
+┃通过检查回包，可能是被端口是否经过防火墙过滤  ┃
+┃设备多种多样，结果存在一定误差                ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+┌──┬────────┬──────────┬──────────┐
+│    │      send      │      Response      │        type        │
+├──┼────────┼──────────┼──────────┤
+│    │      SYN       │         No         │                    │
+│ 1  ├────────┼──────────┤       Filtered     │
+│    │      ACK       │         RST        │                    │
+├──┼────────┼──────────┼──────────┤
+│    │      SYN       │   SYN+ACK/SYN+RST  │                    │
+│ 2  ├────────┼──────────┤       Filtered     │
+│    │      ACK       │         No         │                    │
+├──┼────────┼──────────┼──────────┤
+│    │      SYN       │   SYN+ACK/SYN+RST  │                    │
+│ 3  ├────────┼──────────┤  UNfilered / Open  │
+│    │      ACK       │         RST        │                    │
+├──┼────────┼──────────┼──────────┤
+│    │      SYN       │         No         │                    │
+│ 4  ├────────┼──────────┤        Closed      │
+│    │      ACK       │         No         │                    │
+└──┴────────┴──────────┴──────────┘
+
+╭────────────────────────────────────────────╮
+[fw_detect.py]
+#!/usr/bin/pyhon
+
+import sys
+import logging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)!=3
+    print "Usage - ./Fw_detect.py [Target-IP] [Target Port]
+    print "Example - ./Fw_detect.py 10.0.0.5 443"
+    print "Example will determine if filtering exists on port 443 of host 10.0.0.5"
+    sys.exit()
+
+ip = sys.argv[1]
+port = int(sys.argv[2])
+
+ACK_response = sr1(IP(dst=ip)/TCP(dport=port,flags='A'),timeout=1,verbose=0)
+SYN_response = sr1(IP(dst=ip)/TCP(dport=port,flags='A'),timeout=1,verbose=0)
+if (ACK_response == None) and (SYN response == None):
+    print "Port is either unstate filtered or host is down"
+elif ((ACK_response == None)or (SYN_response == None)) and not ((ACK_response ==None) and (SYN_response == None)):
+    print "Staeful filtering in place"
+elif int(SYN_response[TCP].flags) ==18:
+    print "Port is unfiltered and open"
+elif int(SYN_response[TCP].flags) ==20:
+    print "Port is unfiltered and closed"
+else:
+   print "Unable to determine if the port is filtered"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./fw_detect.py 192.168.1.1 80
+Stateful filtering in place
+
+root@kali:~# ./fw_detect.py 192.168.1.1 22
+Port is either unstatefully filtered or host is down
+
+╋━━━━━━━━━━━━━━━╋
+┃防火墙识别                    ┃
+┃scapy                         ┃
+┃python                        ┃
+┃  ./fw_detect.py 1.1.1.1 443  ┃
+╋━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━╋
+┃防火墙识别                    ┃
+┃Nmap有系类防火墙过滤检测功能  ┃
+┃nmap -sA 172.16.36.135 -p 22  ┃
+╋━━━━━━━━━━━━━━━╋
+
+root@kali:~# nmap -p22 192.168.1.134
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-07 22:47 CST
+Nmap scan report for localhost(192.168.1.134)
+Note is up (0.00047s latency).
+PORT   STATE SERVICE
+22/tcp open  ssh
+MAC Address: 08:00:27:BO:3A:76(Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.58 seconds
+
+root@kali:~# nmap -p22 192.168.1.134 -sA
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-07 22:47 CST
+Nmap scan report for localhost(192.168.1.134)
+Note is up (0.00047s latency).
+PORT   STATE SERVICE
+22/tcp open  ssh
+MAC Address: 08:00:27:BO:3A:76(Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.58 seconds
+
+╋━━━━━━━━━━╋
+┃负载均衡识别        ┃
+┃广域网负载均衡      ┃
+┃  DNS               ┃
+┃HTTP-Loadbalancing  ┃
+┃  Nginx             ┃
+┃  APache            ┃
+┃lbd www.baidu.com   ┃
+┃lbd mail.163.com    ┃
+╋━━━━━━━━━━╋
+
+root@kali:~# lbd www.baidu.com
+
+lbd - load balancing detector 0.4 - Checks if a given domain uses load-balancing.
+                                    Written by Stefan Behte (http://ge.mine.nu)
+                                    Proof-of-concept! Might give false positives.
+
+Checking for DNS-Loadbalancing: FOUND
+www.baidu.com has address 180.97.33.108
+www.baidu.com has address 180.97.33.107
+
+Checking for HTTP-Loadbalancing [Server]: 
+ BWS/1.1
+ NOT FOUND
+
+Checking for HTTP-Loadbalancing [Date]: 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:02, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:03, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:04, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:05, 16:47:06, 16:47:06, 16:47:06, 16:47:06, NOT FOUND
+
+Checking for HTTP-Loadbalancing [Diff]: FOUND
+< BDQID: 0xc1229aff000160f2
+> BDQID: 0xcadf5ece0000b156
+
+www.baidu.com does Load-balancing. Found via Methods: DNS HTTP[Diff]
+
+
+root@kali:~# lbd mail.163.com 
+
+lbd - load balancing detector 0.4 - Checks if a given domain uses load-balancing.
+                                    Written by Stefan Behte (http://ge.mine.nu)
+                                    Proof-of-concept! Might give false positives.
+
+Checking for DNS-Loadbalancing: FOUND
+mail.163.com has address 220.181.12.208
+mail.163.com has address 220.181.12.209
+mail.163.com has address 220.181.12.207
+
+Checking for HTTP-Loadbalancing [Server]: 
+ nginx
+ NOT FOUND
+
+Checking for HTTP-Loadbalancing [Date]: 17:03:03, 17:03:04, 17:03:04, 17:03:04, 17:03:04, 17:03:04, 17:03:04, 17:03:04, 17:03:04, 17:03:05, 17:03:05, 17:03:05, 17:03:05, 17:03:05, 17:03:05, 17:03:05, 17:03:06, 17:03:06, 17:03:06, 17:03:06, 17:03:06, 17:03:06, 17:03:06, 17:03:06, 17:03:07, 17:03:07, 17:03:07, 17:03:07, 17:03:07, 17:03:07, 17:03:07, 17:03:08, 17:03:08, 17:03:08, 17:03:08, 17:03:08, 17:03:08, 17:03:08, 17:03:08, 17:03:09, 17:03:09, 17:03:09, 17:03:09, 17:03:09, 17:03:09, 17:03:09, 17:03:10, 17:03:10, 17:03:10, 17:03:10, NOT FOUND
+
+Checking for HTTP-Loadbalancing [Diff]: FOUND
+< Expires: Wed, 07 Oct 2015 17:41:35 GMT
+> Expires: Wed, 07 Oct 2015 17:41:47 GMT
+
+mail.163.com does Load-balancing. Found via Methods: DNS HTTP[Diff]
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WAF识别                                             ┃
+┃WEB应用防火墙                                       ┃
+┃wafw00f -l                                          ┃
+┃wafw00f http://www.microsoft.com                    ┃
+┃nmap www.microsoft.com --script=http-waf-detect.nse ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# wafw00f -l
+
+                                 ^     ^
+        _   __  _   ____ _   __  _    _   ____
+       ///7/ /.' \ / __////7/ /,' \ ,' \ / __/
+      | V V // o // _/ | V V // 0 // 0 // _/  
+      |_n_,'/_n_//_/   |_n_,' \_,' \_,'/_/    
+                                <   
+                                 ...'
+                                 
+    WAFW00F - Web Application Firewall Detection Tool
+    
+    By Sandro Gauci && Wendel G. Henrique
+
+Can test for these WAFs:
+
+Profense
+NetContinuum
+Barracuda
+HyperGuard
+BinarySec
+Teros
+F5 Trafficshield
+F5 ASM
+Airlock
+Citrix NetScaler
+ModSecurity
+IBM Web Application Security
+IBM DataPower
+DenyALL
+dotDefender
+webApp.secure
+BIG-IP
+URLScan
+WebKnight
+SecureIIS
+Imperva
+ISA Server
+
+oot@kali:~# wafw00f http://www.microsoft.com
+
+                                 ^     ^
+        _   __  _   ____ _   __  _    _   ____
+       ///7/ /.' \ / __////7/ /,' \ ,' \ / __/
+      | V V // o // _/ | V V // 0 // 0 // _/  
+      |_n_,'/_n_//_/   |_n_,' \_,' \_,'/_/    
+                                <   
+                                 ...'
+                                 
+    WAFW00F - Web Application Firewall Detection Tool
+    
+    By Sandro Gauci && Wendel G. Henrique
+
+Checking http://www.microsoft.com
+Generic Detection results:
+The site http://www.microsoft.com seems to be behind a WAF 
+Reason: The server header is different when an attack is detected.
+The server header for a normal response is "AkamaiGHost", while the server header a response to an attack is "Microsoft-IIS/8.0.",
+Number of requests: 17
+
+root@kali:~# nmap www.microsoft.com --script=http-waf-detect.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 01:24 CST
+Nmap scan report for www.microsoft.com (184.86.168.154)
+Host is up (0.24s latency).
+rDNS record for 184.86.168.154: a184-86-168-154.deploy.static.akamaitechnologies.com
+Not shown: 998 filtered ports
+PORT    STATE SERVICE
+80/tcp  open  http
+| http-waf-detect: IDS/IPS/WAF detected:
+|_www.microsoft.com:80/?p4yl04d3=<script>alert(document.cookie)</script>
+443/tcp open  https
+| http-waf-detect: IDS/IPS/WAF detected:
+|_www.microsoft.com:443/?p4yl04d3=<script>alert(document.cookie)</script>
+
+Nmap done: 1 IP address (1 host up) scanned in 25.46 seconds
+
+╋━━━━━━╋
+┃NMAP        ┃
+┃所有参数    ┃
+┃zenmap      ┃
+╋━━━━━━╋
+
+root@kali:~# nmap
+Nmap 6.49BETA5 ( https://nmap.org )
+Usage: nmap [Scan Type(s)] [Options] {target specification}
+TARGET SPECIFICATION:                        //目标发现
+  Can pass hostnames, IP addresses, networks, etc.
+  Ex: scanme.nmap.org, microsoft.com/24, 192.168.0.1; 10.0.0-255.1-254
+  -iL <inputfilename>: Input from list of hosts/networks  //扫描列表文件的IP
+  -iR <num hosts>: Choose random targets              //选择随机目标
+  --exclude <host1[,host2][,host3],...>: Exclude hosts/networks  //排除主机/网络
+  --excludefile <exclude_file>: Exclude list from file     //排除列表文件
+HOST DISCOVERY:                            //主机发现
+  -sL: List Scan - simply list targets to scan         //扫描-简单地列出目标扫描列表
+  -sn: Ping Scan - disable port scan                   //Ping扫描——禁用端口扫描
+  -Pn: Treat all hosts as online -- skip host discovery     //治疗所有主机在线,跳过主机发现
+  -PS/PA/PU/PY[portlist]: TCP SYN/ACK, UDP or SCTP discovery to given ports  //TCP SYN / ACK,UDP或SCTP发现给定端口
+  -PE/PP/PM: ICMP echo, timestamp, and netmask request discovery probes  //ICMP回应、时间戳和子网掩码请求发现探针
+  -PO[protocol list]: IP Protocol Ping  //IP协议平
+  -n/-R: Never do DNS resolution/Always resolve [default: sometimes]  //从不做DNS解析/总是解决(默认值:有时
+  --dns-servers <serv1[,serv2],...>: Specify custom DNS servers    //指定自定义DNS服务器
+  --system-dns: Use OS's DNS resolver        //使用操作系统的DNS解析器
+  --traceroute: Trace hop path to each host  //跟踪每个主机跳路径
+SCAN TECHNIQUES:                          //扫描技术
+  -sS/sT/sA/sW/sM: TCP SYN/Connect()/ACK/Window/Maimon scans     //TCP SYN / Connect()/ ACK /windows/maimon扫描
+  -sU: UDP Scan                      //UDP扫描
+  -sN/sF/sX: TCP Null, FIN, and Xmas scans              //TCP Null, FIN, and Xmas
+  --scanflags <flags>: Customize TCP scan flags        //定制TCP扫描标记
+  -sI <zombie host[:probeport]>: Idle scan            //闲置扫描
+  -sY/sZ: SCTP INIT/COOKIE-ECHO scans                //SCTP INIT/COOKIE-ECHO扫描
+  -sO: IP protocol scan                              //IP协议扫描
+  -b <FTP relay host>: FTP bounce scan              //FTP反弹扫描
+PORT SPECIFICATION AND SCAN ORDER:                  //端口说明和扫描顺序
+  -p <port ranges>: Only scan specified ports      //只扫描指定的端口
+    Ex: -p22; -p1-65535; -p U:53,111,137,T:21-25,80,139,8080,S:9
+  --exclude-ports <port ranges>: Exclude the specified ports from scanning //从扫描排除指定的端口
+  -F: Fast mode - Scan fewer ports than the default scan   //端口扫描少于默认扫描
+  -r: Scan ports consecutively - don't randomize          //连续扫描端口——不要随机
+  --top-ports <number>: Scan <number> most common ports    //扫描<数字>最常见的端口
+  --port-ratio <ratio>: Scan ports more common than <ratio>  //扫描端口比<比率>更常见
+SERVICE/VERSION DETECTION:            //服务/版本检测
+  -sV: Probe open ports to determine service/version info    //调查开放端口来确定服务/版本信息
+  --version-intensity <level>: Set from 0 (light) to 9 (try all probes) //设置从0(光)9(尝试所有探头
+  --version-light: Limit to most likely probes (intensity 2)    //限制最有可能探针强度(2)
+  --version-all: Try every single probe (intensity 9)           //尝试每一个探头(9)强度
+  --version-trace: Show detailed version scan activity (for debugging)//显示详细的版本扫描活动(调试)
+SCRIPT SCAN:      //脚本扫描 
+  -sC: equivalent to --script=default         //相当于——脚本=违约系统默认值
+           directories, script-files or script-categories   // Lua脚本>是一个逗号分隔的列表　　目录,脚本文件或script-categorie
+  --script-args=<n1=v1,[n2=v2,...]>: provide arguments to scripts  //提供脚本的参数
+  --script-args-file=filename: provide NSE script args in a file   //提供了无脚本参数在一个文件中
+  --script-trace: Show all data sent and received         //显示所有数据发送和接收
+  --script-updatedb: Update the script database.          //更新数据库脚本
+  --script-help=<Lua scripts>: Show help about scripts.  //显示帮助关于脚本
+           <Lua scripts> is a comma-separated list of script-files or
+           script-categories.    //< Lua脚本>是一个以逗号分隔的脚本文件　　script-categories。
+OS DETECTION:            //操作系统探测
+  -O: Enable OS detection         //使操作系统检测
+  --osscan-limit: Limit OS detection to promising targets     //限制操作系统检测前景目标
+  --osscan-guess: Guess OS more aggressively              //想操作系统更积极
+TIMING AND PERFORMANCE:                        //时间和性能
+  Options which take <time> are in seconds, or append 'ms' (milliseconds),
+  's' (seconds), 'm' (minutes), or 'h' (hours) to the value (e.g. 30m).
+   //选择以<时间>是在几秒钟内,或附加“女士”(毫秒) 　　“年代”(秒),
+      “m”(分钟),或“h”(小时)值(例如30米)。
+  -T<0-5>: Set timing template (higher is faster)   //设置时间模板(更高更快)
+  --min-hostgroup/max-hostgroup <size>: Parallel host scan group sizes   //平行主机扫描组大小
+  --min-parallelism/max-parallelism <numprobes>: Probe parallelization   //探针并行化
+  --min-rtt-timeout/max-rtt-timeout/initial-rtt-timeout <time>: Specifies
+      probe round trip time.      //指定探针往返时间
+  --max-retries <tries>: Caps number of port scan probe retransmissions.  //限制数量的端口扫描探针重发
+  --host-timeout <time>: Give up on target after this long  //这么长时间后放弃目标
+  --scan-delay/--max-scan-delay <time>: Adjust delay between probes  //调整探针之间的延迟
+  --min-rate <number>: Send packets no slower than <number> per second //发送的数据包没有低于每秒<数字>
+  --max-rate <number>: Send packets no faster than <number> per second //发送的数据包没有超过每秒<数字>
+FIREWALL/IDS EVASION AND SPOOFING:    //防火墙/ IDS逃避和欺骗
+  -f; --mtu <val>: fragment packets (optionally w/given MTU)  //碎片包(可选w /鉴于MTU)
+  -D <decoy1,decoy2[,ME],...>: Cloak a scan with decoys  //斗篷诱饵的扫描
+  -S <IP_Address>: Spoof source address       //恶搞源地址
+  -e <iface>: Use specified interface     //使用指定的接口
+  -g/--source-port <portnum>: Use given port number   //使用给定的端口号
+  --proxies <url1,[url2],...>: Relay connections through HTTP/SOCKS4 proxies  //继电器连接通过HTTP / SOCKS4代理
+  --data <hex string>: Append a custom payload to sent packets  //添加一个自定义的有效负载发送数据包
+  --data-string <string>: Append a custom ASCII string to sent packets  //添加一个自定义的ASCII字符串发送数据包
+  --data-length <num>: Append random data to sent packets  //将随机数据附加到发送数据包
+  --ip-options <options>: Send packets with specified ip options  //将随机数据附加到发送数据包
+  --ttl <val>: Set IP time-to-live field    //设置IP生存时间字段
+  --spoof-mac <mac address/prefix/vendor name>: Spoof your MAC address  //恶搞你的MAC地址
+  --badsum: Send packets with a bogus TCP/UDP/SCTP checksum  //发送数据包的虚假的TCP / UDP / SCTP校验和
+OUTPUT:              //输出
+  -oN/-oX/-oS/-oG <file>: Output scan in normal, XML, s|<rIpt kIddi3,
+     and Grepable format, respectively, to the given filename.
+                          //发送数据包的虚假的TCP / UDP / SCTP校验和
+  -oA <basename>: Output in the three major formats at once  //三大格式的输出
+  -v: Increase verbosity level (use -vv or more for greater effect)
+                         //增加冗长级别(使用vv或更多的更大的影响)
+  -d: Increase debugging level (use -dd or more for greater effect)
+                         //增加冗长级别(使用vv或更多的更大的影响)
+  --reason: Display the reason a port is in a particular state
+                         //显示一个港口的原因是在一个特定的状态
+  --open: Only show open (or possibly open) ports  //只显示打开(或打开)端口
+  --packet-trace: Show all packets sent and received   //显示所有数据包发送和接收
+  --iflist: Print host interfaces and routes (for debugging)  //打印主机接口和路线(调试)
+  --append-output: Append to rather than clobber specified output files
+                         //使悬而不决而不是揍指定输出文件
+  --resume <filename>: Resume an aborted scan     //简历一个中止扫描
+  --stylesheet <path/URL>: XSL stylesheet to transform XML output to HTML
+                         //XSL样式表来转换XML输出HTML
+  --webxml: Reference stylesheet from Nmap.Org for more portable XML
+                        //从Nmap引用样式表。组织更多的便携式XML
+  --no-stylesheet: Prevent associating of XSL stylesheet w/XML output
+                        //防止关联的XSL样式表w / XML输出
+MISC:
+  -6: Enable IPv6 scanning               //启用IPv6扫描
+  -A: Enable OS detection, version detection, script scanning, and traceroute
+                       //使操作系统检测、版本检测,脚本扫描和路由跟踪
+  --datadir <dirname>: Specify custom Nmap data file location  //指定自定义Nmap数据文件的位置
+  --send-eth/--send-ip: Send using raw ethernet frames or IP packets
+                       //使用原始以太网帧或IP数据包发送
+  --privileged: Assume that the user is fully privileged    //假设用户是完全的特权
+  --unprivileged: Assume the user lacks raw socket privileges   //假设用户缺乏原始套接字的特权
+  -V: Print version number   //印刷版本号
+  -h: Print this help summary page.   //打印此帮助总结页面
+EXAMPLES:
+  nmap -v -A scanme.nmap.org
+  nmap -v -sn 192.168.0.0/16 10.0.0.0/8
+  nmap -v -iR 10000 -Pn -p 80
+SEE THE MAN PAGE (https://nmap.org/book/man.html) FOR MORE OPTIONS AND EXAMPLES
+//查看更多选项的手册页(https://nmap.org/book/man.html)和例子
+
+-------------------------------------------------------------------------------------------
+
+root@kali:~# nmap -iR 100 -p22             //选择随机目标
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 15:15 CST
+Nmap scan report for 116.16.219.93
+Host is up (0.23s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 14.220.223.88
+Host is up (0.35s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 23.9.118.253
+Host is up (0.37s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 108.63.76.92
+Host is up (0.46s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 113.56.140.168
+Host is up (0.23s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 182.242.30.1
+Host is up (0.054s latency).
+PORT   STATE  SERVICE
+22/tcp closed ssh
+
+Nmap scan report for 175.160.199.202
+Host is up (0.046s latency).
+PORT   STATE  SERVICE
+22/tcp closed ssh
+
+Nmap scan report for 174-84-121-136.res.bhn.net (174.84.121.136)
+Host is up (0.37s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 108.7.144.26
+Host is up (0.34s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 190.223.32.250
+Host is up (0.37s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 58.255.62.140
+Host is up (0.042s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 41.206.211.209
+Host is up (0.52s latency).
+PORT   STATE  SERVICE
+22/tcp closed ssh
+
+Nmap scan report for 177-174-246-93.user.vivozap.com.br (177.174.246.93)
+Host is up (1.2s latency).
+PORT   STATE  SERVICE
+22/tcp closed ssh
+
+Nmap scan report for 27.216.0.189
+Host is up (0.052s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 184.252.65.239
+Host is up (0.22s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap scan report for 70.245.126.239
+Host is up (0.24s latency).
+PORT   STATE  SERVICE
+22/tcp closed ssh
+
+Nmap scan report for 83.237.163.21
+Host is up (0.76s latency).
+PORT   STATE    SERVICE
+22/tcp filtered ssh
+
+Nmap done: 117 IP addresses (17 hosts up) scanned in 53.79 seconds
+
+root@kali:~# nmap 192.168.1.0/24 --exclude 192.168.1.1-100               //排除主机/网络
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 15:23 CST
+Nmap scan report for 192.168.1.101
+Host is up (0.00019s latency).
+Not shown: 990 closed ports
+PORT      STATE SERVICE
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+443/tcp   open  https
+445/tcp   open  microsoft-ds
+903/tcp   open  iss-console-mgr
+49152/tcp open  unknown
+49153/tcp open  unknown
+49154/tcp open  unknown
+49156/tcp open  unknown
+49163/tcp open  unknown
+MAC Address: 00:5A:39:B0:ED:D2 (Shenzhen Fast Technologies CO.)
+
+Nmap scan report for 192.168.1.102
+Host is up (0.0058s latency).
+Not shown: 997 closed ports
+PORT      STATE SERVICE
+7777/tcp  open  cbt
+8192/tcp  open  sophos
+12345/tcp open  netbus
+MAC Address: 74:51:BA:88:2F:3A (Xiaomi)
+
+Nmap scan report for 192.168.1.107
+Host is up (0.0000050s latency).
+All 1000 scanned ports on 192.168.1.107 are closed
+
+Nmap done: 156 IP addresses (3 hosts up) scanned in 6.84 seconds
+
+root@kali:~# nmap -sL 192.168.1.0/28                 //扫描-简单地列出目标扫描列表
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 15:24 CST
+Nmap scan report for 192.168.1.0
+Nmap scan report for 192.168.1.1
+Nmap scan report for 192.168.1.2
+Nmap scan report for 192.168.1.3
+Nmap scan report for 192.168.1.4
+Nmap scan report for 192.168.1.5
+Nmap scan report for 192.168.1.6
+Nmap scan report for 192.168.1.7
+Nmap scan report for 192.168.1.8
+Nmap scan report for 192.168.1.9
+Nmap scan report for 192.168.1.10
+Nmap scan report for 192.168.1.11
+Nmap scan report for 192.168.1.12
+Nmap scan report for 192.168.1.13
+Nmap scan report for 192.168.1.14
+Nmap scan report for 192.168.1.15
+Nmap done: 16 IP addresses (0 hosts up) scanned in 0.04 seconds   
+
+root@kali:~# nmap --dns-servers 8.8.8.8 www.sina.com     //指定自定义DNS服务器
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 15:55 CST
+Nmap scan report for www.sina.com (202.102.75.147)
+Host is up (0.027s latency).
+Not shown: 985 closed ports
+PORT     STATE    SERVICE
+21/tcp   filtered ftp
+22/tcp   filtered ssh
+23/tcp   filtered telnet
+80/tcp   open     http
+135/tcp  filtered msrpc
+139/tcp  filtered netbios-ssn
+161/tcp  filtered snmp
+389/tcp  filtered ldap
+445/tcp  filtered microsoft-ds
+593/tcp  filtered http-rpc-epmap
+873/tcp  filtered rsync
+3389/tcp filtered ms-wbt-server
+4444/tcp filtered krb524
+5631/tcp filtered pcanywheredata
+5900/tcp filtered vnc
+
+Nmap done: 1 IP address (1 host up) scanned in 2.20 seconds
+
+root@kali:~# nmap www.baidu.com --tracerout -p80           //跟踪每个主机跳路径,扫描80端口
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 15:56 CST
+Nmap scan report for www.baidu.com (180.97.33.107)
+Host is up (0.0083s latency).
+Other addresses for www.baidu.com (not scanned): 180.97.33.108
+PORT Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 16:08 CST
+Nmap scan report for localhost (192.168.1.134)
+Host is up（0.00085s latency)
+PORT   STATE SERVICE
+53/udp open domain
+MAC Address: 08:00:27:BO:3A:76 （Cadmus Computer Systems)
+
+Nmap done: 1 IP address (0 hosts up) scanned in 0.50 seconds
+
+root@kali:~# nmap -p T:21 192.168.1.134
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 15:56 CST
+Nmap scan report for www.baidu.com (192.168.1.133)
+Host is up (0.0083s latency).
+Other addresses for www.baidu.com (not scanned): 180.97.33.108
+PORT Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 16:08 CST
+Nmap scan report for localhost (192.168.1.134)
+Host is up（0.00085s latency)
+PORT   STATE SERVICE
+21/tcp open ftp
+MAC Address: 08:00:27:BO:3A:76 （Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.50 seconds
+
+root@kali:~# nmap 192.168.1.133 --top-port 10
+
+Starting Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 20:47 CST
+Nmap scan report for localhost (192.168.1.133)
+Host is up (0.00043s latency)
+PORT      STATE  SERVICE
+21/tcp    closed ftp
+22/tcp    closed ssh
+23/tcp    closed telnet
+25/tcp    closed smtp
+80/tcp    closed http
+110/tcp   closed pop3
+139/tcp   open   netbois-ssn
+443/tcp   closed https
+445/tcp   closed miscrosoft-ds
+3389/tcp  open   ms-wbt-server
+MAC Address: 08:00:27:BO:3A:76 （Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.50 seconds
+
+root@kali:~# namp -p21 192.168.1.134 -sV --version-intensity 9
+
+Starting Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 20:47 CST
+Nmap scan report for localhost (192.168.1.133)
+Host is up (0.00043s latency)
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 2.3.4
+MAC Address: 08:00:27:BO:3A:76 （Cadmus Computer Systems)
+Service Info: OS: Unix
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.50 seconds
+
+root@kali:~# nmap --script-updatedb
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 23:26 CST
+NSE: Updating rule database.
+NSE: Script Database updated successfully.
+Nmap done: 0 IP addresses (0 hosts up) scanned in 3.31 seconds
+
+root@kali:~# nmap --script-help=http-vuln-cve2013-0156.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 23:29 CST
+
+http-vuln-cve2013-0156
+Categories: exploit vuln
+https://nmap.org/nsedoc/scripts/http-vuln-cve2013-0156.html
+  Detects Ruby on Rails servers vulnerable to object injection, remote command executions and denial of service attacks. (CVE-2013-0156)
+　　类别:利用vuln 　　https://nmap.org/nsedoc/scripts/http - vuln cve2013 - 0156. - html 　　检测到Ruby on Rails服务器容易对象注入,远程命令执行拒绝服务攻击。(cve - 2013 - 0156)
+
+  All Ruby on Rails versions before 2.3.15, 3.0.x before 3.0.19, 3.1.x before 3.1.10, and 3.2.x before 3.2.11 are vulnerable. This script
+  sends 3 harmless yaml payloads to detect vulnerable installations. If the malformed object receives a status 500 response, the server
+  is processing YAML objects and therefore is likely vulnerable.
+2.3.15之前所有Ruby on Rails版本,3.0。3.1 x 3.0.19之前,。3.2 x 3.1.10之前,。x 3.2.11之前是脆弱的。这个脚本　　发送3无害的yaml载荷检测脆弱的设施。如果畸形的对象接收状态500响应,服务器　　YAML是处理对象,因此可能是脆弱的。
+
+  References:
+  * https://community.rapid7.com/community/metasploit/blog/2013/01/10/exploiting-ruby-on-rails-with-metasploit-cve-2013-0156',
+  * https://groups.google.com/forum/?fromgroups=#!msg/rubyonrails-security/61bkgvnSGTQ/nehwjA8tQ8EJ',
+  * http://cvedetails.com/cve/2013-0156/
+
+  TODO:
+  * Add argument to exploit cmd exec vuln
+
+root@kali:~# nmap 192.168.1.134 --scan-delay 10s
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 23:37 CST
+
+root@kali:~# nmap -D 192.168.1.11,192.168.1.12,192.168.1.141 192.168.134
+
+Starting Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 20:47 CST
+Nmap scan report for localhost (192.168.1.133)
+Host is up (0.00043s latency)
+PORT      STATE SERVICE
+21/tcp    open  ftp
+22/tcp    open  ssh
+23/tcp    open  telnet
+25/tcp    open  smtp
+53/tcp    open  domain
+80/tcp    open  http
+110/tcp   open  pop3
+139/tcp   open  netbois-ssn
+445/tcp   open  miscrosoft-ds
+512/tcp   open  exec
+513/tcp   open  login
+514/tcp   open  shell
+1099/tcp  open  rmiregistry
+1524/tcp  open  ingreslock
+2049/tcp  open  nfs
+2121/tcp  open  ccproxy-ftp
+3306/tcp  open  mysql
+5432/tcp  open  postgresql
+5900/tcp  open  vnc
+6000/tcp  open  x11
+6667/tcp  open  irc
+8009/tcp  open  ajp13
+8180/tcp  open  unknown
+MAC Address: 08:00:27:BO:3A:76 （Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.50 second
+
+root@kali:~# nmap -S 192.168.1.11 192.168.1.134
+WARNING: If -S is being used to fake your source address, you may also have to use -e <interface> and -Pn .  If you are using it to specify your real source address, you can ignore this warning.
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-08 23:56 CST
+Could not figure out what device to send the packet out on with the source address you gave me!  If you are trying to sp00f your scan, this is normal, just give the -e eth0 or -e ppp0 or whatever.  Otherwise you can still use -e, but I find it kind of fishy.
+QUITTING!
+        警告:如果使用- s伪造源地址,您可能还需要使用- e <接口>和pn。如果你使用它来指定真正的源地址,你可以忽略这个警告。
+　　　　Nmap 6.49开始beta5在2015-10-08 23:56 CST(https://nmap.org) 　　无法找出设备发送数据包的源地址你给我!如果你试图sp00f扫描,这是正常的,只是给- e eth0或- e ppp0等等。否则你仍然可以使用- e,但我觉得这有点可疑。　　戒烟!
+
+
+root@kali:~# nmap -p22 192.168.1.135 --date=FFFFFFFFFF
+
+Staring Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 21:09 CST
+Nmap scan report for localhost (192.168.1.134)
+Host is up (0.00075s latency).
+PORT  STATE SERVICE
+22/tcp open ssh
+MAC Address: 08:00:27:BO:3A:76 （Cadmus Computer Systems)
+
+Nmap done: 1 IP address (1 hosts up) scanned in 0.50 second
+
+root@kali:~# nmap 192.168.1.134 -p22 --spoof-mac 00::11:11:11:11:11
+Staring Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 21:09 CST
+Spoofing MAC address 00::11:11:11:11:11 (Intel)
+Note done: 1 IP address (0 hosts up) scanned is 054 seconds
+
+root@kali:~# nmap 192.168.1.134 -p22 --spoof-mac 00::11:11:11:11:11 -Pn
+Staring Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 21:09 CST
+Spoofing MAC address 00::11:11:11:11:11 (Intel)
+Note done: 1 IP address (0 hosts up) scanned is 054 seconds
+
+root@kali:~# nmap 192.168.1.134 --spoof-mac00::11:11:11:11:11 -Pn
+Staring Nmap 6.49BETA4 (http://nmap.org) at 2015-08-12 21:09 CST
+Spoofing MAC address 00::11:11:11:11:11 (Intel)
+Note done: 1 IP address (0 hosts up) scanned is 054 seconds
+

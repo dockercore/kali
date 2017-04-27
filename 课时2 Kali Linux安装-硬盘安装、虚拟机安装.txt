@@ -1,0 +1,106 @@
+软件版本：1.1.0
+安装方法：光盘，镜像，u盘（工具：unetbootin 要求：u盘至少4个g）
+安装支持设备：u盘移动，手机，电脑
+
+1.硬盘安装方式
+进入安装界面
+      live  体验
+      live usb persistence  制作u盘无密码移动版
+      live usb encrypted persistence  制作u盘有密码移动版
+      install 直接安装
+      graphical install 图形化安装
+
+2.docker(容器)
+      https://www.kali.org/news/official-kali-linux-docker-images/ kali docker image(kali官方提供的docker镜像里面不包含任何软件工具)
+     https://github.com/offensive-secunity/kali-linux-docker kali官方放在docker的脚本（要求自己做的kali镜像）
+----------------------------------------
+1.虚拟机安装
+    vmware workstation
+    virtualbox
+    官方vm镜像文件：
+     https://www.offensive-security.com/kali-linux-vmware-arm-image-download/
+     win8系统安装虚拟机注意：要卸载微软的kb3045999补丁 卸载方法：打开命令提示符cd/到c盘再powershell再打入get-hotfix -id KB3045999回车打入wusa /uninstall /kb:3045999成功卸载
+       
+     安装tools:
+先在虚拟机上安装附加模块，在打开哪个镜像，选择里面的vboxlinuxadditions.run拷贝出来用终端打开，先列出目录ls,再查询现有的权限ls -l，在赋予执行权限chmod +x 文件（x表示可执行），再看下文件是否是绿色ls -l，再运行./文件
+，重启reboot
+
+2.持久加密usb安装
+       
+
+
+模式：
+1、live(amd64)可以通过启动U盘来运行kali linux。缺点：不可以安装新的软件包或更新修改；
+2、Live USB P/EP(加密的持久USB启动光盘)。
+DOCKER?
+虚拟机安装
+vmware workstation
+Virtualbox
+win8安装virtualbox，需要卸载一个补丁,要用到powershell，cmd下执行powershell，然后
+poewershell
+get-hotfix -id KB3045999
+
+wusa /uninstall /kb:3045999  按回车键，卸载
+
+
+虚拟机安装kali linux设置内存最好是2G，最大可以设置成4G
+
+----------------------------------------------------------------------
+安装kali linux操作系统
+Graphical install   //选择字母界面安装kali linux操作系统
+
+chinese(Simplified)  中文（简体）
+
+中国
+
+汉语
+
+请输入系统的主机名: Kali
+
+域名：      //如果这里有域名可以在下面填写,如果木有域名则自己按继续
+
+输入root账号密码 
+
+向导-使用整个硬盘
+
+SCSII (0,0,0)(sda)- 85.9GB ATA VBOX HARDDISK
+
+√ 讲所有每个文件放在同一个分区中（推荐新手使用）
+×将/home、/usr、/var和/tmp都分别放在单独的分区
+
+分区设定结构并将修改写入硬盘
+ 
+将改动写入硬盘吗？  是
+
+将CRUB 启动引导基安装到主引导记录（MBR）上么？  是
+
+安装完成    继续
+
+--------------------------------------------------------------
+
+root@kali:~# apt-get install linux-headers-$(uname -r)    //更新系统并显示linux操作系统内核版本号
+Reading package lists ... Done
+Building dependency tree
+Reading state information... Done
+Linux-headers-3.18.0-kalil-586 is already the newesr version.
+0 upgrade, 0 newly installed, 0 to remove and 163 not upgraded.
+
+root@kali:~# apt-get update
+
+root@kali:~# uname -r      //uname用来获取电脑和操作系统的相关信息,显示linux操作系统内核版本号 
+3.18.0-kalil-586
+
+root@kali:~/Desktop# ls      //打印出当前目录的清单
+VBocLinuxAdditions.run
+
+root@kali:~/Desktop# ls -l     //列出文件的详细信息，如创建者，创建时间，文件的读写权限列表等等
+tottal 6972
+-rw-r--r 1 root root 7136717 may 13 12:12 VBocLinuxAdditions.run
+
+root@kali:~/Desktop# chmod +x VBocLinuxAdditions.run                 赋予执行权限
+
+root@kali:~/Desktop# ls -l
+tottal 6972
+-rwxr-r--r 1 root root 7136717 may 13 12:12 VBocLinuxAdditions.run      赋予权限且"VBocLinuxAdditions.run"变成绿色
+
+root@kali:~/Desktop# ./VBocLinuxAdditions.run       运行VBocLinuxAdditions.run

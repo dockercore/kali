@@ -1,0 +1,847 @@
+课时18 DNS区域传输、DNS字典爆破、DNS注册信息
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃DNS区域传输                             ┃
+┃  dig @ns1.example.com example.com axfr ┃
+┃  host -T -l sina.com 8.8.8.8           ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# dig @ns2.sina.com sina.com axfr
+;; Connection to 114.134.80.145#53(114.134.80.145) for sina.com failed: connection refused.
+
+root@kali:~# dig @ns4.sina.com sina.com axfr
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> @ns4.sina.com sina.com axfr
+; (1 server found)
+;; global options: +cmd
+; Transfer failed.
+
+root@kali:~# host -T -l sina.com 8.8.8.8 ns3.sina.com
+Using domain server:
+Name: 8.8.8.8
+Address: 8.8.8.8#53
+Aliases: 
+
+Host sina.com not found: 2(SERVFAIL)
+; Transfer failed.
+
+root@kali:~# host -h
+host: illegal option -- h
+Usage: host [-aCdlriTwv] [-c class] [-N ndots] [-t type] [-W time]
+            [-R number] [-m flag] hostname [server]
+       -a is equivalent to -v -t ANY
+       -c specifies query class for non-IN data
+       -C compares SOA records on authoritative nameservers
+       -d is equivalent to -v
+       -l lists all hosts in a domain, using AXFR
+       -i IP6.INT reverse lookups
+       -N changes the number of dots allowed before root lookup is done
+       -r disables recursive processing
+       -R specifies number of retries for UDP packets
+       -s a SERVFAIL response should stop query
+       -t specifies the query type
+       -T enables TCP/IP mode
+       -v enables verbose output
+       -w specifies to wait forever for a reply
+       -W specifies how long to wait for a reply
+       -4 use IPv4 query transport only
+       -6 use IPv6 query transport only
+       -m set memory debugging flag (trace|record|usage)
+
+root@kali:~# man host            //查看该命令的基础用法
+
+root@kali:~# info host           //查看该命令的基础用法
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃DNS字典爆破                                                     ┃
+┃  firece -desserver 8.8.8.8 -dns sina.com.cn -wordlist a.txt    ┃
+┃  dnsdict6 -d4 -t 16 -x sina.com                                ┃
+┃  dnsenum -f dnsbig.txt -dnsserver 8.8.8.8 sina.com -o sina.xml ┃
+┃  dnsmap sina.com -w dns.txt                                    ┃
+┃  dnsrecon -d sina.com --lifetime 10 -t brt -D dnsbig.txt       ┃
+┃  dnsrecon -t std -d sina.com                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+root@kali:~# fierce -dnsserver 8.8.8.8 -dns sina.com.cn wordlist a.txt
+DNS Servers for sina.com.cn:
+	ns4.sina.com.cn
+	ns2.sina.com.cn
+	ns3.sina.com.cn
+	ns1.sina.com.cn
+
+Trying zone transfer first...
+
+Unsuccessful in zone transfer (it was worth a shot)
+Okay, trying the good old fashioned way... brute force
+
+Checking for wildcard DNS...
+	** Found 93723043017.sina.com.cn at 202.102.110.204.
+	** High probability of wildcard DNS.
+Now performing 2280 test(s)...
+123.125.29.250	8.sina.com.cn
+58.63.236.239	a1.sina.com.cn
+58.63.236.237	a1.sina.com.cn
+58.63.236.230	a1.sina.com.cn
+58.63.236.239	a2.sina.com.cn
+58.63.236.237	a2.sina.com.cn
+58.63.236.230	a2.sina.com.cn
+121.14.1.189	ad.sina.com.cn
+121.14.1.190	ad.sina.com.cn
+58.63.236.248	ad.sina.com.cn
+……
+
+root@kali:~# dpkg -L fierce
+/.
+/usr
+/usr/share
+/usr/share/doc
+/usr/share/doc/fierce
+/usr/share/doc/fierce/copyright
+/usr/share/doc/fierce/changelog.Debian.gz
+/usr/share/fierce
+/usr/share/fierce/hosts.txt
+/usr/bin
+/usr/bin/fierce
+
+    more命令，功能类似 cat ，cat命令是整个文件的内容从上到下显示在屏幕上。 more会以一页一页的显示方便使用者逐页阅读，而最基本的指令就是按空白键（space）就往下一页显示，按 b 键就会往回（back）一页显示，而且还有搜寻字串的功能 。more命令从前向后读取文件，因此在启动时就加载整个文件。
+    more命令和cat的功能一样都是查看文件里的内容，但有所不同的是more可以按页来查看文件的内容，还支持直接跳转行等功能。
+root@kali:~# more /usr/share/fierce/hosts.txt
+
+root@kali:~# cat /usr/share/fierce/hosts.txt | grep www
+www
+www-
+www-01
+www-02
+www-1
+www-2
+www-int
+www0
+www01
+www02
+www1
+www2
+www3
+www_
+wwwchat
+wwwdev
+wwwmail
+
+root@kali:~# fierce -dnsserver 8.8.8.8 -dns sina.com.cn wordlist a.txt /usr/share/fierce/hosts.txt
+DNS Servers for sina.com.cn:
+	ns3.sina.com.cn
+	ns2.sina.com.cn
+	ns4.sina.com.cn
+	ns1.sina.com.cn
+
+Trying zone transfer first...
+
+Unsuccessful in zone transfer (it was worth a shot)
+Okay, trying the good old fashioned way... brute force
+
+Checking for wildcard DNS...
+	** Found 97704271057.sina.com.cn at 202.102.110.204.
+	** High probability of wildcard DNS.
+Now performing 2280 test(s)...
+123.125.29.250	8.sina.com.cn
+58.63.236.239	a1.sina.com.cn
+58.63.236.237	a1.sina.com.cn
+58.63.236.230	a1.sina.com.cn
+58.63.236.230	a2.sina.com.cn
+58.63.236.239	a2.sina.com.cn
+58.63.236.237	a2.sina.com.cn
+58.63.236.248	ad.sina.com.cn
+121.14.1.189	ad.sina.com.cn
+121.14.1.190	ad.sina.com.cn
+121.14.1.190	ads.sina.com.cn
+……
+
+安装dnsdict6
+wget http://www.thc.org/releases/thc-ipv6-2.7.tar.gz
+使用上面的命令会出现证书错误，在本机下载然后拖进虚拟，最后打开终端开始安装！
+tar zvxf thc-ipv6-2.7.tar.gz
+cd thc-ipv6-2.7
+sudo apt-get install libpcap-dev libssl-dev
+make
+sudo cp dnsdict6 /usr/bin/
+
+【课外拓展】说明： 用来枚举域服务器的，它使用你提供的一个字典或者内置的列表来枚举
+语法：dnsdict6 [-d46] [-s|-m|-l|-x] [-t 线程] [-D] 域名 [字典路径]
+参数说明:
+-4  显示ipv4
+-t  指定要使用的线程 默认：8 最大:32
+-D  ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝［只显示字典不扫描］＝＝＝＝
+-d  显示在DNS服务器上的NS（一种服务记录类型）MX（邮件服务器） ipv6 的域名信息
+-e  忽略没有NS域错误
+-S  执行SRV服务名称猜测
+-[smlx]  选择字典大小[内置的]   -s 小型是50条  -m 中等是796条[默认]    -l 大型1416条   -x 最大3211条
+
+root@kali:~# dnsdict6 -d4 -t 16 -x sina.com     //枚举域服务器,显示6行，线程16，最大，域名
+Starting DNS enumeration work on sina.com. ...
+Gathering NS and MX information...
+NS of sina.com. is ns4.sina.com.cn => 121.14.1.22
+NS of sina.com. is ns2.sina.com. => 114.134.80.145         
+NS of sina.com. is ns1.sina.com. => 114.134.80.144
+NS of sina.com. is ns4.sina.com. => 123.125.29.29
+NS of sina.com. is ns2.sina.com.cn => 61.172.201.254
+NS of sina.com. is ns3.sina.com.cn => 123.125.29.99
+NS of sina.com. is ns1.sina.com.cn => 202.106.184.166
+NS of sina.com. is ns.sina.com. => 61.172.201.254 
+No IPv6 address for NS entries found in DNS for domain sina.com.
+MX of sina.com is freemx2.sinamil.sina.com.cn => 218.30.115.106
+
+root@kali:~# dnsdict6 -h
+dnsdict6 v2.7 (c) 2014 by van Hauser / THC <vh@thc.org> www.thc.org
+
+Syntax: dnsdict6 [-d4] [-s|-m|-l|-x|-u] [-t THREADS] [-D] domain [dictionary-file]
+
+Enumerates a domain for DNS entries, it uses a dictionary file if supplied
+or a built-in list otherwise. This tool is based on dnsmap by gnucitizen.org.
+
+Options:
+ -4      do also dump IPv4 addresses
+ -t NO   specify the number of threads to use (default: 8, max: 32).
+ -D      dump the selected built-in wordlist, no scanning.
+ -d      display IPv6 information on NS and MX DNS domain information.
+ -e      ignore no NS for domain errors
+ -S      perform SRV service name guessing
+ -[smlxu] choose the dictionary size by -s(mall=100), -m(edium=1419) (DEFAULT)
+           -l(arge=2601), -x(treme=5886) or -u(ber=16724)
+
+
+
+root@kali:~# dnsenum -f dnsbig.txt -dnsserver 8.8.8.8 sina.com -o sina.xml
+dnsenum.pl VERSION:1.2.3
+
+-----   sina.com   -----
+
+
+Host's addresses:
+__________________
+
+sina.com.                                47       IN    A        66.102.251.33
+
+
+Name Servers:
+______________
+
+ns2.sina.com.cn.                         12328    IN    A        61.172.201.254
+ns3.sina.com.cn.                         21599    IN    A        123.125.29.99
+ns1.sina.com.cn.                         12449    IN    A        202.106.184.166
+ns1.sina.com.                            21519    IN    A        114.134.80.144
+ns3.sina.com.                            14250    IN    A        61.172.201.254
+ns4.sina.com.                            20263    IN    A        123.125.29.99
+ns2.sina.com.                            20931    IN    A        114.134.80.145
+ns4.sina.com.cn.                         15452    IN    A        121.14.1.22
+
+
+Mail (MX) Servers:
+___________________
+
+freemx2.sinamail.sina.com.cn.            167      IN    A        218.30.115.106
+freemx3.sinamail.sina.com.cn.            1194     IN    A        60.28.2.248
+freemx1.sinamail.sina.com.cn.            11       IN    A        202.108.3.242
+
+
+Trying Zone Transfers and getting Bind Versions:
+_________________________________________________
+
+
+Trying Zone Transfer for sina.com on ns2.sina.com.cn ... 
+AXFR record query failed: connection failed
+
+Trying Zone Transfer for sina.com on ns3.sina.com.cn ... 
+AXFR record query failed: RCODE from server: REFUSED
+
+Trying Zone Transfer for sina.com on ns1.sina.com.cn ... 
+AXFR record query failed: connection failed
+
+Trying Zone Transfer for sina.com on ns1.sina.com ... 
+AXFR record query failed: truncated zone transfer
+
+Trying Zone Transfer for sina.com on ns3.sina.com ... 
+AXFR record query failed: connection failed
+
+Trying Zone Transfer for sina.com on ns4.sina.com ... 
+AXFR record query failed: RCODE from server: REFUSED
+
+Trying Zone Transfer for sina.com on ns2.sina.com ... 
+AXFR record query failed: connection failed
+
+Trying Zone Transfer for sina.com on ns4.sina.com.cn ... 
+AXFR record query failed: connection failed
+
+
+Brute forcing with dnsbig.txt:
+_______________________________
+
+Error: make sure that the file dnsbig.txt exists and has a size greater than zero.
+
+root@kali:~# dpkg -L dnsenum
+/.
+/usr
+/usr/share
+/usr/share/doc
+/usr/share/doc/dnsenum
+/usr/share/doc/dnsenum/README.md
+/usr/share/doc/dnsenum/copyright
+/usr/share/doc/dnsenum/changelog.Debian.gz
+/usr/share/dnsenum
+/usr/share/dnsenum/dns.txt
+/usr/bin
+/usr/bin/dnsenum
+
+root@kali:~# dnsenum -f www -dnsserver 8.8.8.8 sina.com -o sina.xml
+dnsenum.pl VERSION:1.2.3
+
+-----   sina.com   -----
+
+
+Host's addresses:
+__________________
+
+sina.com.                                14       IN    A        66.102.251.33
+
+
+Name Servers:
+______________
+
+ns3.sina.com.cn                               13896     IN     A        123.125.29.99
+ns1.sina.com                                  7721      IN     A        202.106.184.166
+ns2.sina.com                                  4482      IN     A        114.134.80.145
+ns4.sina.com                                  16316     IN     A        123.125.29.99
+ns3.sina.com                                  177728    IN     A        61.172.201.254
+ns1.sina.com                                  7274      IN     A        114.134.80.144
+
+root@kali:~# find / -name dnsenum 
+/usr/bin/dnsenum
+/usr/share/doc/dnsenum
+/usr/share/dnsenum
+
+root@kali:~# dnsmap sina.com -w dns.txt
+dnsmap 0.30 - DNS Network Mapper by pagvac (gnucitizen.org)
+
+root@kali:~# dnsrecon -d sina.com --lifetime 10 -t brt -D dnsbig.txt
+[-] File dnsbig.txt does not exist!
+
+root@kali:~# dpkg -L dnsrecon
+/.
+/usr
+/usr/share
+/usr/share/man
+/usr/share/man/man1
+/usr/share/man/man1/dnsrecon.1.gz
+/usr/share/doc
+/usr/share/doc/dnsrecon
+/usr/share/doc/dnsrecon/README.md.gz
+/usr/share/doc/dnsrecon/copyright
+/usr/share/doc/dnsrecon/changelog.Debian.gz
+/usr/share/dnsrecon
+/usr/share/dnsrecon/tools
+/usr/share/dnsrecon/tools/parser.py
+/usr/share/dnsrecon/lib
+/usr/share/dnsrecon/lib/mdnsenum.py
+/usr/share/dnsrecon/lib/__init__.py
+/usr/share/dnsrecon/lib/dnshelper.py
+/usr/share/dnsrecon/lib/msf_print.py
+/usr/share/dnsrecon/lib/gooenum.py
+/usr/share/dnsrecon/lib/whois.py
+/usr/share/dnsrecon/namelist.txt
+/usr/share/dnsrecon/msf_plugin
+/usr/share/dnsrecon/msf_plugin/dnsr_import.rb
+/usr/share/dnsrecon/dnsrecon.py
+/usr/bin
+/usr/bin/dnsrecon
+
+
+root@kali:~# dnsrecon -d sina.com --lifetime 10 -t brt -D /usr/share/dnsrecon/namelist.txt
+[*] Performing host and subdomain brute force against sina.com
+[!] Wildcard resolution is enabled on this domain
+[!] It is resolving to 202.102.110.204
+[!] All queries will resolve to this address!!
+[*] Do you wish to continue? y/n 
+y
+[*] 	 A 1.sina.com 202.102.110.204
+[*] 	 A 0.sina.com 202.102.110.204
+[*] 	 A 02.sina.com 202.102.110.204
+[*] 	 A 03.sina.com 202.102.110.204
+[*] 	 A 01.sina.com 202.102.110.204
+[*] 	 A 3.sina.com 202.102.110.204
+[*] 	 A 18.sina.com 202.102.110.204
+[*] 	 A 20.sina.com 202.102.110.204
+[*] 	 A abc.sina.com 202.102.110.204
+[*] 	 A adam.sina.com 202.102.110.204
+[*] 	 A administrador.sina.com 202.102.110.204
+[*] 	 A administrators.sina.com 202.102.110.204
+[*] 	 A admins.sina.com 202.102.110.204
+[*] 	 CNAME ads.sina.com region.sina.usgcac.cdnetworks.net
+[*] 	 CNAME region.sina.usgcac.cdnetworks.net n2.panthercdn.com
+[*] 	 A n2.panthercdn.com 14.0.35.230
+[*] 	 A n2.panthercdn.com 14.0.38.86
+[*] 	 A ae.sina.com 202.102.110.204
+[*] 	 A affiliate.sina.com 202.102.110.204
+[*] 	 A admin.sina.com 202.102.110.204
+[*] 	 A administracion.sina.com 202.102.110.204
+……
+^C[-] You have pressed Ctrl-C. Saving found records.
+[*] Waiting for 9 remaining threads to finish.
+[*] 	 A distributer.sina.com 202.102.110.204
+[*] 	 A dm.sina.com 202.102.110.204
+[*] 	 A devserver.sina.com 202.102.110.204
+[*] 	 A dns.sina.com 202.102.110.204
+[*] 	 A discuss.sina.com 202.102.110.204
+[*] 254 Records Found
+
+root@kali:~# dnsrecon -t std -d sina.com
+[*] Performing General Enumeration of Domain:
+Traceback (most recent call last):
+  File "./dnsrecon.py", line 1681, in <module>
+    main()
+  File "./dnsrecon.py", line 1524, in main
+    spf_enum, do_whois, zonewalk)
+  File "./dnsrecon.py", line 956, in general_enum
+    dns_sec_check(domain, res)
+  File "./dnsrecon.py", line 859, in dns_sec_check
+    answer = res._res.query(domain, 'DNSKEY')
+  File "/usr/lib/python2.7/dist-packages/dns/resolver.py", line 824, in query
+    raise NoNameservers
+dns.resolver.NoNameservers
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃DNS注册信息                               ┃
+┃Whois                                     ┃ 
+┃Whois -h whois.apnic.net 192.0.43.10      ┃
+┃                                          ┃
+┃AFRINIC          http://www.afrinic.net   ┃
+┃APNIC            http://www.apnic.net     ┃
+┃ARIN             http://ws.arin.net       ┃
+┃IANA             http://www.iana.com      ┃
+┃ICANN            http://www.icann.org     ┃
+┃LACNIC           http://www.lacnic.net    ┃
+┃NRO              http://www.nro.net       ┃
+┃RIPE             http://www.ripe.net      ┃
+┃InterNic         http://www.internic.net  ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# whois sina.com
+
+Whois Server Version 2.0
+
+Domain names in the .com and .net domains can now be registered
+with many different competing registrars. Go to http://www.internic.net
+for detailed information.
+
+   Server Name: SINA.COM.CN
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Domain Name: SINA.COM
+   Registrar: NETWORK SOLUTIONS, LLC.
+   Sponsoring Registrar IANA ID: 2
+   Whois Server: whois.networksolutions.com
+   Referral URL: http://networksolutions.com
+   Name Server: NS1.SINA.COM
+   Name Server: NS1.SINA.COM.CN
+   Name Server: NS2.SINA.COM
+   Name Server: NS2.SINA.COM.CN
+   Name Server: NS3.SINA.COM
+   Name Server: NS3.SINA.COM.CN
+   Name Server: NS4.SINA.COM
+   Status: clientTransferProhibited http://www.icann.org/epp#clientTransferProhibited
+   Updated Date: 26-nov-2014
+   Creation Date: 16-sep-1998
+   Expiration Date: 15-sep-2019
+
+>>> Last update of whois database: Fri, 18 Sep 2015 16:00:27 GMT <<<
+
+NOTICE: The expiration date displayed in this record is the date the 
+registrar's sponsorship of the domain name registration in the registry is 
+currently set to expire. This date does not necessarily reflect the expiration 
+date of the domain name registrant's agreement with the sponsoring 
+registrar.  Users may consult the sponsoring registrar's Whois database to 
+view the registrar's reported date of expiration for this registration.
+
+TERMS OF USE: You are not authorized to access or query our Whois 
+database through the use of electronic processes that are high-volume and 
+automated except as reasonably necessary to register domain names or 
+modify existing registrations; the Data in VeriSign Global Registry 
+Services' ("VeriSign") Whois database is provided by VeriSign for 
+information purposes only, and to assist persons in obtaining information 
+about or related to a domain name registration record. VeriSign does not 
+guarantee its accuracy. By submitting a Whois query, you agree to abide 
+by the following terms of use: You agree that you may use this Data only 
+for lawful purposes and that under no circumstances will you use this Data 
+to: (1) allow, enable, or otherwise support the transmission of mass 
+unsolicited, commercial advertising or solicitations via e-mail, telephone, 
+or facsimile; or (2) enable high volume, automated, electronic processes 
+that apply to VeriSign (or its computer systems). The compilation, 
+repackaging, dissemination or other use of this Data is expressly 
+prohibited without the prior written consent of VeriSign. You agree not to 
+use electronic processes that are automated and high-volume to access or 
+query the Whois database except as reasonably necessary to register 
+domain names or modify existing registrations. VeriSign reserves the right 
+to restrict your access to the Whois database in its sole discretion to ensure 
+operational stability.  VeriSign may restrict or terminate your access to the 
+Whois database for failure to abide by these terms of use. VeriSign 
+reserves the right to modify these terms at any time. 
+
+The Registry database contains ONLY .COM, .NET, .EDU domains and
+Registrars.
+
+For more information on Whois status codes, please visit 
+https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en.
+
+
+Domain Name: SINA.COM
+Registry Domain ID: 2243615_DOMAIN_COM-VRSN
+Registrar WHOIS Server: whois.networksolutions.com
+Registrar URL: http://networksolutions.com
+Updated Date: 2015-01-28T23:23:26Z
+Creation Date: 1998-09-16T04:00:00Z
+Registrar Registration Expiration Date: 2019-09-15T04:00:00Z
+Registrar: NETWORK SOLUTIONS, LLC.
+Registrar IANA ID: 2
+Registrar Abuse Contact Email: abuse@web.com
+Registrar Abuse Contact Phone: +1.8003337680
+Reseller: 
+Domain Status: clientTransferProhibited http://www.icann.org/epp#clientTransferProhibited
+Registry Registrant ID: 
+Registrant Name: SINA.COM TECHNOLOGY(CHINA)CO.,LTD
+Registrant Organization: SINA.COM TECHNOLOGY(CHINA)CO.,LTD
+Registrant Street: BEIJING IDEAL PLAZA,20F NO.58
+Registrant City: beijing
+Registrant State/Province: CN
+Registrant Postal Code: 100080
+Registrant Country: CN
+Registrant Phone: +86.1058983009
+Registrant Phone Ext: 
+Registrant Fax: +86.1082607527
+Registrant Fax Ext: 
+Registrant Email: domainname@staff.sina.com.cn
+Registry Admin ID: 
+Admin Name: Xie, Guomin
+Admin Organization: SINA.COM TECHNOLOGY(CHINA)CO.,LTD
+Admin Street: BEIJING IDEAL PLAZA,20F NO.58
+Admin City: beijing
+Admin State/Province: CN
+Admin Postal Code: 100080
+Admin Country: CN
+Admin Phone: +86.1058983078
+Admin Phone Ext: 
+Admin Fax: +86.1082607527
+Admin Fax Ext: 
+Admin Email: domainname@staff.sina.com.cn
+Registry Tech ID: 
+Tech Name: Xie, Guomin
+Tech Organization: SINA.COM TECHNOLOGY(CHINA)CO.,LTD
+Tech Street: BEIJING IDEAL PLAZA,20F NO.58
+Tech City: beijing
+Tech State/Province: CN
+Tech Postal Code: 100080
+Tech Country: CN
+Tech Phone: +86.1058983078
+Tech Phone Ext: 
+Tech Fax: +86.1082607527
+Tech Fax Ext: 
+Tech Email: domainname@staff.sina.com.cn
+Name Server: NS1.SINA.COM
+Name Server: NS2.SINA.COM
+Name Server: NS1.SINA.COM.CN
+Name Server: NS2.SINA.COM.CN
+Name Server: NS3.SINA.COM.CN
+Name Server: NS3.SINA.COM
+Name Server: NS4.SINA.COM
+DNSSEC: Unsigned
+URL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/
+>>> Last update of whois database: Fri, 18 Sep 2015 16:00:27 GMT <<<
+
+The data in Networksolutions.com's WHOIS database is provided to you by
+Networksolutions.com for information purposes only, that is, to assist you in
+obtaining information about or related to a domain name registration
+record. Networksolutions.com makes this information available "as is," and
+does not guarantee its accuracy. By submitting a WHOIS query, you
+agree that you will use this data only for lawful purposes and that,
+under no circumstances will you use this data to: (1) allow, enable,
+or otherwise support the transmission of mass unsolicited, commercial
+advertising or solicitations via direct mail, electronic mail, or by
+telephone; or (2) enable high volume, automated, electronic processes
+that apply to Networksolutions.com  (or its systems). The compilation,
+repackaging, dissemination or other use of this data is expressly
+prohibited without the prior written consent of Networksolutions.com.
+Networksolutions.com reserves the right to modify these terms at any time.
+By submitting this query, you agree to abide by these terms.
+
+root@kali:~# whois wooyun.org
+Domain Name:WOOYUN.ORG
+Domain ID: D159099935-LROR
+Creation Date: 2010-05-06T08:50:48Z
+Updated Date: 2015-01-07T03:37:41Z
+Registry Expiry Date: 2024-05-06T08:50:48Z
+Sponsoring Registrar:Hichina Zhicheng Technology Limited (R1373-LROR)
+Sponsoring Registrar IANA ID: 420
+WHOIS Server: 
+Referral URL: 
+Domain Status: clientDeleteProhibited -- http://www.icann.org/epp#clientDeleteProhibited
+Domain Status: clientTransferProhibited -- http://www.icann.org/epp#clientTransferProhibited
+Registrant ID:hc556860480-cn
+Registrant Name:Fang Xiao Dun
+Registrant Organization:Fang Xiao Dun
+Registrant Street: Haidian District JuYuan Road 6# 502
+Registrant City:Beijing
+Registrant State/Province:Beijing
+Registrant Postal Code:100080
+Registrant Country:CN
+Registrant Phone:+86.18610137578
+Registrant Phone Ext: 
+Registrant Fax: +86.18610137578
+Registrant Fax Ext: 
+Registrant Email:xssshell@gmail.com
+Admin ID:HC-009652962-CN
+Admin Name:Fang Xiaodun
+Admin Organization:Beijing Bigfish Technology
+Admin Street: Haidian District JuYuan Road 6# 502
+Admin City:Beijing
+Admin State/Province:Beijing
+Admin Postal Code:100080
+Admin Country:CN
+Admin Phone:+86.18610137578
+Admin Phone Ext: 
+Admin Fax: +86.18610137578
+Admin Fax Ext: 
+Admin Email:xssshell@gmail.com
+Tech ID:HC-844637505-CN
+Tech Name:Fang Xiaodun
+Tech Organization:Beijing Bigfish Technology
+Tech Street: Haidian District JuYuan Road 6# 502
+Tech City:Beijing
+Tech State/Province:Beijing
+Tech Postal Code:100080
+Tech Country:CN
+Tech Phone:+86.18610137578
+Tech Phone Ext: 
+Tech Fax: +86.18610137578
+Tech Fax Ext: 
+Tech Email:xssshell@gmail.com
+Name Server:NS1.DNSV2.COM
+Name Server:NS2.DNSV2.COM
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+Name Server: 
+DNSSEC:Unsigned
+
+Access to Public Interest Registry WHOIS information is provided to assist persons in determining the contents of a domain name registration record in the Public Interest Registry registry database. The data in this record is provided by Public Interest Registry for informational purposes only, and Public Interest Registry does not guarantee its accuracy. This service is intended only for query-based access. You agree that you will use this data only for lawful purposes and that, under no circumstances will you use this data to(a) allow, enable, or otherwise support the transmission by e-mail, telephone, or facsimile of mass unsolicited, commercial advertising or solicitations to entities other than the data recipient's own existing customers; or (b) enable high volume, automated, electronic processes that send queries or data to the systems of Registry Operator, a Registrar, or Afilias except as reasonably necessary to register domain names or modify existing registrations. All rights reserved. Public Interest Registry reserves the right to modify these terms at any time. By submitting this query, you agree to abide by this policy. For more information on Whois status codes, please visit https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en.
+
+root@kali:~# whois www.google.com
+
+Whois Server Version 2.0
+
+Domain names in the .com and .net domains can now be registered
+with many different competing registrars. Go to http://www.internic.net
+for detailed information.
+
+   Server Name: WWW.GOOGLE.COM.AR
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Server Name: WWW.GOOGLE.COM.AU
+   Registrar: MELBOURNE IT, LTD. D/B/A INTERNET NAMES WORLDWIDE
+   Whois Server: whois.melbourneit.com
+   Referral URL: http://www.melbourneit.com
+
+   Server Name: WWW.GOOGLE.COM.BR
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Server Name: WWW.GOOGLE.COM.CO
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Server Name: WWW.GOOGLE.COM.DO
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Server Name: WWW.GOOGLE.COM.GERRYGOULD.COM
+   IP Address: 8.8.4.4
+   IP Address: 8.8.8.8
+   IP Address: 2001:4860:4860:0:0:0:0:8844
+   IP Address: 2001:4860:4860:0:0:0:0:8888
+   Registrar: GOOGLE INC.
+   Whois Server: whois.rrpproxy.net
+   Referral URL: http://domains.google.com
+
+   Server Name: WWW.GOOGLE.COM.HK
+   Registrar: GKG.NET, INC.
+   Whois Server: whois.gkg.net
+   Referral URL: http://www.gkg.net
+
+   Server Name: WWW.GOOGLE.COM.INFO-MADA.COM
+   IP Address: 216.239.32.21
+   IP Address: 216.239.38.21
+   IP Address: 216.239.36.21
+   IP Address: 216.239.34.21
+   Registrar: GODADDY.COM, LLC
+   Whois Server: whois.godaddy.com
+   Referral URL: http://registrar.godaddy.com
+
+   Server Name: WWW.GOOGLE.COM.MX
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Server Name: WWW.GOOGLE.COM.NAPLESCABS.COM
+   IP Address: 216.239.32.21
+   IP Address: 216.239.34.21
+   IP Address: 216.239.36.21
+   IP Address: 216.239.38.21
+   Registrar: GODADDY.COM, LLC
+   Whois Server: whois.godaddy.com
+   Referral URL: http://registrar.godaddy.com
+
+   Server Name: WWW.GOOGLE.COM.PE
+   Registrar: DELUXE SMALL BUSINESS SALES, INC. D/B/A APLUS.NET
+   Whois Server: whois.names4ever.com
+   Referral URL: http://www.aplus.net
+
+   Server Name: WWW.GOOGLE.COM.PK
+   Registrar: INTERNET.BS CORP.
+   Whois Server: whois.internet.bs
+   Referral URL: http://www.internet.bs
+
+   Server Name: WWW.GOOGLE.COM.SA
+   Registrar: OMNIS NETWORK, LLC
+   Whois Server: whois.omnis.com
+   Referral URL: http://www.omnis.com
+
+   Server Name: WWW.GOOGLE.COM.TR
+   Registrar: TUCOWS DOMAINS INC.
+   Whois Server: whois.tucows.com
+   Referral URL: http://www.tucowsdomains.com
+
+   Server Name: WWW.GOOGLE.COM.TW
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+   Server Name: WWW.GOOGLE.COM.VN
+   Registrar: ENOM, INC.
+   Whois Server: whois.enom.com
+   Referral URL: http://www.enom.com
+
+>>> Last update of whois database: Fri, 18 Sep 2015 16:10:03 GMT <<<
+
+NOTICE: The expiration date displayed in this record is the date the 
+registrar's sponsorship of the domain name registration in the registry is 
+currently set to expire. This date does not necessarily reflect the expiration 
+date of the domain name registrant's agreement with the sponsoring 
+registrar.  Users may consult the sponsoring registrar's Whois database to 
+view the registrar's reported date of expiration for this registration.
+
+TERMS OF USE: You are not authorized to access or query our Whois 
+database through the use of electronic processes that are high-volume and 
+automated except as reasonably necessary to register domain names or 
+modify existing registrations; the Data in VeriSign Global Registry 
+Services' ("VeriSign") Whois database is provided by VeriSign for 
+information purposes only, and to assist persons in obtaining information 
+about or related to a domain name registration record. VeriSign does not 
+guarantee its accuracy. By submitting a Whois query, you agree to abide 
+by the following terms of use: You agree that you may use this Data only 
+for lawful purposes and that under no circumstances will you use this Data 
+to: (1) allow, enable, or otherwise support the transmission of mass 
+unsolicited, commercial advertising or solicitations via e-mail, telephone, 
+or facsimile; or (2) enable high volume, automated, electronic processes 
+that apply to VeriSign (or its computer systems). The compilation, 
+repackaging, dissemination or other use of this Data is expressly 
+prohibited without the prior written consent of VeriSign. You agree not to 
+use electronic processes that are automated and high-volume to access or 
+query the Whois database except as reasonably necessary to register 
+domain names or modify existing registrations. VeriSign reserves the right 
+to restrict your access to the Whois database in its sole discretion to ensure 
+operational stability.  VeriSign may restrict or terminate your access to the 
+Whois database for failure to abide by these terms of use. VeriSign 
+reserves the right to modify these terms at any time. 
+
+The Registry database contains ONLY .COM, .NET, .EDU domains and
+Registrars.
+
+For more information on Whois status codes, please visit 
+https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en.
+
+root@kali:~# whois 202.106.0.20
+% [whois.apnic.net]
+% Whois data copyright terms    http://www.apnic.net/db/dbcopyright.html
+
+% Information related to '202.106.0.0 - 202.106.255.255'
+
+inetnum:        202.106.0.0 - 202.106.255.255
+netname:        UNICOM-BJ
+descr:          China Unicom Beijing province network
+descr:          China Unicom
+country:        CN
+admin-c:        CH1302-AP
+tech-c:         SY21-AP
+mnt-by:         APNIC-HM
+mnt-lower:      MAINT-CNCGROUP-BJ
+mnt-routes:     MAINT-CNCGROUP-RR
+mnt-irt:        IRT-CU-CN
+changed:        hm-changed@apnic.net 20031017
+status:         ALLOCATED PORTABLE
+changed:        hm-changed@apnic.net 20060124
+changed:        hm-changed@apnic.net 20090507
+changed:        hm-changed@apnic.net 20090508
+source:         APNIC
+
+irt:            IRT-CU-CN
+address:        No.21,Jin-Rong Street
+address:        Beijing,100140
+address:        P.R.China
+e-mail:         zhouxm@chinaunicom.cn
+abuse-mailbox:  zhouxm@chinaunicom.cn
+admin-c:        CH1302-AP
+tech-c:         CH1302-AP
+auth:           # Filtered
+mnt-by:         MAINT-CNCGROUP
+changed:        zhouxm@chinaunicom.cn 20101110
+changed:        hm-changed@apnic.net 20101116
+source:         APNIC
+
+person:         ChinaUnicom Hostmaster
+nic-hdl:        CH1302-AP
+e-mail:         abuse@cnc-noc.net
+address:        No.21,Jin-Rong Street
+address:        Beijing,100033
+address:        P.R.China
+phone:          +86-10-66259764
+fax-no:         +86-10-66259764
+country:        CN
+changed:        abuse@cnc-noc.net 20090408
+mnt-by:         MAINT-CNCGROUP
+source:         APNIC
+
+person:         sun ying
+address:        fu xing men nei da jie 97, Xicheng District
+address:        Beijing 100800
+country:        CN
+phone:          +86-10-66030657
+fax-no:         +86-10-66078815
+e-mail:         hostmast@publicf.bta.net.cn
+nic-hdl:        SY21-AP
+mnt-by:         MAINT-CNCGROUP-BJ
+changed:        suny@publicf.bta.net.cn 19980824
+changed:        hm-changed@apnic.net 20060717
+changed:        hostmast@publicf.bta.net.cn  20090630
+source:         APNIC
+
+% This query was served by the APNIC Whois Service version 1.69.1-APNICv1r6 (WHOIS1)

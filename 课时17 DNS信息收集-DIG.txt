@@ -1,0 +1,314 @@
+课时17 DNS信息收集-DIG
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃DNS信息收集------DIG                                                    ┃
+┃  dig @8.8.8.8 www.sina.com.mx                                          ┃
+┃  dig www.sina.com any                                                  ┃
+┃  反向查询：dig +noall +answer -x 8.8.8.8                               ┃
+┃  bind版本信息：dig +noall +answer txt chaos VERSION.BIND @ns3.dnsv4.com┃
+┃  DNS追踪：dig +trace example.com                                       ┃
+┃    抓包比较递归查询、迭代查询过程的区别                                ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# nslookup sina.com -type=any 8.8.8.8
+Server:		8.8.8.8
+Address:	8.8.8.8#53
+
+Non-authoritative answer:
+Name:	sina.com
+Address: 66.102.251.33
+root@kali:~# dig sina.com any @8.8.8.8
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> sina.com any @8.8.8.8
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 21943
+;; flags: qr rd ra; QUERY: 1, ANSWER: 14, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;sina.com.			IN	ANY
+
+;; ANSWER SECTION:
+sina.com.		59	IN	A	66.102.251.33
+sina.com.		59	IN	TXT	"v=spf1 include:spf.sinamail.sina.com.cn -all"
+sina.com.		299	IN	SOA	ns1.sina.com.cn. zhihao.staff.sina.com.cn. 2005042601 900 300 604800 300
+sina.com.		21599	IN	NS	ns2.sina.com.
+sina.com.		21599	IN	NS	ns4.sina.com.
+sina.com.		21599	IN	NS	ns2.sina.com.cn.
+sina.com.		21599	IN	NS	ns1.sina.com.cn.
+sina.com.		21599	IN	NS	ns3.sina.com.
+sina.com.		21599	IN	NS	ns4.sina.com.cn.
+sina.com.		21599	IN	NS	ns3.sina.com.cn.
+sina.com.		21599	IN	NS	ns1.sina.com.
+sina.com.		59	IN	MX	10 freemx2.sinamail.sina.com.cn.
+sina.com.		59	IN	MX	10 freemx3.sinamail.sina.com.cn.
+sina.com.		59	IN	MX	5 freemx1.sinamail.sina.com.cn.
+
+;; Query time: 414 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8)
+;; WHEN: Thu Sep 17 13:39:30 CST 2015
+;; MSG SIZE  rcvd: 395
+
+root@kali:~# dig sina.com any @202.106.0.20
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> sina.com any @202.106.0.20
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 25617
+;; flags: qr rd ra; QUERY: 1, ANSWER: 12, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;sina.com.			IN	ANY
+
+;; ANSWER SECTION:
+sina.com.		26	IN	MX	10 freemx2.sinamail.sina.com.cn.
+sina.com.		26	IN	MX	5 freemx1.sinamail.sina.com.cn.
+sina.com.		26	IN	MX	10 freemx3.sinamail.sina.com.cn.
+sina.com.		46	IN	A	66.102.251.33
+sina.com.		69901	IN	NS	ns1.sina.com.cn.
+sina.com.		69901	IN	NS	ns2.sina.com.cn.
+sina.com.		69901	IN	NS	ns3.sina.com.
+sina.com.		69901	IN	NS	ns3.sina.com.cn.
+sina.com.		69901	IN	NS	ns1.sina.com.
+sina.com.		69901	IN	NS	ns2.sina.com.
+sina.com.		69901	IN	NS	ns4.sina.com.cn.
+sina.com.		69901	IN	NS	ns4.sina.com.
+
+;; Query time: 52 msec
+;; SERVER: 202.106.0.20#53(202.106.0.20)
+;; WHEN: Thu Sep 17 13:42:55 CST 2015
+;; MSG SIZE  rcvd: 289
+
+root@kali:~# dig mail.163.com any
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> mail.163.com any
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 35590
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 8, ADDITIONAL: 10
+
+;; QUESTION SECTION:
+;mail.163.com.			IN	ANY
+
+;; ANSWER SECTION:
+mail.163.com.		1190	IN	CNAME	mail163.yxgslb.netease.com.
+
+;; AUTHORITY SECTION:
+163.com.		40210	IN	NS	ns3.nease.net.
+163.com.		40210	IN	NS	ns2.nease.net.
+163.com.		40210	IN	NS	ns8.nease.net.
+163.com.		40210	IN	NS	ns4.nease.net.
+163.com.		40210	IN	NS	ns5.nease.net.
+163.com.		40210	IN	NS	ns1.nease.net.
+163.com.		40210	IN	NS	ns7.nease.net.
+163.com.		40210	IN	NS	ns6.nease.net.
+
+;; ADDITIONAL SECTION:
+ns1.nease.net.		40210	IN	A	123.58.173.177
+ns2.nease.net.		40210	IN	A	123.58.173.178
+ns3.nease.net.		40211	IN	A	220.181.28.4
+ns4.nease.net.		70848	IN	A	61.135.255.140
+ns5.nease.net.		40211	IN	A	121.195.179.18
+ns6.nease.net.		40210	IN	A	121.195.179.19
+ns7.nease.net.		40210	IN	A	111.13.84.10
+ns7.nease.net.		40210	IN	A	111.13.84.11
+ns8.nease.net.		40212	IN	A	54.86.137.107
+ns8.nease.net.		40212	IN	A	54.178.188.118
+
+;; Query time: 229 msec
+;; SERVER: 192.168.1.1#53(192.168.1.1)
+;; WHEN: Thu Sep 17 13:44:29 CST 2015
+;; MSG SIZE  rcvd: 380
+
+root@kali:~# dig +noall mail.163.com
+
+root@kali:~# dig +noall +answer mail.163.com any
+mail.163.com.		1002	IN	CNAME	mail163.yxgslb.netease.com.
+
+root@kali:~# dig +noall mail.163.com
+
+root@kali:~# dig +noall +answer mail.163.com any | awk '{print $%}'
+awk: line 1: syntax error at or near %
+
+
+root@kali:~# dig +noall +answer mail.163.com any | awk '{print $5}'
+mail163.yxgslb.netease.com.
+
+root@kali:~# dig 163.com.mx
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> 163.com.mx
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 54573
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 10
+
+;; QUESTION SECTION:
+;163.com.mx.			IN	A
+
+;; ANSWER SECTION:
+163.com.mx.		600	IN	A	211.42.249.85
+
+;; AUTHORITY SECTION:
+163.com.mx.		600	IN	NS	f1g1ns1.dnspod.net.
+163.com.mx.		600	IN	NS	f1g1ns2.dnspod.net.
+
+;; ADDITIONAL SECTION:
+f1g1ns1.dnspod.net.	40168	IN	A	182.140.167.166
+f1g1ns1.dnspod.net.	40168	IN	A	111.30.132.180
+f1g1ns1.dnspod.net.	40168	IN	A	113.108.80.138
+f1g1ns1.dnspod.net.	40168	IN	A	125.39.208.193
+f1g1ns1.dnspod.net.	40168	IN	A	180.153.9.189
+f1g1ns2.dnspod.net.	39567	IN	A	182.140.167.188
+f1g1ns2.dnspod.net.	39567	IN	A	101.226.30.224
+f1g1ns2.dnspod.net.	39567	IN	A	112.90.82.194
+f1g1ns2.dnspod.net.	39567	IN	A	115.236.137.40
+f1g1ns2.dnspod.net.	39567	IN	A	115.236.151.191
+
+;; Query time: 335 msec
+;; SERVER: 192.168.1.1#53(192.168.1.1)
+;; WHEN: Thu Sep 17 13:55:11 CST 2015
+;; MSG SIZE  rcvd: 258
+
+root@kali:~# dig 163mx03.mxmail.netease.com
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> 163mx03.mxmail.netease.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 50461
+;; flags: qr rd ra; QUERY: 1, ANSWER: 9, AUTHORITY: 2, ADDITIONAL: 3
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;163mx03.mxmail.netease.com.	IN	A
+
+;; ANSWER SECTION:
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.163
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.164
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.156
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.157
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.158
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.159
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.160
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.161
+163mx03.mxmail.netease.com. 577	IN	A	220.181.14.162
+
+;; AUTHORITY SECTION:
+mxmail.netease.com.	466680	IN	NS	ns-split3.netease.com.
+mxmail.netease.com.	466680	IN	NS	ns-split4.netease.com.
+
+;; ADDITIONAL SECTION:
+ns-split3.netease.com.	466644	IN	A	61.135.255.142
+ns-split4.netease.com.	499806	IN	A	220.181.28.153
+
+;; Query time: 15 msec
+;; SERVER: 192.168.1.1#53(192.168.1.1)
+;; WHEN: Thu Sep 17 15:17:45 CST 2015
+;; MSG SIZE  rcvd: 279
+
+root@kali:~# dig -x 220.181.14.157
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> -x 220.181.14.157
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 37542
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 8, ADDITIONAL: 10
+
+;; QUESTION SECTION:
+;157.14.181.220.in-addr.arpa.	IN	PTR
+
+;; ANSWER SECTION:
+157.14.181.220.in-addr.arpa. 86400 IN	PTR	m14-157.188.com.
+
+;; AUTHORITY SECTION:
+14.181.220.in-addr.arpa. 477311	IN	NS	ns4.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns5.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns8.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns2.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns1.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns6.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns3.nease.net.
+14.181.220.in-addr.arpa. 477311	IN	NS	ns7.nease.net.
+
+;; ADDITIONAL SECTION:
+ns1.nease.net.		34549	IN	A	123.58.173.177
+ns2.nease.net.		34549	IN	A	123.58.173.178
+ns3.nease.net.		34550	IN	A	220.181.28.4
+ns4.nease.net.		65187	IN	A	61.135.255.140
+ns5.nease.net.		34550	IN	A	121.195.179.18
+ns6.nease.net.		34549	IN	A	121.195.179.19
+ns7.nease.net.		34549	IN	A	111.13.84.10
+ns7.nease.net.		34549	IN	A	111.13.84.11
+ns8.nease.net.		34551	IN	A	54.178.188.118
+ns8.nease.net.		34551	IN	A	54.86.137.107
+
+;; Query time: 29 msec
+;; SERVER: 192.168.1.1#53(192.168.1.1)
+;; WHEN: Thu Sep 17 15:18:49 CST 2015
+;; MSG SIZE  rcvd: 387
+
+root@kali:~# dig +noall +answer txt chaos VERSION.BIND @ns.dnsv4.com
+;; Warning query response not set
+Version.bind            0        CH        TXT      "1.1.1504.01"
+
+root@kali:~# dig sina.com ns
+
+; <<>> DiG 9.9.5-9+deb8u3-Debian <<>> sina.com ns
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 17697
+;; flags: qr rd ra; QUERY: 1, ANSWER: 8, AUTHORITY: 0, ADDITIONAL: 9
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;sina.com.			IN	NS
+
+;; ANSWER SECTION:
+sina.com.		31995	IN	NS	ns3.sina.com.cn.
+sina.com.		31995	IN	NS	ns2.sina.com.cn.
+sina.com.		31995	IN	NS	ns4.sina.com.
+sina.com.		31995	IN	NS	ns1.sina.com.cn.
+sina.com.		31995	IN	NS	ns2.sina.com.
+sina.com.		31995	IN	NS	ns3.sina.com.
+sina.com.		31995	IN	NS	ns4.sina.com.cn.
+sina.com.		31995	IN	NS	ns1.sina.com.
+
+;; ADDITIONAL SECTION:
+ns1.sina.com.		31995	IN	A	114.134.80.144
+ns1.sina.com.cn.	23569	IN	A	202.106.184.166
+ns2.sina.com.		22584	IN	A	114.134.80.145
+ns2.sina.com.cn.	25771	IN	A	61.172.201.254
+ns3.sina.com.		21335	IN	A	61.172.201.254
+ns3.sina.com.cn.	23569	IN	A	123.125.29.99
+ns4.sina.com.		23573	IN	A	123.125.29.99
+ns4.sina.com.cn.	23569	IN	A	121.14.1.22
+
+;; Query time: 227 msec
+;; SERVER: 192.168.1.1#53(192.168.1.1)
+;; WHEN: Thu Sep 17 19:16:43 CST 2015
+;; MSG SIZE  rcvd: 320
+
+root@kali:~# dig +noall +answer txt chaos VERSION.BIND @ns2.sina.com
+VERSION.BIND.		0	CH	TXT	
+
+不要把DNS透露到公网上！
+
+root@kali:~# dig +trace www.sina.com
+
+root@kali:~# dig sina.com
+
+╔═══════════════════════════════════════╗
+║dig 与 dig+trace解析结果不一致                                                ║
+║我猜想是这样的:                                                               ║
+║1.用+trace的方式时候，你的本地dns进行recursive的查询，从返回的结果可以看到，是║
+║首先查找互联网root dns，然后一级一级recursive下来，最后直接查询nwu.edu.cn的授 ║
+║权dns服务器，得到结果。                                                       ║
+║2.不用trace的方式，你的本地dns默认是直接forward出去，让forwarders list里面的服║
+║务器帮你做查询，也就是你说的网通服务器，由于种种原因，它查询或者缓存里面是电信║
+║的地址，那就返回给你这个地址了。                                              ║
+╚═══════════════════════════════════════╝

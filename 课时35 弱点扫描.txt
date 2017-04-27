@@ -1,0 +1,285 @@
+课时35 弱点扫描
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃发现弱点                                ┃
+┃发现漏洞                                ┃
+┃  基于端口五福扫描结果版本信息（速度慢）┃
+┃  搜索已公开的漏洞数据库（数量大）      ┃
+┃  使用弱点扫描器实现漏洞管理            ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# searchsploit
+  Usage: searchsploit [options] term1 [term2] ... [termN]
+Example:
+  searchsploit afd windows local
+  searchsploit -t oracle windows
+
+=========
+ Options 
+=========
+   -c, --case     Perform a case-sensitive search (Default is insensitive).
+   -h, --help     Show this help screen.
+   -t, --title    Search just the exploit title (Default is title AND the file's path).
+   -v, --verbose  Verbose output. Title lines are allowed to overflow their columns.
+   -w, --www      Show URLs to Exploit-DB.com rather than local path.
+       --colour   Disable colour highlighting.
+       --id       Display EDB-ID value rather than local path.
+
+=======
+ Notes 
+=======
+ * Use any number of search terms, in any order.
+ * Search terms are not case sensitive, and order is irrelevant.
+   * Use '-c' if you wish to reduce results by case-sensitive searching.
+* Use '-t' to exclude the file's path to filter the search results.
+   * Could possibly remove false positives (especially when searching numbers).
+ * When updating from git or displaying help, search terms will be ignored.
+
+
+
+root@kali:~# searchsploit tomcat
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             | (/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+Apache Tomcat < 5.5.17 - Remote Directory Li | ./multiple/remote/2061.txt
+Apache Tomcat Connector (mod_jk) Remote Expl | ./linux/remote/4162.c
+Apache Tomcat (webdav) - Remote File Disclos | ./multiple/remote/4530.pl
+Apache Tomcat (webdav) - Remote File Disclos | ./linux/remote/4552.pl
+Apache Tomcat Connector jk2-2.0.2 (mod_jk2)  | ./linux/remote/5386.txt
+apache tomcat < 6.0.18 utf8 - Directory Trav | ./multiple/remote/6229.txt
+Apache Tomcat - runtime.getRuntime().exec()  | ./windows/local/7264.txt
+Apache Tomcat Cookie Quote Handling Remote I | ./multiple/remote/9994.txt
+Apache Tomcat Form Authentication Username E | ./multiple/remote/9995.txt
+Apache Tomcat 3.2.1 - 404 Error Page Cross-S | ./multiple/webapps/10292.txt
+Apache Tomcat 5.5.0 < 5.5.29 / 6.0.0 < 6.0.2 | ./multiple/remote/12343.txt
+Apache Tomcat < 6.0.18 utf8 - Directory Trav | ./unix/remote/14489.c
+Apache Tomcat Manager Application Deployer A | ./multiple/remote/16317.rb
+Apache Tomcat - Remote Exploit (PUT Request) | ./multiple/remote/18619.txt
+Apache Tomcat 3.1 - Path Revealing Vulnerabi | ./multiple/remote/20131.txt
+Tomcat 3.0/3.1 Snoop Servlet Information Dis | ./multiple/remote/20132.txt
+apache tomcat 3.0 - Directory Traversal Vuln | ./windows/remote/20716.txt
+Tomcat 3.2.1/4.0_Weblogic Server 5.1 URL JSP | ./multiple/remote/20719.txt
+Jakarta Tomcat 3.x/4.0 Error Message Informa | ./unix/local/21073.txt
+Apache Tomcat 4.0/4.1 - Servlet Path Disclos | ./unix/remote/21412.txt
+Apache Tomcat 3.2.3/3.2.4 - Source.JSP Malfo | ./multiple/remote/21490.txt
+Apache Tomcat 3.2.3/3.2.4 - Example Files We | ./multiple/remote/21491.txt
+Apache Tomcat 3.2.3/3.2.4 - RealPath.JSP Mal | ./multiple/remote/21492.txt
+Apache Tomcat 3/4 - JSP Engine Denial of Ser | ./linux/dos/21534.jsp
+Apache Tomcat 4.0.3 - Servlet Mapping Cross- | ./linux/remote/21604.txt
+Apache Tomcat 4.0.3 - DoS Device Name & Cros | ./windows/remote/21605.txt
+Apache Tomcat 4.1 - JSP Request Cross-Site S | ./unix/remote/21734.txt
+Apache Tomcat 3.2 - Directory Disclosure Vul | ./unix/remote/21882.txt
+Apache Tomcat 3/4 - DefaultServlet File Disc | ./unix/remote/21853.txt
+Apache 1.3.x & Tomcat 4.0.x/4.1.x Mod_JK - C | ./unix/dos/22068.pl
+Apache Tomcat 3.x - Null Byte Directory/File | ./linux/remote/22205.txt
+Apache Tomcat 4.0.x - Non-HTTP Request Denia | ./linux/dos/23245.pl
+4D WebStar 5.3/5.4 Tomcat Plugin Remote Buff | ./osx/remote/25626.c
+Apache Tomcat / Geronimo 1.0 - Sample Script | ./multiple/remote/27095.txt
+Apache Tomcat 5 Information Disclosure Vulne | ./multiple/remote/28254.txt
+Apache Tomcat/JBoss EJBInvokerServlet / JMXI | ./php/remote/28713.php
+Apache Tomcat 5.5.25 - CSRF Vulnerabilities  | ./multiple/webapps/29435.txt
+Apache Tomcat 6.0.10 Documentation Sample Ap | ./multiple/remote/30052.txt
+Apache Tomcat <= 6.0.13 JSP Example Web Appl | ./jsp/webapps/30189.txt
+Apache HTTP Server Tomcat 5.x/6.0.x - Direct | ./linux/remote/29739.txt
+Apache Tomcat <= 6.0.13 Host Manager Servlet | ./multiple/remote/30495.html
+Apache Tomcat <= 6.0.13 Cookie Handling Quot | ./multiple/remote/30496.txt
+Apache Tomcat <= 5.5.15 Cal2.JSP Cross-Site  | ./jsp/webapps/30563.txt
+Apache Tomcat <= 6.0.15 Cookie Quote Handlin | ./multiple/remote/31130.txt
+Apache Tomcat Manager - Application Upload A | ./multiple/remote/31433.rb
+Apache Tomcat 4.0.3 - Requests Containing MS | ./multiple/remote/31551.txt
+Apache Commons FileUpload and Apache Tomcat  | ./multiple/dos/31615.rb
+Apache Tomcat <= 6.0.16 - 'RequestDispatcher | ./multiple/remote/32137.txt
+Apache Tomcat <= 6.0.16 - 'HttpServletRespon | ./multiple/remote/32138.txt
+Apache Tomcat <= 6.0.18 Form Authentication  | ./multiple/remote/33023.txt
+Apache Tomcat 3.2 - 404 Error Page Cross-Sit | ./multiple/remote/33379.txt
+Apache Tomcat <= 7.0.4 - 'sort' and 'orderBy | ./linux/remote/35011.txt
+Awstats 6.x Apache Tomcat Configuration File | ./cgi/webapps/35035.txt
+--------------------------------------------- ----------------------------------
+
+root@kali:~# cd /usr/share/exploitdb/platfroms/
+
+root@kali:/usr/share/exploitdb/platfroms# cd multiple/remote/
+
+root@kali:/usr/share/exploitdb/platfroms/multiple/remote/# ls 31433.rb
+
+root@kali:/usr/share/exploitdb/platfroms/multiple/remote/# less 31433.rb  //查看脚本
+
+sandi-gui  在kali 2.0没有这种工具
+
+root@kali:~# apt-get install sandi
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树       
+正在读取状态信息... 完成       
+下列【新】软件包将被安装：
+  sandi
+升级了 0 个软件包，新安装了 1 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级。
+需要下载 36.2 kB 的软件包。
+解压缩后会消耗掉 115 kB 的额外空间。
+获取：1 http://http.kali.org/kali/ sana/main sandi all 1.3-0kali1 [36.2 kB]
+下载 36.2 kB，耗时 11秒 (3,025 B/s)                                            
+正在选中未选择的软件包 sandi。
+(正在读取数据库 ... 系统当前共安装有 337246 个文件和目录。)
+正准备解包 .../sandi_1.3-0kali1_all.deb  ...
+正在解包 sandi (1.3-0kali1) ...
+正在设置 sandi (1.3-0kali1) ...
+
+root@kali:~# searchsploit ms08-067
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             | (/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+--------------------------------------------- ----------------------------------
+root@kali:~# searchsploit 08_067
+--------------------------------------------- ----------------------------------
+ Exploit Title                               |  Path
+                                             | (/usr/share/exploitdb/platforms)
+--------------------------------------------- ----------------------------------
+--------------------------------------------- ----------------------------------
+root@kali:~# searchsploit 067
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃从信息的维度定义漏洞管理                              ┃
+┃信息收集                                              ┃
+┃    扫描发现网络IP、OS、服务、配置、漏洞              ┃
+┃    能力需求：定义扫描方式内容和目标                  ┃
+┃信息管理                                              ┃
+┃    格式化信息，并进行筛选、分组、定义优先级          ┃
+┃    能力需求：资产分组、指定所有者、向所有者报告漏洞  ┃
+┃信息输出                                              ┃
+┃    向不同层级的人群展示足够的信息量                  ┃
+┃    能力需求：生成报告，导出数据、与SIEM集成          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━╋
+┃弱点扫描类型    ┃
+┃主动扫描        ┃
+┃    有身份验证  ┃
+┃    无身份验证  ┃
+┃被动扫描        ┃
+┃    镜像端口抓包┃
+┃    其他来源输入┃
+┃基于Agent的扫描 ┃
+┃    支持平台有限┃
+╋━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念                                                ┃
+┃CVSS (Common Vnlnerability Scoring System)                  ┃
+┃    通用漏洞评分系统-----工业标准                           ┃
+┃    描述安全漏洞严重程度的统一评分方案                      ┃
+┃    V3版本-----2015年6月10日                                ┃
+┃    Basic Metric: 基础的恒定不变的弱点权重                  ┃
+┃    Temporal Metric: 依赖时间因素的弱点权重                 ┃
+┃    Enviromental Metric: 利用弱点的环境要求和实施难度的权重 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+cvss-v30-specification-v1.7.pdf
+
+cvss-v30-preview2-metricvectorstring-december-2014.pdf
+
+
+              Base                    Temporal                        Environmental     
+           Metric Group              Metric Group                     Metric Group  
+ 
+Access Vector       Comfidentiaity    Exploitability       Collateral Damage  Confidentiality
+                       Impact                              potential          Requirement
+
+Access Complexity   Integrrity        Remediation Level    Target             Integrity
+                       Impact                              Dustribution       Requirement
+  
+Authertication      Availability      Report                                  Avalabity
+                       Impact         comfidence                              Requirement
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念                                                            ┃
+┃CVSS (Common Vnlnerability Scoring System)                              ┃
+┃    CVSS是安全内容自动化协议（SCAP）的一部分                            ┃
+┃    通常CVSS与CVE一同由美国国家漏洞库（NVD）发布并保持数据的更新        ┃
+┃    分值范围：0-----10                                                  ┃
+┃    不同机构按CVSS分值定义威胁的中、高、低威胁级别                      ┃
+┃    CVSS体现弱点的风险，威胁级别（severity）表示弱点风险对企业的影响程度┃
+┃    CVSS分值是工业标准，但威胁级别不是                                  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念                                    ┃
+┃Vnlnerability Reference                         ┃
+┃CVE (Common Vnlnerability and Exposures)        ┃
+┃    已公开的信息安全漏洞字典，统一的漏洞编号标准┃
+┃    MITRE公司负责维护（飞盈利机构）             ┃
+┃    扫描器的大部分扫描项都对应的CVE编号         ┃
+┃    实现不同广商之间信息交换的统一标准          ┃
+┃CVE发布流程                                     ┃
+┃    发现漏洞                                    ┃
+┃    CAN负责制定CVE ID                           ┃
+┃    发布到CVE List-----CVE-2008-4250            ┃
+┃    MITRE负责对内容进行编辑维护                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念                              ┃
+┃很多广商维护自己的Vnlnerability Reference ┃
+┃    MS                                    ┃
+┃    MSKB                                  ┃
+┃其他Vnlnerability Reference               ┃
+┃    CERT      TA08-297A                   ┃
+┃    BID       31874                       ┃
+┃    IAVM      2008-A-0081                 ┃
+┃    OVAL      OVAL6093                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念
+┃OVAL (Open Vnlnerability and Assessment Language)                             ┃
+┃    描述漏洞检查方法的机器可识别语言                                          ┃
+┃    详细的描述漏洞检测的技术细节，可导入自动化检测工具中的实施漏洞检测工作    ┃
+┃CCE                                                                           ┃
+┃    描述软件配置缺陷的一种标准化格式                                          ┃
+┃    在信息安全风险评估中，配置缺陷的检测是一项重要内容，使用CCE可以让配置     ┃
+┃缺陷以标准的方式展示出来，便于配置缺陷估计的可量化操作                        ┃
+┃CPE (Common Froduct Enumeration)                                              ┃
+┃    信息技术产品、系统、软件包的结构化命名规范，分类命名                      ┃
+┃CWE (Common Weakness Enumeration)                                             ┃
+┃    常见漏洞类型的字典，描述不同类型漏洞的特征（访问控制、信息泄露、拒绝服务）┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念                                                                  ┃
+┃Security Content Automation Protocol (SCAP)                                   ┃
+┃    SCAP是一个集合了多种安全标准框架                                          ┃
+┃    六个元素：CVE、OVAL、CCE、CPE、CVSS、XCCDF                                ┃
+┃    目的是以标准的方法展示和操作安全数据                                      ┃
+┃    由NIST负责维护                                                            ┃
+┃SCAP主要解决三个问题                                                          ┃
+┃    实现高层政策法规等到底层实施的落地（如FISMA，ISO27000系列）               ┃
+┃    讲信息安全所涉及的各个要素标准化（如同意漏洞的命名及严重性度量）          ┃
+┃    将复杂的系统配置核查工作自动化                                            ┃
+┃SCAP是当前美国比较成熟的一套信息安全评估标准体系，其标准化，自动化的思想对信息┃
+┃安全行业产生了深远的影响。                                                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃漏洞基本概念                                  ┃
+┃NVD（National Vulnerability Datebase）        ┃
+┃    美国政府的漏洞关键标准数据                ┃
+┃    完全基于SCAP框架                          ┃
+┃    实现自动化漏洞管理、安全测量、合规要求    ┃
+┃    包含以下库                                ┃
+┃        安全检查列表                          ┃
+┃        软件安全漏                            ┃
+┃        配置错误                              ┃
+┃        产品名称                              ┃
+┃        影响度量                              ┃
+┃https://nvd.nist.gov/
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━╋
+┃漏洞管理            ┃
+┃周期性扫描跟踪漏洞  ┃
+┃高危漏洞优先处理    ┃
+┃扫描注意事项        ┃
+┃    准确性          ┃
+┃    时间            ┃
+┃    资源            ┃
+╋━━━━━━━━━━╋

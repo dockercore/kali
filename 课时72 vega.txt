@@ -1,0 +1,38 @@
+课时72 vega
+
+╋━━━━━━━━━━━━━━╋
+┃vega                        ┃
+┃JAVA编写的开源Web扫描器     ┃
+┃扫描模式                    ┃
+┃代理模式                    ┃
+┃爬站、处理表单、注入测试    ┃
+┃支持SSL:http://vega/ca/crt  ┃
+╋━━━━━━━━━━━━━━╋
+
+靶机IP地址:192.168.1.115
+Kali IP地址：192.168.1.116
+
+Vega是一个开放源代码的web应用程序安全测试平台，Vega能够帮助你验证SQL注入、跨站脚本（XSS）、敏感信息泄露和其它一些安全漏洞。Vega使用Java编写，有 GUI，可以在Linux、OS X和windows下运行。Vega类似于 Paros Proxy, Fiddler, Skipfish and ZAproxy。 Vega的主要功能如下：
+  Automated Crawler and Vulnerability Scanner
+  Consistent UI
+  Website Crawler
+  Intercepting Proxy
+  SSL MITM
+  Content Analysis
+  Extensibility through a Powerful Javascript Module API
+  Customizable alerts
+  Database and Shared Data Model
+Vega中包含的模块如下：
+  Cross Site Scripting (XSS)
+  SQL Injection
+  Directory Traversal
+  URL Injection
+  Error Detection
+  File Uploads
+  Sensitive Data Discovery
+
+应用程序----->Web程序----->vega
+
+浏览器插件：autoproxy
+
+

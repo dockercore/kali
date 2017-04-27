@@ -1,0 +1,114 @@
+持久加密USB安装-1
+LUKS: linux UNified Key Setup
+  磁盘分区加密规范
+  不依赖于操作系统的磁盘级加密
+  Windows——DoxBox
+  后端：dm-crypt
+  前端：cryptsetup
+  微软的bitlocker
+将镜像刻录到U盘
+  dd if=kali-linux-1.1.0-amd64.iso of=/dev/sdb bs=1M
+
+root@kali:~# dmesg                   //查看系统的状态
+
+root@kali:~/Desktop# dd if=kali-linux-1.1.0-amd64.iso of=/dev/sdb bs=1M            //将镜像刻录到U盘
+
+root@kali:~/Desktop# watch -n kaliall -USR1 dd                               //查看进度
+
+持久加密USB安装-2
+  为U盘创建额外分区
+  使用LUKS加密分区
+  打开加密分区
+  格式化加密分区+卷标
+  挂载加密分区，并创建persistence.conf文件
+
+root@kali:~/Desktop# part
+parted   partprobe  partx
+/dev/sdb(30.9GB)
+(parted) select/dev/sdb          //选择U盘
+Using /dev/sdb
+(parted) print                   //显示U盘信息
+Model: Kingston DataTraveler 3.0(scsi)
+Dis /dev/sdb: 30.9GB
+Sector size(logical/physical): 512B/512B
+Partition Table: msdos
+
+Number   start     End      Size      Type      File system    FLags
+1        32.8KB   2997MB   2997MB    primary                   boot, hidden
+2        2997KB   3063MB   66.1MB    primary     fat16
+ 
+(parted) mkpart primary 3063 7063       //3063为Start位置，7063为结束位置，回车
+(parted)  print                        //再次查看U盘信息，发现新分区以建好
+Model: Kingston DataTraveler 3.0(scsi)
+Dis /dev/sdb: 30.9GB
+Sector size(logical/physical): 512B/512B
+Partition Table: msdos
+
+Number   start     End      Size      Type      File system    FLags
+1        32.8KB   2997MB   2997MB    primary                   boot, hidden
+2        2997KB   3063MB   66.1MB    primary     fat16
+3        3064MB   7063MB   3999MB    primary 
+
+(parted) quit                          //退出
+Information You may need to update /etc/fstab.
+
+root@kali:~/Desktop# cryptsrtup --verbose --verify-passphrase luksFormat /dev/sdb3     //前端命令分区加密
+
+WARNING!
+========
+This will overwite data on /dev/sdb3 irrevocably.
+
+Are you sure? (Type uppercase yes): YES         //写大写的YES
+Enter passphrase: 
+Verify passphrase"
+Command successful.
+
+root@kali:~/Desktop# cryptsetup luksOpen /dev/sdb3 usb     //加密打开加密ubs 放在/dev/sdb3
+Enter passphrase for /dev/sdb3;
+
+root@kali:~/Desktop# ls /dev/mapper/usb          //打印/dev/mapper/usb目录的清单
+/dev/mapper/usb
+root@kali:~/Desktop# mkfs.ext4 /dev/mapper/usb           //超级使用者
+ 
+root@kali:~/Desktop# e2label /dev/mapper/usb persistence     // 持久USB命令
+
+root@kali:~/Desktop# mkdir -p /mut/usb                        //创建目录
+
+root@kali:~/Desktop# mount /dev/mapper/usb /mnt/usb       // 挂载ubs
+
+root@kali:~/Desktop# echo "/ union" > /mnt/usb/persistence.conf        // 这段字符"/ union"传入/mnt/usb/persistence.conf         完成持久usb
+root@kali:~/Desktop# umount/dev/mapper/usb            //挂载卸载usb
+
+root@kali:~/Desktop# cryptsetup luksclose /dev/mapper/usb           //关掉usb       
+
+熟悉坏境
+  登陆密码
+  TOP 10安全工具
+  字体调整
+  监视网络流量
+  强行终止程序
+  文件目录
+  共享文件 
+
+TOP 10安全工具：
+aircrack-ng
+burpsuite
+hydra
+john
+maltrgo
+metasploit framework
+owasp-zap
+sqlmap
+wireshark      抓包分析工具  
+
+字体调整
+
+root@kali:~# gnome-tweak-tool
+弹出叫Advanced Settings的界面
+Antialiasing 图形保真 ---> Rgba
+
+root@kali:~# apt-get install netspeed     //安装监视流量软件包
+
+按住键盘上的ALT键，把鼠标放在工具条上，点击右键“添加到面板”，选择“网络监控器(Netspeed)",点击添加
+
+apt-get update && apt-get upgrade && apt-get dist-upgrade

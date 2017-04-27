@@ -1,0 +1,206 @@
+课时69 AIRRACK-NG(二)
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRTUN-NG                                                               ┃
+┃Repeate                                                                 ┃
+┃    WDS/Bridge                                                          ┃
+┃    扩展无线侦听的距离                                                  ┃
+┃    要求两块网卡都置入monitor模式                                       ┃
+┃    airtun-ng -a <AP MAC> --repeat --bssid <AP MAC> -i wlan0mon wlan2mon┃
+┃    wlan0mon: 收包的网卡                                                ┃
+┃    wlan2mon: 发包的网卡                                                ┃
+┃    -a: 发包的源地址                                                    ┃
+┃    --bssid: 过滤只发指定源地址的包(可选)                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃AIRTUN-NG                                         ┃
+┃Replay                                            ┃
+┃    将抓取的CAP文件重放到指定网卡                 ┃
+┃    airtun-ng -a <Source MAC> -r 1.cap <interface>┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  PID Name
+  875 wpa_supplicant
+ 1580 dhclient
+
+映射两个网卡到kali虚拟机里
+
+root@kali:~# airmon-ng start wlan0
+Found 2 processess that could cause trouble.
+If airodump-ng, aireplay-ng or airtun-ng stops working after
+a short period of time, you may want to kill (some of) them!
+
+  PID Name
+  875 wpa_supplicant
+ 1580 dhclient
+
+PHY     Interface       Dirver             Chipset
+
+phy1     wlan0          rt2800usb          Ralink Technology, Corp, RT5370
+phy0    wlan2           ath9k_htc          Atheros Communications, Inc. AR9271 802.11n
+                 (mac80211 monitor mode vif enable for [phy0]wlan2 on [phy0]wlan2mon)
+                 (mac80211 station mode vif disabled for [phy0]wlan2)
+
+root@kali:~# iwconfig
+eth0      no wireless extensions.
+
+wlan0mon  IEEE 802.11bgn  Mode:Monitor  Frequency:2.457 GHz  Tx-Power=20 dBm
+          Retry short limit:7    RTS thr:off    Fragment thr:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  Mode:Monitor  Frequency:2.457 GHz  Tx-Power=20 dBm
+          Retry short limit:7    RTS thr:off    Fregment thrL:off
+          Power Management:off
+
+lo        no wireless extensions.
+
+root@kali:~# airtun-ng -a 14:75:90:21:4F:56 --repeat --bssid 14:75:90:21:4F:56 -i wlan0mon wlan2mon
+第一个侦听网卡灵敏度大，第二是发包网卡传输功率大
+
+╋━━━━━━━━━╋
+┃其他工具          ┃
+┃bessid-ng         ┃
+┃fern-wifi-cracker ┃
+╋━━━━━━━━━╋
+
+root@kali:~# besside-ng -h
+
+  Besside-ng 1.2 rc3 - (C) 2010 Andrea Bittau
+  http://www.aircrack-ng.org
+
+  Usage: besside-ng [options] <interface>
+
+  Options:
+
+       -b <victim mac> : Victim BSSID
+       -R <victim ap regex> : Victim ESSID regex
+       -s <WPA server> : Upload wpa.cap for cracking
+       -c       <chan> : chanlock
+       -p       <pps>  : flood rate
+       -W              : WPA only
+       -v              : verbose, -vv for more, etc.
+       -h              : This help screen
+
+root@kali:~# man besside-ng
+
+Application----->Wireless Attacks----->fer wifi cracker
+基于Aircrack-ng来实现的
+
+root@kali:~# service network-manager stop
+
+root@kali:~# airmon-ng check kill
+Killing these processes:
+
+  PID Name
+  875 wpa_supplicant
+ 1580 dhclient
+
+手动打这些命令，然后打开fer wifi cracker
+
+usr/share/wfuzz/wordlist/fuzzdb/wordlists-user-passwd/names/namelist.txt
+
+cookie hijacker   cookie劫持
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃无线侦查                                        ┃
+┃kismet                                          ┃
+┃    kismet*.nettxt                              ┃
+┃    kismet*.pcapdump                            ┃
+┃                                                ┃
+┃                                                ┃
+┃gpsd -n -N -D4/dev/ttyUSBO                      ┃
+┃giskismet -x Kismet-*.netxml                    ┃
+┃giskismet -q "select * from wireless" -o gps.kml┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# airmon-ng stop wlan2mon
+
+root@kali:~# ifconfig -a
+
+root@kali:~# iwconfig
+eth0      no wireless extensions.
+
+wlan2     IEEE 80211bgn  ESSID:off/any
+          Mode:Managed Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7    RTS thr:off    Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+lo        no wireless extensions.
+
+
+root@kali:~# kismet
+
+Intf:wlan2
+Name:wlan2
+Add
+
+root@kali:~# desmg
+
+root@kali:~# ps aux | grep gpsd
+root       2892  0.0  0.0  1266  1724 pts/0    S+  19:18   0:00  grep gpsd
+
+root@kali:~# kill 2892
+bash: kill: (2892) - No such process
+
+root@kali:~# gpsd
+bash: gpsd: command not foud
+
+root@kali:~# apt-get install gpsd gpsd-clients
+
+root@kali:~# gpsd -h
+
+root@kali:~# gpsd -n -N C4 /dev/ttyUSB0
+
+root@kali:~# giskimet -x Kismet-20151126-19-26-10-1.netxml
+Kismet-20151126-19-26-10-1.netxml:1: parser error : Document is empty
+
+^
+Kismet-20151126-19-26-10-1.netxml:1: parser error : Start tag ex[ected, '<' not found
+
+^
+
+root@kali:~# giskimet -x Kismet-20151126-18-42-55-1.netxml
+Warning: no gps data found for BSSID: 08:10:79:2A:29:7A ESSID: 2-1-403
+Warning: no gps data found for BSSID: 14:75:90:21:4F:56 ESSID: TP-LINK_4F56
+Warning: no gps data found for BSSID: 50:BD:5F:C0:F6:D6 ESSID: MasterHuang
+Warning: no gps data found for BSSID: 5C:63:BF:F9:74:0C ESSID: TP-D03234
+Warning: no gps data found for BSSID: BC:D1:77:C0:87:DE ESSID: MERURY_C087DE
+Warning: no gps data found for BSSID: D0:C7:C0:99:ED:3A ESSID: ziroom222
+
+root@kali:~# giskismet -q "select * from wireless" -o ask.kml
+
+root@kali:~# more ask.kml
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+<Document>
+   <name>Kismet</name>
+   <description>select * from wireless</description>
+
+</Document>
+</kml>
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃无线侦查                                                                              ┃
+┃Google地球                                                                            ┃
+┃    http://dl.google.com/dl/earth/client/current/google-earth-stable current amd64.deb┃
+┃dpkg -i google-earth64.deb                                                            ┃
+┃apt-get -f install                                                                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cp /media/sf_D_DRIVE/软件/google-earth-stable current amd64.deb
+
+root@kali:~# dpkg -i google-earth-stable current amd64.deb     //第一次安装谷歌地球不能安装上去，需要安装依赖包
+
+root@kali:~# apt-get -f install    //强制安装依赖包
+
+root@kali:~# dpkg -i google-earth-stable current amd64.deb   //再一次安装谷歌地球
+
+root@kali:~# google-earth      //在命令行打开谷歌地图
+

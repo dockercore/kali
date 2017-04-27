@@ -1,0 +1,353 @@
+课时83 APPSCAN
+
+APPSCNA
+Watchfire APPScan, 2007年被IBM收购， 成为IBM APPScan
+扫描过程
+    探索阶段
+    测试阶段
+第一个过程发现新的URL地址，下一个扫描过程自动开始
+向导方式
+完全配置
+
+APPSCNA
+Glass box
+    相当于Acusensor
+    Agent收集服务器端源代码信息和其他数据
+    支持JAVA、.NET两种平台
+
+Web服务器 IBM Security AppScan Standard一款优秀的Web应用安全测试工具
+
+IBM Security AppScan Standard（以下简称 AppScan Standard）是业界一款优秀的 Web 应用安全测试工具。越来越多的机构将之应用到实际开发过程中，并尝试将 AppScan Standard 集成到他们的自动化构建中去。AppScan Standard V8.6 的 CLI 命令行界面提供了丰富的命令及参数，用户可以很方便地从脚本或者批处理文件中控制 AppScan Standard，轻松实现将 AppScan Standard 集成到自动构建中去。本文将跟读者介绍 AppScan Standard 的 CLI 的命令结构和常见命令，并结合实例演示如何通过 Apache Ant 集成 AppScan Standard。
+
+AppScan Standard CLI 命令简介
+
+AppScan Standard 安装完成后，会在系统变量 "PATH" 中增加 AppScan Standard 的安装根目录（譬如 C:\Program Files (x86)\IBM\Rational AppScan\）。AppScan Standard CLI 命令 AppScanCMD.exe 即存在于 AppScan 的安装根目录中。因此用户打开 DOS 命令窗口，即可以执行 AppScan Standard 的 CLI 命令。
+
+AppScan Standard CLI 命令调用比较简单，主要包括三个部分：CLI 命令 + CLI 子命令 + 子命令参数。ACLI 命令包括三个子命令：Exec，Report，Help。下面列出三个子命令的功能和详细参数。
+
+    Exec 命令
+
+Exec 命令会使用指定的起始 URL 创建新扫描，运行和保存此扫描。同时还可以使用它来生成和保存扫描的报告。如果没有指定 CLI 子命令，缺省模式下将会运行 exec 命令。
+
+表 1. Exec 命令参数
+参数 	说明
+/starting_url 	设置扫描的起始 URL。起始 URL 也可以在 /base_scan 或者 /scan_template 中指定。starting_url 参数会覆盖前两者参数中的起始 URL。
+/base_scan 	设置源扫描文件（必须包含完整路径），新建扫描文件将使用该源扫描文件中的扫描配置。
+/dest_scan 	设置新扫描文件的保存位置（必须包含完整路径）。此参数若未设置的话，AppScanCMD 会把新扫描文件保存到 Temp 文件夹，并提示新扫描文件的完整路径。
+/scan_template 	设置扫描模板文件，新建扫描文件将使用该模板文件中的扫描配置。
+/old_host
+/new_host 	/old_host 跟 /new_host 配合使用，新扫描文件将会用 new_host 来替换扫描中所有的 old_host 路径。这个参数非常有利于脚本重用，譬如 FVT 阶段的 AppScan 脚本即可通过这种方式重用到 UAT 环境中。
+/login_file 	指定新扫描文件需导入的登录序列。
+/multi_step_file 	指定新扫描文件需导入的多步骤文件
+/manual_explore_file 	指定新扫描文件需导入的手工探索文件。
+/policy_file 	指定新扫描文件所使用的测试策略文件。
+/additional_domains 	指定新扫描文件在扫描中包含的、除起始 URL 之外的域。如果有多个域，建议用分号将它们分隔。
+/report_file 	设定新扫描文件需生成的报告名称和路径（必须包括完整路径）。
+/report_type 	设定报告格式。支持 <xml|pdf|rtf|txt|html|rc_ase> 六种报告格式，缺省值为 XML。rc_ase 指的是 AppScan Enterprise 报告，使用时需保证设置好 AppScan Enterprise 的连接参数。
+/min_severity 	指定要在报告中包含的最低结果严重性（仅适用于非 XML 报告），支持四种严重性 <low|medium|high|informational>，缺省值为 low。
+/test_type 	指定要在报告中包含哪些类型的测试，支持四大类型 <All|Application|Infrastructure|ThirdParty>，缺省值为 All。
+/verbose 	包含此标志，则在输出中包含进度行。
+/scan_log 	包含此标志，则在扫描时显示扫描日志。
+/explore_only 	包含此标志，则仅运行"探索"阶段。
+/test_only 	包含此标志，则仅运行"测试"阶段。
+/multi-step 	包含此标志，则仅测试多步骤操作。
+/continue 	包含此标志，则继续扫描 base_scan 文件。
+Report 命令
+
+Report 命令用来载入指定的扫描文件，生成对应的报告。Report 命令参数主要有 /base_scan，/report_file，/report_type，/min_severity，/test_type 这五项，用法和功能跟 Exec 命令中的同名参数相同。本文不再赘述。
+
+    Help 命令
+
+Help 命令用以帮助熟悉 CLI 的命令用法。Help 命令没有参数。
+
+AppScan Standard CLI 命令在执行完成中会输出退出状态代码，用以表示操作是否成功，如果不成功还通过退出状态代码提示错误内容。
+
+表 2. CLI 命令退出代码表
+代码 	意义
+0 	成功完成
+1 	AppScan 启动失败
+2 	命令行错误
+3 	许可证无效
+4 	装入失败
+5 	扫描失败
+6 	报告失败
+7 	保存失败
+8 	常见错误
+
+看到这里，相信读者已经对 AppScan 的 CLI 命令已经了然于心。AppScan Standard CLI 命令非常直观明了。但我们也看到 Exec 命令有很多参数，究竟什么情况下该用哪些参数？采用 base_scan 还是采用 starting_url 和 scan_template 等参数？什么样的脚本重用性更好，更适合使用 AppScan Standard CLI 来集成？下面笔者将跟读者分享自己的一些经验。
+
+常用 AppScan Standard CLI 命令
+
+敏捷开发过程中，我们往往按照故事（Store）为单元进行开发。笔者实际工作中往往会为每个故事录制 AppScan Standard 的测试脚本，一旦某个故事实现并部署到 FVT（Function Verification Test）环境后，我们会将录制好的该故事的测试脚本加入到集成测试中。在不同迭代（Sprint）阶段，我们会为新增加的故事录制新的测试脚本。在前期的几个迭代阶段，一般仅执行新增故事的安全测试。在最后的几个迭代阶段内，会执行前面阶段所录制的全部测试脚本。FVT 测试完成后系统迁移到 UAT（User Acceptance Test）环境后，还会再次执行全部测试脚本。为了更好地保证系统的安全性，UAT 测试阶段还会由其他安全测试团队对系统再进行一次完整安全测试。
+
+可以看出，整个开发阶段安全测试任务比较多，如果每次都打开图形界面去录制脚本进行安全测试，这个工作量将会比较大。因此笔者实际工作中比较注重测试脚本的重用性。提高脚本重用性主要通过以下几种方式：
+
+    将通用的扫描配置导出为 .scant 模板，譬如“环境定义”、“探索选项”、“定制参数”、“错误页面”、“通信和代理”、“测试选项”等。
+    将定制好的测试策略导出为 .policy 文件，通常将测试测罗分为几组，如“应用程序”、“基础结构”、“侵入性”等。在 FVT 阶段侧重测试应用程序漏洞，在 UAT 阶段侧重测试基础结构及侵入性测试。
+    将录制好的登录脚本导出 .login 文件。一般建议在登录脚本中使用公用测试帐号，如果绑定了个人帐号，建议各人采用各自的登录脚本，以便个人帐号信息泄漏。
+    将各个故事对应的测试脚本导出 .exd 文件。
+    将多步骤操作序列导出为 .seq 文件。
+
+基于以上重用性原则，笔者通常会为系统定制好扫描模板，录制登录脚本，手工探索各个故事的操作过程导出为 .exd 文件（测试策略通常建议由公司层面统一规范）。然后通过 CLI 命令执行以上测试脚本。以下是笔者常用的几个 CLI 命令。
+
+清单 1. 针对某故事的测试命令
+
+AppScanCMD exec /starting_url http://sampleFVT.com/store1 /scan_template mytemplate.scant
+ /policy_file c:/scan_scripts/itcs104.policy /login_file jeremy.login 
+ /manual_explore_file c:/scan_scripts/store1.exd /test_only 
+ /report_file c:/scan_scripts/store1_report.pdf /report_type pdf
+
+清单 1 命令中的 starting_url 设置了该故事的起始 URL；scan_template 设置了全局通用的扫描配置选项，譬如基于参数导航的设置、通信超时设置等；policy_file 指定了测试策略；login_file 指定了当前测试人员自己的登录序列；manual_explore_file 指定了针对该故事所录制并导出的探索脚本；test_only 限定 AppScan 仅测试该故事，不要自行探测其他 URL；report_file 和 report_type 用来设定输出测试报告。
+
+通过清单 1 可以看出，这种测试方法下脚本能够最大化重复利用，譬如登录脚本、模板等；其次，这种测试方法效率较高，仅集中测试该故事所包括的 URL；同时由于脚本都拆开后，可维护性也较好，如果该故事的 URL 有变化，仅需要重新录制探测脚本即可以，或者直接手工编辑 .exd 文件；此外，这个测试脚本可以重复执行，这个命令可以通过批处理文件、Junit、Ant 等集成起来重复调用。
+
+清单 2. 多步骤操作的测试命令
+
+AppScanCMD exec /scan_template mytemplate.scant /policy_file itcs104.policy 
+ /login_file jeremy.login /multi_step_file c:/scan_scripts/multistepscenario.seq 
+ /multi-step /report_file c:/scan_scripts/store1_report.pdf /report_type pdf
+
+清单 2 命令中的 scan_template 设置了全局通用的扫描配置选项；policy_file 指定了测试策略；login_file 设置了当前测试人员自己的登录序列；multi_step_file 设定了多步骤操作序列；multi-step 标志限定 AppScan 仅测试多步骤操作，不再去探索其他 URL；report_file 和 report_type 用来设定输出测试报告。
+
+清单 3. UAT 环境的测试命令
+
+AppScanCMD exec /starting_url http://sampleUAT.com/store1 /scan_template mytemplate.scant
+ /old_host http://sampleFVT.com /new_host http://sampleUAT.com 
+ /policy_file c:/scan_scripts/itcs104.policy /login_file jeremy.login 
+ /manual_explore_file c:/scan_scripts/store1.exd /test_only 
+ /report_file c:/scan_scripts/store1_report.pdf /report_type pdf
+
+通常 FVT 阶段完成后，笔者会利用 new_host 和 old_host 命令来重用 FVT 环境的 AppScan 测试脚本进行 UAT 环境的安全测试。譬如清单 3 所示，相比于清单 1 增加了“/old_host http://sampleFVT.com /new_host http://sampleUAT.com”，AppScan 即可以自动将探索和测试阶段的“sampleFVT.com”域名替换为“sampleUAT.com”域名。非常酷的特性，目前只有 CLI 模式下才能使用该特性，图形界面下暂不支持这功能。
+
+利用 Ant 集成 AppScan Standard CLI 命令
+
+尽管 AppScan Standard CLI 命令非常灵活方便，但每次都敲入这些命令还是非常繁琐麻烦，且容易出错。实际应用中我们都会把它集成到批处理或者 Ant 一类的集成环境中去。下面笔者跟读者分享如何将 AppScan Standard CLI 命令集成到 Apache Ant（后文简称为 Ant）中。注：下文中所有 Ant 示例均在 Ant v1.7 中测试通过，其他 Ant 版本未经测试，读者见谅。
+
+Ant 是非常强大的基于 Java 的构建工具。它除了包含丰富的任务（Ant Task）外，还支持定制任务。为了演示 AppScan Standard CLI 的易集成性，笔者特编写了集成 AppScan Standard CLI 的 Ant 定制任务，下文将跟读者简介该定制任务的实现及使用方法。
+
+清单 4. AppScan Standard CLI 任务示例
+
+<?xml version="1.0"?>
+<project name="build" basedir="." default="main" >
+ <property name="workingDir" value="c:/test" />
+ <target name="declare">
+ <taskdef name="appscan.execute" classname="com.ibm.appscan.anttask.AppScanStdExec" 
+   classpath="lib/Ant4AppScanStdCLI.jar" />
+ </target>
+ <target name="main" depends="declare" >
+ <appscan.execute baseScan="${workingDir}/scan1.scan" scanLog="true" verbose="true"/>
+ </target>
+</project>
+
+清单 4 中的 Ant 脚本定制了一个任务“appscan.execute”。Ant 会初始化 Ant4AppScanStdCLI.jar 中的 com.ibm.appscan.anttask.AppScanStdExec 类，Ant 执行到“appscan.execute”任务时将该任务的所有属性通过 set 方法传递给 AppScanStdExec 实例中，然后执行该实例的 execute 方法。
+
+清单 5. Ant 定制任务类的 execute 方法
+
+public class AppScanStdExec extends Task {
+ ...
+ public void execute() throws BuildException {
+ try {
+ validateAttributes();
+ String cmdString = this.intepreterCMD();
+ Runtime rt = Runtime.getRuntime();
+ Process proc = rt.exec(cmdString);
+ analysisProcessStream(proc.getInputStream());
+ int exitCode = proc.waitFor();
+ if(exitCode !=0 )
+ throw new BuildException(exitStatusCodes.get(String.valueOf(exitCode)));
+ } catch (BuildException be) {
+ throw be;
+ } catch (Exception e) {
+ e.printStackTrace();
+ throw new BuildException(e.getMessage());
+ }
+ }
+}
+
+清单 5 展示了 Ant 定制任务类的 execute 方法。首先它会检查 Ant 任务中配置的属性，然后将用户配置的属性解析为 AppScan Standard CLI 命令，然后调用 Runtime.exec 方法执行 AppScan Standard CLI 命令。执行过程中的信息会通过 Process.getInputStream 方法获取到并打印到输出中。Process 的命令退出代码会通过 Process.waitFor 方法获取到，如果退出代码不是 0（参见表 2），则打印出对应的错误信息输出到 Ant 的 BuildException 中。清单 4 中的 Ant 示例脚本中，笔者故意指定了错误的 base_scan 文件路径，用来测试 Ant 定制任务类。如清单 6 所示。
+
+清单 6. 示范 Ant 脚本执行结果
+
+Buildfile: build.xml
+declare:
+main:
+[appscan.execute] 无法找到基础扫描文件："c:/test/scan1.scan"
+
+BUILD FAILED
+D:\Workloc\DeveloperWorks\8_CLI\Ant_AppScan\build.xml:14: Command Line Error
+
+可以看出 Ant 定制任务正确打印了 AppScan 的执行信息“无法找到基础扫描文件 ...”，同时也正确捕获了 AppScan 的退出代码为 2 即命令行错误。
+
+读者可以在本文下载链接中找到 Jar 包和示例 Ant 脚本，修改示例 Ant 脚本实现自己项目中的 AppScan 脚本自动构建测试。下文笔者将展示如何基于 Ant 调用 AppScan Standard CLI 命令测试 Altoro Mutual 网站。案例
+
+下面笔者将跟读者演示如何利用上文介绍的 Ant 定制任务来扫描 Altoro Mutual 中的银行个人自助业务（查看帐号信息、转账等）。笔者会利用向导手工探索银行自助业务的页面，在数据视图检查测试 URL 无误后，将扫描配置导出为 altoromutual.scant 模板文件，将登录序列导出为 jsmith.login 文件，将定制好的开发者精要测试策略导出为 develop_phase.policy 文件，将手工探索出来的所有 URL 导出为 selfbanking.exd 文件。实际工作中，模板文件、测试策略、登录序列只是第一次需要录制，以后仅需要为新的功能故事录制探索文件即可。
+
+整理好以上测试脚本文件后，我们即可以配置 Ant 脚本将这个故事的安全扫描集成为 Ant 任务，如下文清单 7 所示。
+
+清单 7. AltoroMutual 安全测试 Ant 任务
+
+<?xml version="1.0"?>
+<project name="build" basedir="." default="main" >
+ <property name="workingDir" value="${basedir}/scripts" />
+ <target name="declare">
+ <taskdef name="appscan.execute" classname="com.ibm.appscan.anttask.AppScanStdExec" 
+   classpath="lib/Ant4AppScanStdCLI.jar" />
+ </target>
+ <target name="main" depends="declare" >
+ <appscan.execute scanTemplate="${workingDir}/altoromutual.scant"
+            policyFile="${workingDir}/develop_phase.policy"
+            loginFile="${workingDir}/jsmith.login"
+            manualExploreFile="${workingDir}/selfbanking.exd"
+            testOnly="true"
+            reportFile="report/selfbanking_report.pdf"
+            reportType="pdf"/>
+ </target>
+</project>
+
+执行该 Ant 脚本，结果如下。
+
+清单 8 . AltoroMutual 安全测试输出
+
+Buildfile: build.xml
+declare:
+main:
+[appscan.execute] 有效的输入参数和标志：
+[appscan.execute] EXEC
+[appscan.execute] scan_template = 'd:\workloc\developerworks\8_cli\ant_appscan/scripts/al
+toromutual.scant'
+[appscan.execute] login_file = 'd:\workloc\developerworks\8_cli\ant_appscan/scripts/jsmit
+h.login'
+[appscan.execute] manual_explore_file = 'd:\workloc\developerworks\8_cli\ant_appscan/scri
+pts/selfbanking.exd'
+[appscan.execute] policy_file = 'd:\workloc\developerworks\8_cli\ant_appscan/scripts/deve
+lop_phase.policy'
+[appscan.execute] report_file = 'D:\Workloc\DeveloperWorks\8_CLI\Ant_AppScan\report\selfb
+anking_report.pdf'
+[appscan.execute] report_type = 'Pdf'
+[appscan.execute] report_file = 'D:\Workloc\DeveloperWorks\8_CLI\Ant_AppScan\report\selfb
+anking_report.pdf'
+[appscan.execute] min_severity = 'Informational'
+[appscan.execute] test_type = 'All'
+[appscan.execute] verbose = 'False'
+[appscan.execute] explore_only = 'False'
+[appscan.execute] test_only = 'True'
+[appscan.execute] continue = 'False'
+[appscan.execute] multi_step = 'False'
+[appscan.execute] scan_log = 'False'
+[appscan.execute] wait_on_exit = 'False'
+[appscan.execute]
+[appscan.execute] 正在启动 AppScan...
+[appscan.execute]
+[appscan.execute] 正在新建扫描 ...
+[appscan.execute] 正在导入扫描模板："d:\workloc\developerworks\8_cli\ant_appscan/scripts/altoromut
+ual.scant"
+[appscan.execute] 正在导入登陆文件："d:\workloc\developerworks\8_cli\ant_appscan/scripts/jsmith.lo
+gin"
+[appscan.execute] 正在导入测试策略："d:\workloc\developerworks\8_cli\ant_appscan/scripts/develop_p
+hase.policy"
+[appscan.execute] 正在导入手动浏览数据："d:\workloc\developerworks\8_cli\ant_appscan/scripts/selfban
+king.exd"
+[appscan.execute] 正在分析"手动浏览"数据。即使指定了 test_only，也将重新发送请求。
+[appscan.execute] ...
+[appscan.execute] 安全性问题：
+[appscan.execute]
+[appscan.execute] 高：2
+[appscan.execute] 中等：2
+[appscan.execute] 低：0
+[appscan.execute] 已成功完成。
+
+BUILD SUCCESSFUL
+Total time: 51 seconds
+
+从清单 8 看出，AppScan Standard CLI 命令成功被集成到 Ant 任务中。下面笔者演示如何将此脚本复用到另外一个域名上。如清单 9 所示，仅需要在以前脚本内增加两个属性：oldHost="http://demo.testfire.net" 和 newHost="http://jhe.ibm.com" 即可。
+
+清单 9. Ant 任务 - 脚本复用到新域名
+
+<?xml version="1.0"?>
+<project name="build" basedir="." default="main" >
+ <property name="workingDir" value="${basedir}/scripts" />
+ <target name="declare">
+ <taskdef name="appscan.execute" classname="com.ibm.appscan.anttask.AppScanStdExec" 
+   classpath="lib/Ant4AppScanStdCLI.jar" />
+ </target>
+ <target name="main" depends="declare" >
+ <appscan.execute scanTemplate="${workingDir}/altoromutual.scant"
+            policyFile="${workingDir}/develop_phase.policy"
+            loginFile="${workingDir}/jsmith.login"
+            manualExploreFile="${workingDir}/selfbanking.exd"
+            oldHost="http://demo.testfire.net"
+            newHost="http://jhe.ibm.com"
+            testOnly="true"
+            reportFile="report/selfbanking_report.pdf"
+            reportType="pdf"/>
+ </target>
+</project>
+
+执行清单 9 脚本，其输出如清单 10 所示。可以看出 AppScan 在导入包含旧域名的脚本后自动替换为新域名。该测试的结果跟清单 8 中一样。
+
+
+清单 10. 脚本复用到新域名测试输出
+
+Buildfile: build.xml
+declare:
+main:
+[appscan.execute] 有效的输入参数和标志：
+[appscan.execute] EXEC
+[appscan.execute] scan_template = 'd:\workloc\developerworks\8_cli\ant_appscan/scripts/al
+toromutual.scant'
+[appscan.execute] login_file = 'd:\workloc\developerworks\8_cli\ant_appscan/scripts/jsmit
+h.login'
+[appscan.execute] manual_explore_file = 'd:\workloc\developerworks\8_cli\ant_appscan/scri
+pts/selfbanking.exd'
+[appscan.execute] policy_file = 'd:\workloc\developerworks\8_cli\ant_appscan/scripts/deve
+lop_phase.policy'
+[appscan.execute] new_host = 'http://jhe.ibm.com'
+[appscan.execute] new_port = '80'
+[appscan.execute] old_host = 'http://demo.testfire.net'
+[appscan.execute] old_port = '80'
+[appscan.execute] report_file = 'D:\Workloc\DeveloperWorks\8_CLI\Ant_AppScan\report\selfb
+anking_report.pdf'
+[appscan.execute] report_type = 'Pdf'
+[appscan.execute] report_file = 'D:\Workloc\DeveloperWorks\8_CLI\Ant_AppScan\report\selfb
+anking_report.pdf'
+[appscan.execute] min_severity = 'Informational'
+[appscan.execute] test_type = 'All'
+[appscan.execute] verbose = 'False'
+[appscan.execute] explore_only = 'False'
+[appscan.execute] test_only = 'True'
+[appscan.execute] continue = 'False'
+[appscan.execute] multi_step = 'False'
+[appscan.execute] scan_log = 'False'
+[appscan.execute] wait_on_exit = 'False'
+[appscan.execute]
+[appscan.execute] 正在启动 AppScan...
+[appscan.execute]
+[appscan.execute] 正在新建扫描 ...
+[appscan.execute] 正在导入扫描模板："d:\workloc\developerworks\8_cli\ant_appscan/scripts/altoromut
+ual.scant"
+[appscan.execute] 正在导入登陆文件："d:\workloc\developerworks\8_cli\ant_appscan/scripts/jsmith.lo
+gin"
+[appscan.execute] 正在导入测试策略："d:\workloc\developerworks\8_cli\ant_appscan/scripts/develop_p
+hase.policy"
+[appscan.execute] 正在替换主机："http://demo.testfire.net"-->"http://jhe.ibm.com"
+[appscan.execute] 正在导入手动浏览数据："d:\workloc\developerworks\8_cli\ant_appscan/scripts/selfban
+king.exd"
+[appscan.execute] 正在以"手动浏览"方式替换主机："http://demo.testfire.net"-->"http://jhe.ibm.com"
+[appscan.execute] 正在分析"手动浏览"数据。即使指定了 test_only，也将重新发送请求。
+[appscan.execute] ...
+[appscan.execute] 安全性问题：
+[appscan.execute] 高：2
+[appscan.execute] 中等：2
+[appscan.execute] 低：0
+[appscan.execute] 已成功完成。
+
+BUILD SUCCESSFUL
+Total time: 1 minute 59 seconds
+
+注：细心的读者应该注意到日志中警告“分析手动浏览数据。即使指定了 test_only，也将重新发送请求”。这里的意思是，AppScan 导入 .exd 文件时，会读取该文件中的 URL 并一一发送请求，AppScan 会检查这些 URL 的 HTTP 响应来生成相应的测试变体。因此，我们需要保证 .exd 文件中的 URL 是有效的。如果导入的是无效 URL，AppScan 可能无法检测出该 URL 中的安全漏洞。读者可阅读参考资料列出的“利用 AppScan 定制参数提升脚本的重用性”了解如何利用定制参数提高脚本重用性。
+
+总结
+
+本文笔者结合实际项目经验，跟读者分享了如何使用 AppScan Standard CLI 命令进行安全测试。AppScan Standard V8.5 的 CLI 命令行界面得到了很大提升，本文给读者介绍了新 CLI 的命令结构和参数，以及作者实际项目中常使用的几个 CLI 命令及应用场景。同时笔者为 AppScan Standard CLI 编写了 Ant 定制任务，结合案例演示了如何利用 Ant 定制任务来扫描 Altoro Mutual 系统，希望能帮助读者意识到 AppScan Standard CLI 的强大和方便，帮助读者快速将之应用到持续构建中去。鉴于笔者经验有限，若有不及之处，欢迎读者来信交流。
+
+

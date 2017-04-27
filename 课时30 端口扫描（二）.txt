@@ -1,0 +1,219 @@
+课时30 端口扫描（二）
+
+╋━━━━━━━━━━━━━━━━━╋
+┃端口扫描                          ┃
+┃隐蔽扫描-----syn                  ┃
+┃  不建立完整链接                  ┃
+┃  应用日志不记录扫描行为-----隐蔽 ┃
+┃僵尸扫描                          ┃
+┃  极度隐蔽                        ┃
+┃  实施条件苛刻                    ┃
+┃  可伪造源地址                    ┃
+┃  选择僵尸机                      ┃
+┃      闲置系统                    ┃
+┃      系统使用递增的IPID          ┃
+┃          0                       ┃
+┃          随机                    ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃僵尸扫描                                                      ┃
+┃Scapy-----zombie.py                                           ┃
+┃  i=IP()                                                      ┃
+┃  t=TCP()                                                     ┃
+┃  rz=(i/t)                                                    ┃
+┃  rt=(i/t)                                                    ┃
+┃  rz[IP].dst=IPz                                              ┃
+┃  rz[TCP].dport=445                                           ┃
+┃  rt[IP].src=IPz                                              ┃
+┃  rt[IP].dst=IPt                                              ┃
+┃  rt[TCP].dport=22                                            ┃
+┃  az1=sr1(rz)       /      at=sr1(rt)      /      az2=sr1(rz) ┃
+┃  az1.display()    /       az2.display()                      ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# scapy
+WARNING: No route found for IPv6 destination :: (no default route?)
+Welcome to Scapy (2.2.0)
+>>> i=IP()
+>>> t=TCP()
+>>> rz=(i/t)
+>>> rt=(i/t)
+>>> rz[IP].dst="192.168.1.133"
+>>> rz[TCP].dport=445
+>>> rt[IP].flags="SA"
+
+>>> rt[IP].src="192.168.1.133"
+>>> rt[IP].dst="192.168.1.134"
+>>> rt[TCP].dport=25
+>>> rt[TCP].flags="S
+
+>>> az1=sr1(rz)
+begin emission:
+.Finished to send 1 packets.
+*
+Received 2 packets, got 1 answers, remaining 0 packets
+>>> at=sr1(rt,timeout=1)
+begin emission:
+.Finished to send 1 packets.
+*
+Received 2 packets, got 0 answers, remaining 1 packets
+>>> az2=sr1(rz)
+.Finished to send 1 packets.
+*
+Received 1 packets, got 1 answers, remaining 0 packets
+>>> az1
+<IP version=4L ihl=5L tos=0x0 len=40 id=726 flags= frag=0L ttl=128 proto=tcp chksum=0xb39a src=192.168.1.133 ds192.168.1.133 options=[] |<TCP sport=microsoft_ds dport=ftp_data seq=0 ack=0 datapfs=sL reserved=0L flags=p
+>>> az1
+<IP version=4L ihl=5L tos=0x0 len=40 id=728 flags= frag=0L ttl=128 proot=tcp chksum=0xb39a src=192.168.1.133 ds192.168.1.133 options=[] |<TCP sport=microsoft_ds dport=ftp_data seq=0 ack=0 
+>>> rt[TCP].dport=33445
+>>> az1=sr1(rz)
+>>> at=sr1(rt,timeout=1)
+>>> az2=sr1(rz)
+>>> az1
+<IP version=4L ihl=5L tos=0x0 len=40 id=729 flags= frag=0L ttl=128 proto=tcp chksum=0xb39a src=192.168.1.133 ds192.168.1.133 options=[] |<TCP sport=microsoft_ds dport=ftp_data seq=0 ack=0 
+>>> az1
+<IP version=4L ihl=5L tos=0x0 len=40 id=730 flags= frag=0L ttl=128 proto=tcp chksum=0xb39a src=192.168.1.133 ds192.168.1.133 options=[] |<TCP sport=microsoft_ds dport=ftp_data seq=0 ack=0 
+
+
+╭────────────────────────────────────────────╮
+[zombie.py]
+#!/usr/bin/python
+import loggging
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+
+bef ipid(zombie):
+  reply1 = sr1(IP(dst = zombie)/TCP(flags = "SA"),timeout = 2,verbose = 0)
+  send(IP(dst = zombie)/TCP(flags = "SA"),verbose = 0)
+  reply2 = sr1(IP(dst = zombie)/TC{(flags = "SA"),timeout = 2,verbose = 0)
+  if reply2[IP].id == (reply1{IP].id+2);
+    print"IPID sequence is incremental and target appers to be idle. ZOMBIE LOCATED"
+    response=raw_input("DO you want to use this zombie to perform a scan? (Y or N): ")
+    if response == "Y";
+      target=raw_input("Enter the IP address pf the target system: ")
+      zombiescan(target,zombie)
+  else:
+    print"Either the IPID sequence is not incremental or the target is not idle. NOT A GOOD ZOMBIE"
+
+def zombiescan(target,zombie):
+  print"\nScanning target "+target+" with zombie" +zombie
+  print"\n----------Open ports on Target----------\n"
+  for port in range[1,100]:
+    try:
+      start_val = sr1(IP(dst = zombie)/TCP(flags = "SA",dport = port),timeout = 2,verbose = 0)
+      send(IP(src = zombie,dst = tatget)/TCP(flags = "S",dport = port),verbose = 0)
+      end_val = sr1(IP(dst = zombie)/TCP(flags = "SA"),timeout = 2,verbose = 0)
+      if end_val[IP].id == (start_val[IP].id+2);
+        print port
+    except:
+      pass
+
+print"------------Zombie Scan suite------------\n"
+print"1 - Identify Zombie Host\n"
+print"2 - Proform Zombie Scan\n"
+ans = raw_input("Select an Option (1 or 2): ")
+if ans =="1"
+  zombie=raw_input("Enter IP addrss to test IPID sequence: ")
+  ipid(zombie)
+else:
+  if ans =="2"
+    aombie = raw_input("Enter IP address for zombie systme: ")
+    target = raw_input("Enter IP address of scan target: ")
+    zombiescan(target.zombie)
+╰────────────────────────────────────────────╯
+
+------------Zombie Scan suite------------
+
+1 - Identify Zombie Host
+
+2 - Proform Zombie Scan
+
+Selecy an Option ( 1 or 2):
+Enter IP address to test IPID sequence: 192.168.1.133
+IPID sequence is incremental and target appears to be idle. ZOMBIE LOCATED
+Do you want to use this zombie to perform a scan? (Y or N): Y
+Enter the IP address of the target system: 192.168.1.134
+
+Scanning target 192.168.1.1347 with zombie 192.168.1.133
+
+---------Open ports on Target----------
+ 
+21
+22
+23
+25
+80
+111
+139
+445
+512
+513
+514
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃僵尸扫描                                            ┃
+┃发现僵尸机                                          ┃
+┃  nmap -p445 192.168.1.133 --script=ipidseq.nse     ┃
+┃扫描目标                                            ┃
+┃  nmap 172.16.36.135 -sI 172.16.36.135 -Pb -p 0-100 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# nmap -p445 192.168.1.133 --script=ipidseq.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-03 16:27 CST
+Nmap scan report for 192.168.1.133
+Host is up (0.00060s latency).
+PORT    STATE    SERVICE
+445/tcp filtered microsoft-ds
+MAC Address: 80:00:27:FB:0B:AA(Cadmus Computer Systems)
+
+Host script results:
+|_ipidseq: Incrementtal!
+
+Nmap done: 1 IP address (1 host up) scanned in 5.85 seconds
+
+root@kali:~# nmap -p445 192.168.1.133 --script=ipidseq.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-03 16:27 CST
+Nmap scan report for 192.168.1.133
+Host is up (0.00060s latency).
+PORT    STATE    SERVICE
+445/tcp filtered microsoft-ds
+MAC Address: 80:00:27:B0:3A:76(Cadmus Computer Systems)
+
+Host script results:
+|_ipidseq: Incrementtal!
+
+Nmap done: 1 IP address (1 host up) scanned in 5.85 seconds
+
+root@kali:~# nmap -p80 192.168.1.1 --script=ipidseq.nse
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-03 16:31 CST
+Nmap scan report for 192.168.1.1
+Host is up (0.00082s latency).
+PORT   STATE SERVICE
+80/tcp open  http
+
+Host script results:
+|_ipidseq: Incremental!
+
+Nmap done: 1 IP address (1 host up) scanned in 0.37 seconds
+
+
+root@kali:~# nmap 192.168.1.134 -sI 192.168.1.132 -Pn -p 0-100
+
+Starting Nmap 6.49BETA5 ( https://nmap.org ) at 2015-10-03 16:34 CST
+Idle scan using zombie 192.168.1.132 (192.168.1.132:80); Class: Incremental
+Host is up (0.00044s latency).
+Not shown: 94 closed ports
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+23/tcp open  telnet
+25/tcp open  smtb
+53/tcp open  domain
+80/tcp open  http
+MAC Address: 80:00:27:B0:3A:76(Cadmus Computer Systems)
+
+Nmap done: 1 IP address(1 host up) scanned in 10.80 seconds

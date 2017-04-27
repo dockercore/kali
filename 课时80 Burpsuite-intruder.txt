@@ -1,0 +1,53 @@
+¿ÎÊ±80 Burpsuite-intruder
+
+Burpsuite
+Active / Passive Scan
+Extender
+    BApp Stroe
+        .lython
+        http://www.jython.org/downloads.html
+    Option
+    Scan queue
+    Result
+
+Burpstie------intruder
+POSITION
+Sniper
+---------------------------------------------
+Request      Position        payload
+---------------------------------------------
+ #1          1              Item_1_List_1
+ #2          1              Item_2_List_1
+ #3          1              Item_1_List_1
+ #4          1              Item_2_List_1
+---------------------------------------------
+
+Battering ram
+---------------------------------------------
+Request      Position        payload
+---------------------------------------------
+ #1          1,2             Item_1_List_1
+ #2          1,2             Item_2_List_1
+---------------------------------------------
+
+Pitchfork
+---------------------------------------------------------
+Request      Position        payload
+---------------------------------------------------------
+ #1          1,2             Item_1_List_1,Item_2_List_2
+ #2          1,2             Item_2_List_1,Item_2_List_2
+---------------------------------------------------------
+
+Cluster bomb
+---------------------------------------------------------
+Request      Position        payload
+---------------------------------------------------------
+ #1          1,2             Item_1_List_1,Item_1_List_2
+ #2          1,2             Item_2_List_1,Item_1_List_2
+ #3          1,2             Item_1_List_1,Item_2_List_2
+ #4          1,2             Item_2_List_1,Item_2_List_2
+---------------------------------------------------------
+
+
+
+

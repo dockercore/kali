@@ -1,0 +1,732 @@
+课时26 主动信息收集-发现（三）
+
+╋━━━━━━━━━━━━━╋
+┃发现-----三层发现         ┃
+┃优点                      ┃
+┃    可路由                ┃
+┃    速度比较快            ┃
+┃缺点                      ┃
+┃    速度比二层慢          ┃
+┃    经常被边界防火墙过滤  ┃
+┃IP、icmp协议              ┃
+╋━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃发现-----三层发现                                                         ┃
+┃Ping 1.1.1.1 -c 2                                                         ┃
+┃Ping -R 1.1.1.1 / traceroute 1.1.1.1                                      ┃
+┃Ping 1.1.1.1 -c 1 | grep "bytes from" | cut -d " " -f 4 | cut -d ":" -f 1 ┃
+┃脚本                                                                      ┃
+┃    Ping.sh 1.1.1.0                                                       ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# ping 192.168.1.1 -c 5
+
+root@kali:~# traceroute www.sina.com
+
+root@kali:~# ping -R www.sina.com
+
+root@kali:~# ping -h
+Usage: ping [-aAbBdDfhLnOqrRUvV] [-c count] [-i interval] [-I interface]
+            [-m mark] [-M pmtudisc_option] [-l preload] [-p pattern] [-Q tos]
+            [-s packetsize] [-S sndbuf] [-t ttl] [-T timestamp_option]
+            [-w deadline] [-W timeout] [hop1 ...] destination
+
+ ▉→●→●→●→●→▉      从我的机器跳过四个路由器
+
+root@kali:~# man ping
+PING(8)                System Manager's Manual: iputils                PING(8)
+
+NAME
+       ping, ping6 - send ICMP ECHO_REQUEST to network hosts
+
+SYNOPSIS
+       ping  [-aAbBdDfhLnOqrRUvV]  [-c count] [-F flowlabel] [-i interval] [-I
+       interface] [-l  preload]  [-m  mark]  [-M  pmtudisc_option]  [-N  node‐
+       info_option] [-w deadline] [-W timeout] [-p pattern] [-Q tos] [-s pack‐
+       etsize] [-S sndbuf] [-t ttl] [-T timestamp option] [hop  ...]  destina‐
+       tion
+
+DESCRIPTION
+       ping uses the ICMP protocol's mandatory ECHO_REQUEST datagram to elicit
+       an ICMP ECHO_RESPONSE from a host or gateway.   ECHO_REQUEST  datagrams
+       (``pings'')  have  an  IP and ICMP header, followed by a struct timeval
+       and then an arbitrary number of ``pad'' bytes  used  to  fill  out  the
+       packet.
+
+       ping6  is  IPv6  version  of  ping,  and can also send Node Information
+       Queries (RFC4620).  Intermediate hops may not be allowed, because  IPv6
+       source routing was deprecated (RFC5095).
+
+OPTIONS
+       -a     Audible ping.
+
+       -A     Adaptive  ping.  Interpacket interval adapts to round-trip time,
+              so that effectively not more than one (or more,  if  preload  is
+              set)  unanswered probe is present in the network. Minimal inter‐
+              val is 200msec for not super-user.  On  networks  with  low  rtt
+              this mode is essentially equivalent to flood mode.
+
+       -b     Allow pinging a broadcast address.
+
+       -B     Do  not  allow  ping  to  change  source address of probes.  The
+              address is bound to one selected when ping starts.
+
+       -c count
+              Stop after sending count  ECHO_REQUEST  packets.  With  deadline
+              option, ping waits for count ECHO_REPLY packets, until the time‐
+              out expires.
+
+       -d     Set the SO_DEBUG option on the socket being used.   Essentially,
+              this socket option is not used by Linux kernel.
+
+       -D     Print  timestamp  (unix  time + microseconds as in gettimeofday)
+              before each line.
+
+       -f     Flood ping. For  every  ECHO_REQUEST  sent  a  period  ``.''  is
+              printed,  while  for  ever  ECHO_REPLY  received  a backspace is
+              printed.  This provides a rapid display of how many packets  are
+              being  dropped.   If  interval is not given, it sets interval to
+              zero and outputs packets as fast as they come back or  one  hun‐
+              dred  times  per second, whichever is more.  Only the super-user
+              may use this option with zero interval.
+
+       -F flow label
+              ping6 only.  Allocate and set 20 bit flow label (in hex) on echo
+              request packets.  If value is zero, kernel allocates random flow
+              label.
+
+       -h     Show help.
+
+
+      -i interval
+              Wait interval seconds between sending each packet.  The  default
+              is  to  wait for one second between each packet normally, or not
+              to wait in flood mode. Only super-user may set interval to  val‐
+              ues less 0.2 seconds.
+
+       -I interface
+              interface is either an address, or an interface name.  If inter‐
+              face is an address, it sets source address to  specified  inter‐
+              face address.  If interface in an interface name, it sets source
+              interface to specified interface.  For ping6, when doing ping to
+              a link-local scope address, link specification (by the '%'-nota‐
+              tion in destination, or by this option) is required.
+
+       -l preload
+              If preload is specified, ping sends that many packets not  wait‐
+              ing for reply.  Only the super-user may select preload more than
+              3.
+
+       -L     Suppress loopback of multicast packets.  This flag only  applies
+              if the ping destination is a multicast address.
+
+       -m mark
+              use  mark to tag the packets going out. This is useful for vari‐
+              ety of reasons within the kernel such as using policy routing to
+              select specific outbound processing.
+
+       -M pmtudisc_opt
+              Select  Path  MTU  Discovery  strategy.   pmtudisc_option may be
+              either do (prohibit fragmentation, even  local  one),  want  (do
+              PMTU  discovery, fragment locally when packet size is large), or
+              dont (do not set DF flag).
+
+       -N nodeinfo_option
+              ping6 only.  Send ICMPv6  Node  Information  Queries  (RFC4620),
+              instead of Echo Request.
+
+              help   Show help for NI support.
+
+              name   Queries for Node Names.
+
+              ipv6   Queries  for  IPv6 Addresses. There are several IPv6 spe‐
+                     cific flags.
+
+                     ipv6-global
+                            Request IPv6 global-scope addresses.
+
+                     ipv6-sitelocal
+                            Request IPv6 site-local addresses.
+
+                     ipv6-linklocal
+                            Request IPv6 link-local addresses.
+
+                     ipv6-all
+                            Request IPv6 addresses on other interfaces.
+
+              ipv4   Queries for IPv4 Addresses.  There is one  IPv4  specific
+                     flag.
+
+                     ipv4-all
+                            Request IPv4 addresses on other interfaces.
+
+              subject-ipv6=ipv6addr
+                     IPv6 subject address.
+
+
+             subject-ipv4=ipv4addr
+                     IPv4 subject address.
+
+              subject-name=nodename
+                     Subject  name.   If it contains more than one dot, fully-
+                     qualified domain name is assumed.
+
+              subject-fqdn=nodename
+                     Subject name.   Fully-qualified  domain  name  is  always
+                     assumed.
+
+       -n     Numeric output only.  No attempt will be made to lookup symbolic
+              names for host addresses.
+
+       -O     Report outstanding ICMP ECHO reply before sending  next  packet.
+              This is useful together with the timestamp -D to log output to a
+              diagnostic file and search for missing answers.
+
+       -p pattern
+              You may specify up to 16 ``pad'' bytes to fill  out  the  packet
+              you send.  This is useful for diagnosing data-dependent problems
+              in a network.  For example, -p ff will cause the sent packet  to
+              be filled with all ones.
+
+       -q     Quiet  output.  Nothing is displayed except the summary lines at
+              startup time and when finished.
+
+       -Q tos Set Quality of Service -related bits in ICMP datagrams.  tos can
+              be decimal (ping only) or hex number.
+
+              In RFC2474, these fields are interpreted as 8-bit Differentiated
+              Services (DS), consisting of: bits 0-1 (2 lowest bits) of  sepa‐
+              rate  data, and bits 2-7 (highest 6 bits) of Differentiated Ser‐
+              vices Codepoint (DSCP).  In RFC2481 and RFC3168,  bits  0-1  are
+              used for ECN.
+
+              Historically  (RFC1349, obsoleted by RFC2474), these were inter‐
+              preted as: bit 0 (lowest  bit)  for  reserved  (currently  being
+              redefined  as  congestion  control), 1-4 for Type of Service and
+            bits 5-7 (highest bits) for Precedence.
+
+       -r     Bypass the normal routing tables and send directly to a host  on
+              an  attached  interface.   If  the  host  is  not on a directly-
+              attached network, an error is returned.  This option can be used
+              to  ping  a  local  host  through an interface that has no route
+              through it provided the option -I is also used.
+
+       -R     ping only.  Record route.  Includes the RECORD_ROUTE  option  in
+              the  ECHO_REQUEST  packet  and  displays  the  route  buffer  on
+              returned packets.  Note that the IP header is only large  enough
+              for nine such routes.  Many hosts ignore or discard this option.
+
+       -s packetsize
+              Specifies  the  number of data bytes to be sent.  The default is
+              56, which translates into 64 ICMP data bytes when combined  with
+              the 8 bytes of ICMP header data.
+
+       -S sndbuf
+              Set  socket  sndbuf.  If not specified, it is selected to buffer
+              not more than one packet.
+
+    -t ttl ping only.  Set the IP Time to Live.
+
+       -T timestamp option
+              Set special IP  timestamp  options.   timestamp  option  may  be
+              either  tsonly  (only  timestamps),  tsandaddr  (timestamps  and
+              addresses) or tsprespec host1 [host2 [host3 [host4]]] (timestamp
+              prespecified hops).
+
+       -U     Print  full  user-to-user  latency (the old behaviour). Normally
+              ping prints network round trip time, which can be different f.e.
+              due to DNS failures.
+
+       -v     Verbose output.
+
+       -V     Show version and exit.
+
+       -w deadline
+              Specify  a  timeout, in seconds, before ping exits regardless of
+              how many packets have been sent or received. In this  case  ping
+              does  not  stop after count packet are sent, it waits either for
+              deadline expire or until count probes are answered or  for  some
+              error notification from network.
+
+       -W timeout
+              Time to wait for a response, in seconds. The option affects only
+              timeout in absence of any responses, otherwise  ping  waits  for
+              two RTTs.
+
+       When  using  ping  for  fault  isolation, it should first be run on the
+       local host, to verify that the local network interface is up  and  run‐
+       ning.  Then,  hosts  and  gateways  further  and further away should be
+       ``pinged''. Round-trip times and packet loss statistics  are  computed.
+       If  duplicate packets are received, they are not included in the packet
+       loss calculation, although the round trip time of these packets is used
+       in  calculating  the  minimum/average/maximum  round-trip time numbers.
+       When the specified number of packets have been sent (and  received)  or
+       if  the  program  is  terminated with a SIGINT, a brief summary is dis‐
+       played. Shorter current statistics can be obtained without  termination
+       of process with signal SIGQUIT.
+
+       If  ping  does  not  receive any reply packets at all it will exit with
+       code 1. If a packet count and deadline are both  specified,  and  fewer
+       than  count  packets are received by the time the deadline has arrived,
+       it will also exit with code 1.  On other error it exits  with  code  2.
+       Otherwise  it exits with code 0. This makes it possible to use the exit
+       code to see if a host is alive or not.
+
+       This program is intended for use in network  testing,  measurement  and
+       management.   Because  of  the load it can impose on the network, it is
+       unwise to use ping during normal operations or from automated scripts.
+
+ICMP PACKET DETAILS
+       An IP header without options is 20 bytes.  An ICMP ECHO_REQUEST  packet
+       contains  an  additional  8  bytes  worth of ICMP header followed by an
+       arbitrary amount of data.  When a packetsize is given,  this  indicated
+       the  size  of  this  extra  piece of data (the default is 56). Thus the
+       amount of data received inside of an IP packet of type ICMP  ECHO_REPLY
+       will  always  be  8  bytes more than the requested data space (the ICMP
+       header).
+
+       If the data space is at least of size of struct timeval ping  uses  the
+       beginning  bytes  of this space to include a timestamp which it uses in
+       the computation of round trip times.  If the data space is shorter,  no
+       round trip times are given.
+
+DUPLICATE AND DAMAGED PACKETS
+       ping  will  report  duplicate  and  damaged packets.  Duplicate packets
+       should never occur, and seem to be caused by  inappropriate  link-level
+       retransmissions.   Duplicates  may  occur  in  many  situations and are
+       rarely (if ever) a good sign, although the presence of  low  levels  of
+       duplicates may not always be cause for alarm.
+
+       Damaged  packets  are obviously serious cause for alarm and often indi‐
+       cate broken hardware somewhere in the ping packet's path (in  the  net‐
+       work or in the hosts).
+
+TRYING DIFFERENT DATA PATTERNS
+       The (inter)network layer should never treat packets differently depend‐
+       ing on the data contained in the data  portion.   Unfortunately,  data-
+       dependent  problems  have  been known to sneak into networks and remain
+       undetected for long periods of time.  In many cases the particular pat‐
+       tern  that will have problems is something that doesn't have sufficient
+       ``transitions'', such as all ones or all zeros, or a pattern  right  at
+       the  edge,  such  as  almost all zeros.  It isn't necessarily enough to
+       specify a data pattern of all zeros (for example) on the  command  line
+       because  the pattern that is of interest is at the data link level, and
+       the relationship between what you type and what the controllers  trans‐
+       mit can be complicated.
+
+       This  means that if you have a data-dependent problem you will probably
+       have to do a lot of testing to find it.  If you are lucky, you may man‐
+       age  to  find  a  file that either can't be sent across your network or
+       that takes much longer to transfer than  other  similar  length  files.
+       You  can then examine this file for repeated patterns that you can test
+       using the -p option of ping.
+
+TTL DETAILS
+       The TTL value of an IP packet  represents  the  maximum  number  of  IP
+       routers  that  the  packet can go through before being thrown away.  In
+       current practice you can expect each router in the Internet  to  decre‐
+       ment the TTL field by exactly one.
+
+       The  TCP/IP  specification  states  that  the TTL field for TCP packets
+       should be set to 60, but many systems use smaller values (4.3 BSD  uses
+       30, 4.2 used 15).
+
+   The  maximum possible value of this field is 255, and most Unix systems
+       set the TTL field of ICMP ECHO_REQUEST packets to 255.  This is why you
+       will  find  you  can  ``ping'' some hosts, but not reach them with tel‐
+       net(1) or ftp(1).
+
+       In normal operation ping prints  the  TTL  value  from  the  packet  it
+       receives.   When  a remote system receives a ping packet, it can do one
+       of three things with the TTL field in its response:
+
+       · Not change it; this is what Berkeley  Unix  systems  did  before  the
+         4.3BSD  Tahoe  release.  In  this  case the TTL value in the received
+         packet will be 255 minus the number  of  routers  in  the  round-trip
+         path.
+
+       · Set  it  to  255;  this is what current Berkeley Unix systems do.  In
+         this case the TTL value in the received packet will be 255 minus  the
+         number  of  routers in the path from the remote system to the pinging
+         host.
+
+       · Set it to some other value. Some machines use the same value for ICMP
+         packets  that  they use for TCP packets, for example either 30 or 60.
+         Others may use completely wild values.
+
+BUGS
+       · Many Hosts and Gateways ignore the RECORD_ROUTE option.
+
+       · The  maximum  IP  header  length  is  too  small  for  options   like
+         RECORD_ROUTE to be completely useful.  There's not much that that can
+         be done about this, however.
+
+       · Flood pinging is not recommended in general, and  flood  pinging  the
+         broadcast  address  should  only be done under very controlled condi‐
+         tions.
+
+SEE ALSO
+       netstat(1), ifconfig(8).
+
+HISTORY
+       The ping command appeared in 4.3BSD.
+
+       The version described here is its descendant specific to Linux.
+
+SECURITY
+       ping requires CAP_NET_RAW capability to be executed. It may be used  as
+       set-uid root.
+
+AVAILABILITY
+       ping  is part of iputils package and the latest versions are  available
+       in   source    form    at    http://www.skbuff.net/iputils/iputils-cur‐
+       rent.tar.bz2.
+
+root@kali:~# ping 1.1.1.1 -c 1 | grep "bytes from" | cut -d " " -f 4 | cut -d ":" -f 1
+
+root@kali:~# ping 192.168.1 -c 1 | grep "bytes from" | cut -d " " -f 4 | cut -d ":" -f 1
+192.168.1.1
+
+root@kali:~# ifconfig sinterface | grep "inet addr" | cut -d ':' -f 2 | cut -d ":" -f 1| cut -d '.' -f 1-3
+
+root@kali:~# ifconfig eth0 | grep grep "inet addr" | cut -d ':' -f 2 | cut -d ":" -f 1| cut -d '.' -f 1-31
+
+╭────────────────────────────────────────────╮
+[pinger1.py]
+#!/bin/bash
+if{"#$" -ne 1};then
+  echo "Usage - ./pinger.sh {/24 network address}"
+  echo "Example - ./pinger.sh 172.16.36.0"
+  echo "Example will perform an ICMP ping sweep of the 172.16.36.0/24 network"
+  exit
+fi
+prefix=$(echo $1 | cut -d '.' -f 1-3)
+for addr in$(seq 1 254);do
+  ping -c 1 Sprefix.Saddr | grep "bytes from" | cut -d ' ' -f 4 | cut -d '.' -f 1 & 
+done
+╰────────────────────────────────────────────╯
+
+root@kali:~# chmod u+x pinger
+
+root@kali:~# chmod u+x pinger.sh
+
+root@kali:~# ./pinger.sh
+
+root@kali:~# ./pinger.sh 211.144.145.0
+
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+┃发现-----三层发现                           ┃
+┃Scapy                                       ┃                                  
+┃  OSI多层堆叠手工声称ICMP包-----IP/ICMP     ┃
+┃  ip=IP()                                   ┃
+┃  ip.ds="1.1.1.1"                           ┃
+┃  ping=ICMP()                               ┃
+┃  a=sr1(ip/ping)                            ┃
+┃  a.display()                               ┃
+┃Ping不存在的地址                            ┃
+┃    a=sr1(ip/ping.timeout=1)                ┃
+┃                                            ┃
+┃  a=sr1(IP(dst="1.1.1.1")/ICMP(),timeout=1) ┃
+╋━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# scapy
+WARNING: No route found for IPv6 destination :: (no default route?)
+Welcome to Scapy (2.2.0)
+>>> i=IP()
+>>> p=ICMP()
+>>> ping=(i/p)
+>>> ping.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= icmp
+  chksum= None
+  src= 127.0.0.1
+  dst= 127.0.0.1
+  \options\
+###[ ICMP ]###
+     type= echo-request
+     code= 0
+     chksum= None
+     id= 0x0
+     seq= 0x0
+>>> ping[IP].dst="192.168.1.1"
+>>> ping.display()
+###[ IP ]###
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= icmp
+  chksum= None
+  src= 192.168.77.129
+  dst= 192.168.1.1
+  \options\
+###[ ICMP ]###
+     type= echo-request
+     code= 0
+     chksum= None
+     id= 0x0
+     seq= 0x0
+>>> a=sr1(ping)
+Begin emission:
+.Finished to send 1 packets.
+*
+Received 2 packets, got 1 answers, remaining 0 packets
+>>> a.display()
+###[ IP ]###
+  version= 4L
+  ihl= 5L
+  tos= 0x0
+  len= 28
+  id= 63695
+  flags= 
+  frag= 0L
+  ttl= 128
+  proto= icmp
+  chksum= 0x723e
+  src= 192.168.1.1
+  dst= 192.168.77.129
+  \options\
+###[ ICMP ]###
+     type= echo-reply
+     code= 0
+     chksum= 0xffff
+     id= 0x0
+     seq= 0x0
+###[ Padding ]###
+        load= '\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+>>> sr1(IP(dst="192.168.1.1")/ICMP())
+Begin emission:
+.Finished to send 1 packets.
+*
+Received 2 packets, got 1 answers, remaining 0 packets
+<IP  version=4L ihl=5L tos=0x0 len=28 id=63719 flags= frag=0L ttl=128 proto=icmp chksum=0x7226 src=192.168.1.1 dst=192.168.77.129 options=[] |<ICMP  type=echo-reply code=0 chksum=0xffff id=0x0 seq=0x0 |<Padding  load='\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00' |>>>
+>>> sr1(IP(dst="192.168.1.11")/ICMP())
+Begin emission:
+Finished to send 1 packets.
+*
+Received 1 packets, got 1 answers, remaining 0 packets
+<IP  version=4L ihl=5L tos=0x0 len=56 id=63720 flags= frag=0L ttl=128 proto=icmp chksum=0x71a5 src=192.168.1.101 dst=192.168.77.129 options=[] |<ICMP  type=dest-unreach code=host-unreachable chksum=0xfcfe unused=0 |<IPerror  version=4L ihl=5L tos=0x0 len=28 id=17594 flags= frag=0L ttl=63 proto=icmp chksum=0x674a src=192.168.77.129 dst=192.168.1.11 options=[] |<ICMPerror  type=echo-request code=0 chksum=0xf7ff id=0x0 seq=0x0 |>>>>
+
+>>> sr1(IP(dst="192.168.1.11")/ICMP(),timeout=1)
+Begin emission:
+.Finished to send 1 packets.
+
+Received 1 packets, got 0 answers, remaining 1 packets
+
+
+╭────────────────────────────────────────────╮
+[pinger1.py]
+#!/bin/bash
+import logging
+import subprocess
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)1=2;
+  echo "Usage - ./pinger.sh {/24 network address}"
+  echo "Example - ./pinger.sh 172.16.36.0"
+  echo "Example will perform an ICMP ping sweep of the 172.16.36.0/24 network"
+  sys.exit()
+
+address=str(sys.argv[1])
+prefix=address.split('.')[0]+'.'+address.split('.')[1]+'.'+address.split('.')[2]+'.'
+
+for addr in range(1,254);
+  a=sr1(IP(dst=prefix+str(addr)/ICMP().timeout=0.1,verbose=0)
+if a==None;
+    pass
+else:
+    print prefix+str(addr)
+╰────────────────────────────────────────────╯
+root@kali:~# chmod u+x pinger1.sh
+
+root@kali:~# ./pinger1.sh
+
+root@kali:~# ./pinger1.sh 211.144.145.0
+
+╭────────────────────────────────────────────╮
+[pinger1.py]
+#!/bin/bash
+import logging
+import subprocess
+logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
+from scapy.all import *
+
+if len(sys.argv)1=2;
+  echo "Usage - ./pinger.sh {/24 network address}"
+  echo "Example - ./pinger.sh 172.16.36.0"
+  echo "Example will perform an ICMP ping sweep of the 172.16.36.0/24 network"
+  sys.exit()
+
+filename=str(sys.argv[1])
+file=open(filename,'|')
+
+for addr in file;
+  a=sr1(IP(dst=prefix+str(addr)/ICMP().timeout=0.1,verbose=0)
+if a==None;
+    pass
+else:
+    print addr.srtip()
+╰────────────────────────────────────────────╯
+root@kali:~# ./pinger2.sh addr
+root@kali:~# nmap 192.168.1.1 -sn
+
+╋━━━━━━━━━━━━━╋
+┃发现-----三层发现         ┃
+┃fping 1.1.1.1 -c 1        ┃
+┃fping -g 1.1.1.1 1.1.2    ┃
+┃fping -g 1.1.1.0/24       ┃
+┃fping -f iplist.txt       ┃
+╋━━━━━━━━━━━━━╋
+
+fping的命令和参数详解
+Usage: fping [options] [targets...]
+用法：fping [选项] [ping的目标]
+   -a         show targets that are alive
+               显示可ping通的目标
+   -A         show targets by address
+               将目标以ip地址的形式显示
+   -b n       amount of ping data to send, in bytes (default 56)
+               ping 数据包的大小。（默认为56）
+   -B f       set exponential backoff factor to f
+               设置指数反馈因子到f 【这个不懂，求指教~】
+   -c n       count of pings to send to each target (default 1)
+                ping每个目标的次数 (默认为1)
+   -C n       same as -c, report results in verbose format
+                同-c, 返回的结果为冗长格式
+   -e         show elapsed time on return packets
+                显示返回数据包所费时间
+   -f file    read list of targets from a file ( - means stdin) (only if no -g specified)
+               从文件获取目标列表( - 表示从标准输入)(不能与 -g 同时使用)
+   -g         generate target list (only if no -f specified)
+               生成目标列表(不能与 -f 同时使用)
+                (specify the start and end IP in the target list, or supply a IP netmask)
+                (ex. fping -g 192.168.1.0 192.168.1.255 or fping -g 192.168.1.0/24)
+                (可指定目标的开始和结束IP， 或者提供ip的子网掩码)
+                (例：fping -g 192.168.1.0 192.168.1.255 或 fping -g 192.168.1.0/24)
+   -H n       Set the IP TTL value (Time To Live hops)
+                设置ip的TTL值 (生存时间)
+   -i n       interval between sending ping packets (in millisec) (default 25)
+               ping包之间的间隔(单位：毫秒)(默认25)
+   -l         loop sending pings forever
+              循环发送ping
+   -m         ping multiple interfaces on target host
+                ping目标主机的多个网口
+   -n         show targets by name (-d is equivalent)
+                将目标以主机名或域名显示(等价于 -d )
+   -p n       interval between ping packets to one target (in millisec)
+                对同一个目标的ping包间隔(毫秒)
+                (in looping and counting modes, default 1000)
+                (在循环和统计模式中，默认为1000)
+   -q         quiet (don't show per-target/per-ping results)
+               安静模式(不显示每个目标或每个ping的结果)
+   -Q n       same as -q, but show summary every n seconds
+               同-q, 但是每n秒显示信息概要
+   -r n       number of retries (default 3)
+               当ping失败时，最大重试次数(默认为3次)
+   -s         print final stats
+               打印最后的统计数据
+   -I if      bind to a particular interface
+              绑定到特定的网卡
+   -S addr    set source address
+                  设置源ip地址
+   -t n       individual target initial timeout (in millisec) (default 500)
+               单个目标的超时时间(毫秒)(默认500)
+   -T n       ignored (for compatibility with fping 2.4)
+                请忽略(为兼容fping 2.4)
+   -u         show targets that are unreachable
+                显示不可到达的目标
+   -O n       set the type of service (tos) flag on the ICMP packets
+                在icmp包中设置tos（服务类型）
+   -v         show version
+                显示版本号
+   targets    list of targets to check (if no -f specified)
+                需要ping的目标列表(不能和 -f 同时使用)
+-h              show this page
+                 显示本帮助页
+
+root@kali:~# fping 192.168.1.1 -c 1
+
+root@kali:~# fping 192.168.1.1 -c 10
+
+root@kali:~# fping 192.168.1.100 192.168.1.200 -c 1
+
+root@kali:~# fping 192.168.1.100 192.168.1.200 -c 1 | egrep -v 100%
+
+root@kali:~# fping 192.168.1.100 192.168.1.200 -c 1 | grep min/avg/max
+
+root@kali:~# fping 192.168.1.100 192.168.1.200 -c 1 >> result.txt
+
+root@kali:~# cat result.txt | grep min/avg/max
+
+root@kali:~# cat result.txt
+
+root@kali:~# fping 192.168.1.0/24
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃发现-----三层发现                                                               ┃
+┃Hping                                                                           ┃
+┃    能够发送几乎任意TCP/IP包                                                    ┃
+┃    功能请发但每次只能扫描一个目标                                              ┃
+┃hping3 1.1.1.1 --icmp -c 2                                                      ┃
+┃for addr in $(seq 1 254);do hping3 1.1.1.$addr --icmp -c 1 >>handle.txt & done  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# hping3 192.168.1.1 --icmp -c 2
+HPING 192.168.1.1 (eth0 192.168.1.1): icmp mode set, 28 headers + 0 data bytes
+len=46 ip=192.168.1.1 ttl=128 id=63816 icmp_seq=0 rtt=8.4 ms
+len=46 ip=192.168.1.1 ttl=128 id=63817 icmp_seq=1 rtt=3.2 ms
+
+--- 192.168.1.1 hping statistic ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 3.2/5.8/8.4 ms
+
+root@kali:~# for addr in $(seq 1 254);do hping3 192.168.1.$addr --icmp -c 1 >>handle.txt & done
+1] 8236
+[2] 8237
+[3] 8238
+[4] 8239
+[5] 8240
+[6] 8241
+[7] 8242
+[8] 8243
+[9] 8244
+[10] 8245
+[11] 8246
+[12] 8247
+......
+
+root@kali:~# cat handle.txt
+HPING 1.1.1.4 (eth0 1.1.1.4): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.6 (eth0 1.1.1.6): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.3 (eth0 1.1.1.3): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.9 (eth0 1.1.1.9): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.11 (eth0 1.1.1.11): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.8 (eth0 1.1.1.8): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.5 (eth0 1.1.1.5): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.7 (eth0 1.1.1.7): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.12 (eth0 1.1.1.12): icmp mode set, 28 headers + 0 data bytes
+HPING 1.1.1.2 (eth0 1.1.1.2): icmp mode set, 28 headers + 0 data bytes
+......
+
+root@kali:~# cat handle.txt | grep ^len       //以这个行的启始位置
+root@kali:~# cat handle.txt | grep ^len
+len=46 ip=192.168.1.1 ttl=128 id=63818 icmp_seq=0 rtt=45.0 ms
+len=46 ip=192.168.1.101 ttl=128 id=63819 icmp_seq=0 rtt=38.2 ms
+
+
+

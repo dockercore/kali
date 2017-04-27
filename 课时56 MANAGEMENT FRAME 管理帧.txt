@@ -1,0 +1,241 @@
+课时56 MANAGEMENT FRAME 管理帧
+
+╋━━━━━━━━━━━━━━━━╋
+┃       MANAGEMENT FRAME         ┃
+┃             管理帧             ┃
+╋━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━╋
+┃MANAGEMENT FRAME                ┃
+┃用于协商和控制STA与AP之间的关系 ┃
+╋━━━━━━━━━━━━━━━━╋
+
+┌───────┬────────┬───────────────────────┐
+│  Type Filed  │ Subtype Filed  │                Description                   │
+├───────┼────────┼───────────────────────┤
+│      0       │       0        │             Association Request              │
+├───────┼────────┼───────────────────────┤
+│      0       │       1        │             Association Response             │
+├───────┼────────┼───────────────────────┤
+│      0       │       2        │           Re-association Request             │
+├───────┼────────┼───────────────────────┤
+│      0       │       3        │          Re-association Response             │
+├───────┼────────┼───────────────────────┤
+│      0       │       4        │               Probe Request                  │
+├───────┼────────┼───────────────────────┤
+│      0       │       5        │              Probe Response                  │
+├───────┼────────┼───────────────────────┤
+│      0       │       6        │            Measurement Pilot                 │
+├───────┼────────┼───────────────────────┤
+│      0       │       7        │               Reserved                       │
+├───────┼────────┼───────────────────────┤
+│      0       │       8        │                Beacon                        │
+├───────┼────────┼───────────────────────┤
+│      0       │       9        │                 ATIM                         │
+├───────┼────────┼───────────────────────┤
+│      0       │       10       │               Disassociation                 │
+├───────┼────────┼───────────────────────┤
+│      0       │       11       │               Authentication                 │
+├───────┼────────┼───────────────────────┤
+│      0       │       12       │             Deauthentication                 │
+├───────┼────────┼───────────────────────┤
+│      0       │       13       │                 Action                       │
+├───────┼────────┼───────────────────────┤
+│      0       │       14       │               Action No ACK                  │
+├───────┼────────┼───────────────────────┤
+│      0       │       15       │                  Reserved                    │
+└───────┴────────┴───────────────────────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃BEACON FRAMES                             ┃
+┃AP发送的广播帧，通告无线网络的存在(BSSID) ┃
+┃发包频率                                  ┃
+┃    102.4ms (可变)                        ┃
+┃    时间单位1024 microsecond (60秒)       ┃
+┃SSID网络名                                ┃
+┃    隐藏AP不发SSID广播                    ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+              2           2             6             6         6         2              ┌───────────────┐
+      ┌──────┬──────┬──────┬────┬────┬─────┐       │                              │
+      │    Frame   │  Duration  │ Destination│ Source │ BSS ID │ Sequence │       │ Note:All values are in bytes │
+      │   control  │            │   Address  │ Address│        │ Control  │       │                              │
+      └──────┴──────┴──────┴────┴────┴─────┘       └───────────────┘
+       ↘                                                                      ↙
+
+
+                                 ↘          24          ↙       Variable           4
+                                  ┌───────────┬──────────┬────┐
+                                  │       Header         │     Frame body     │   FCS  │ 
+                                  └───────────┴──────────┴────┘
+                                                         ↙                      ↘
+
+
+  ↙        8                  2            2       Variable    Variable           6                2               8      ↘
+┌───────────┬─────┬──────┬────┬─────┬─────────┬───────┬───────┐
+│      Timestamp       │ Beacon   │ Capabity   │  SSID  │Supported │ FH Paramenter Set│      DS      │      CF      │
+│                      │ interval │ information│        │  rates   │                  │Parameter set │Parameter set ├┐
+└───────────┴─────┴──────┴────┴─────┴─────────┴───────┴───────┘│
+                                                                                                                              │
+┌──────────────────────────────────────────────────────────────┘
+│  2                   Variable    Variable        4         Variable      3           6               8           Variable
+│    ┌───────┬────┬──────┬─────┬─────┬────┬───────┬────────┬────┐
+│    │     IBSS     │  TIM   │   Country  │FH Hopping│FH pattecn│  Power │Channel switch│     Quiet      │IBSS DFS│
+└─→│Parameter set │        │information │ parameter│   table  │constant│ announcement │                │        ├┐
+      └───────┴────┴──────┴─────┴─────┴────┴───────┴────────┴────┘│
+                                                                                                                              │
+┌──────────────────────────────────────────────────────────────┘
+│        4           3       Variable    Variable
+│    ┌───┬──────┬─────┬─────┐
+│    │  TPC │     EXP    │Extended  │Robust    │
+└─→│Report│ information│Supported │Security  │
+      │      │            │  rates   │Network   │
+      └───┴──────┴─────┴─────┘
+
+╋━━━━━━━━━━━━━━━━╋
+┃BEACON FRAMES                   ┃
+┃IBSSI Status                    ┃
+┃    0: infrastructure           ┃
+┃    1: ad-hoc                   ┃
+┃Privicy                         ┃
+┃    WEP、WPA                    ┃
+┃ESSID                           ┃
+┃    名称、长度                  ┃
+┃速率                            ┃
+┃    802.11 g (1-----54Mbit)     ┃
+┃信道                            ┃
+┃    11                          ┃
+╋━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━╋
+┃PROBE REQUEST FRANES  ┃
+┃用于STA扫描现有AP     ┃
+┃    发现连接过的AP    ┃
+┃    发现未连连接的AP  ┃
+╋━━━━━━━━━━━╋
+
+
+                                                                   24                    Variable           4
+                                                        ┌───────────┬──────────┬────┐
+                                                        │       Header         │     Frame body     │   FCS  │
+                                                        └───────────┴──────────┴────┘
+                                                      ↙                        │                     ↘
+                                                                                │
+                                                                                │
+       ↙     2           2             6             6         6         2     │Variable   Variable   Variable ↘
+      ┌──────┬──────┬──────┬────┬────┬─────┬────┬─────┬─────┐
+      │    Frame   │  Duration  │ Destination│ Source │ BSS ID │ Sequence │  SSID  │Supported │Extended  │
+      │   control  │            │   Address  │ Address│        │ Control  │        │  rates   │Supported │
+      │            │            │            │        │        │          │        │          │  rates   │
+      └──────┴──────┴──────┴────┴────┴─────┴────┴─────┴─────┘
+
+╋━━━━━━━━━━━━━━━━━━━━━╋
+┃PROBE REQUEST FRANES                      ┃
+┃发现连接过的AP时，速率和ESSID相同的AP响应 ┃
+╋━━━━━━━━━━━━━━━━━━━━━╋
+
+              2           2             6             6         6         2              ┌───────────────┐
+      ┌──────┬──────┬──────┬────┬────┬─────┐       │                              │
+      │    Frame   │  Duration  │ Destination│ Source │ BSS ID │ Sequence │       │ Note:All values are in bytes │
+      │   control  │            │   Address  │ Address│        │ Control  │       │                              │
+      └──────┴──────┴──────┴────┴────┴─────┘       └───────────────┘
+       ↘                                                                      ↙
+
+
+                                 ↘          24          ↙       Variable           4
+                                  ┌───────────┬──────────┬────┐
+                                  │       Header         │     Frame body     │   FCS  │ 
+                                  └───────────┴──────────┴────┘
+                                                         ↙                      ↘
+
+
+  ↙        8                  2            2       Variable    Variable           6                2               8      ↘
+┌───────────┬─────┬──────┬────┬─────┬─────────┬───────┬───────┐
+│      Timestamp       │ Beacon   │ Capability │  SSID  │Supported │ FH Paramenter Set│      DS      │      CF      │
+│                      │ interval │ information│        │  rates   │                  │Parameter set │Parameter set ├┐
+└───────────┴─────┴──────┴────┴─────┴─────────┴───────┴───────┘│
+                                                                                                                              │
+┌──────────────────────────────────────────────────────────────┘
+│  2                   Variable    Variable        4         Variable      3           6               8           Variable
+│    ┌───────┬────┬──────┬─────┬─────┬────┬───────┬────────┬────┐
+│    │     IBSS     │  TIM   │   Country  │FH Hopping│FH pattecn│  Power │Channel switch│     Quiet      │IBSS DFS│
+└─→│Parameter set │        │information │ parameter│   table  │constant│ announcement │                │        ├┐
+      └───────┴────┴──────┴─────┴─────┴────┴───────┴────────┴────┘│
+                                                                                                                              │
+┌──────────────────────────────────────────────────────────────┘
+│        4           3       Variable    Variable
+│    ┌───┬──────┬─────┬─────┐
+│    │  TPC │     EXP    │Extended  │Robust    │
+└─→│Report│ information│Supported │Security  │
+      │      │            │  rates   │Network   │
+      └───┴──────┴─────┴─────┘
+
+╋━━━━━━━━━━━╋
+┃AUTHENTICATION FRAMES ┃
+╋━━━━━━━━━━━╋
+
+              2           2             6             6         6         2 
+      ┌──────┬──────┬──────┬────┬────┬─────┐
+      │    Frame   │  Duration  │ Destination│ Source │ BSS ID │ Sequence │
+      │   control  │            │   Address  │ Address│        │ Control  │
+      └──────┴──────┴──────┴────┴────┴─────┘
+       ↘                                                                      ↙
+
+
+                                 ↘          24          ↙       Variable           4
+                                  ┌───────────┬──────────┬────┐
+                                  │       Header         │     Frame body     │   FCS  │ 
+                                  └───────────┴──────────┴────┘
+                                                         ↙                      ↘
+
+
+                                            ↙      2               2             2          Variable  ↘
+                                           ┌───────┬───────┬──────┬───────┐
+                                           │Authentcation │Authentcation │            │              │
+                                           │Algorlthen No │ Transcation  │ Status Code│Challenge text│
+                                           │              │   Seq NO     │            │              │
+                                           └───────┴───────┴──────┴───────┘
+
+╋━━━━━━━━━━━━━━━━━━╋
+┃AUTHENTICATION FRAMES               ┃
+┃Authentication Algorith身份认证类型 ┃
+┃    0: 开放系统身份验证             ┃
+┃    1: 共享密钥身份验证             ┃
+┃身份认证有多个帧交换过程组成        ┃
+┃Authentication Seq                  ┃
+┃    每次身份验证过程Seq唯一         ┃
+┃    1-65535                         ┃
+┃Challenge text                      ┃
+┃    只有共享秘钥方式才有此字段      ┃
+┃Status Code: 成功/失败              ┃
+╋━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+┃ASSOCIATION/REASSOCIATION FRAMES              ┃
+┃身份验证成功后，STA执行关联操作，加入无线网络 ┃
+┃    Association Request                       ┃
+┃    Reassociation Request                     ┃
+┃    Association Request                       ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━╋
+┃   ASSOCIATION REQUEST FRAMES     ┃
+╋━━━━━━━━━━━━━━━━━╋
+
+                                                                   24                    Variable           4
+                                                        ┌───────────┬──────────┬────┐
+                                                        │       Header         │     Frame body     │   FCS  │
+                                                        └───────────┴──────────┴────┘
+                                                      ↙                        │                     ↘
+                                                                                │
+                                                                                │
+       ↙     2           2               6           6         6         2     │Variable   Variable   Variable ↘
+      ┌──────┬──────┬──────┬────┬────┬─────┬────┬─────┬─────┐
+      │    Frame   │  Duration  │ Destination│ Source │ BSS ID │ Sequence │  SSID  │Supported │Extended  │
+      │   control  │            │   Address  │ Address│        │ Control  │        │  rates   │Supported │
+      │            │            │            │        │        │          │        │          │  rates   │
+      └──────┴──────┴──────┴────┴────┴─────┴────┴─────┴─────┘
+
+
+
+

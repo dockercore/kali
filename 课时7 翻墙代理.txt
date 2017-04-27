@@ -1,0 +1,106 @@
+翻墙&代理
+GFW长城防火墙
+  facebook、youttube
+翻墙
+  http代理
+  socks代理
+  ssh隧道
+  VPN
+Goagent
+Tor
+
+加密通信
+隐藏来源
+突破网络封锁
+
+注意不要触及敏感地带
+不要从事非法行为
+
+http://code.google.com/p/goagent/
+注册：appengine.google.com
+https://github.com/gosgent/gosgent
+
+IE------>goagent-------->GAE------->目标网站
+
+一、注册Google账号
+首先，我们要访问appengine.goole.com，点击右上角的“注册”按钮。
+注意；你填写的邮箱即为登录名。
+创建账户
+你可以使用自己的Google账号访问"Google App Engine"和Google的其他服务。如果您已拥有在此登录
+注册Google账号，邮箱即为登录名
+Google账户的必须信息
+您当前的电子邮箱地址:xxxxx@qq.com
+设定密码：xxxxx
+再次输入密码：xxxxx
+二、登陆GAE并验证手机号码
+2.1注册成功并验证电子邮箱后，我们回到appengine.google.com.登录后点击“Create Application”按钮。
+2.2验证您的账户
+短信是免费的。
+手机号要在前面加上地区代码比如“8613xxxxxxxxx"。
+2.3收取短信并在网页中填写短信中的验证码。
+三、创建GAE应用
+3.1账户验证成功后，点击“Create an Application”。
+需要填写的有：
+a.Application Identifier（也有应用的二级域名），
+b.Application Title(“应用名称/标题”）,这个就比较随意了
+c.Trems of Service,同意。
+3.2创建应用
+四、下载并配置GoAgent
+4.1下载GoAgent
+a.官方地址下载
+进入GoAgent的Google Code主页，点击最新稳定版下载。
+4.2解压、配置GoAgent
+a.解压后，进入“goagent\server\”目录下，运行uploader（uplodaer.bat)。
+输入APP ID(与上面我们创建应用填写的“Application Identifiter”相同），之后输入Email与密码，如果您输入的信息正确，这个程序就开始搭建属于您的GoAgent了。
+4.3配置GoAgent
+搭建成功后，打开“goagent\local\”目录下的“proxy.ini”文件。在proxy,ini中，需要将“[gae]”下的“appid=”修改为与上一步中“APP ID”相同的内容。修改完毕后，保存并关闭proxy.ini文件。
+
+[listen]
+ip = 127.0.0.1
+port = 8087
+visible = 1
+
+[gae]
+enable = 1
+appid = wildcatgaedemo
+password =
+path = /fetch.py
+profile =google_cn
+mulconn = 1
+
+4.4运行GoAgent
+下面，在“goagent\local\”目录下的goagent.exe就可以运行啦。
+五、将GoAgent应用于Internet Explorer
+“127.0.0.1”，“8087”。下图右方为proxy.ini文件，我们这里填写的地址即为本地IP地址，端口为我们设置的端口8087。
+
+GOAGENT安装
+  链接: http://pan.baidu.com/s/1gd749Zt 密码: rx35
+  Apt-get install python-dev python-greenlet python-gevent python-vte python-openssl python-crypto python-appindicator python-pip libnss3-tools
+  pip install pyOpenSSL
+  pip install gevent --upgrade
+  mkdir -p ~/.pki/nssdb
+  certutil -d sql:$HOME/.pki/nssdb –N
+  导入证书
+  设置浏览器代理
+  试用版
+
+链接: http://pan.baidu.com/s/1gd749Zt 密码: rx35
+
+导入证书:
+Edit----->references----->Advanced----->Certificates----->view Certificates----->Authorities----->import----->桌面----->Agent----->CA.crt----->打开----->
+勾上三个选项：
+Trust this CA to identify websites
+Trust this CA to identify email users
+Trust this CA to identify software developers
+----->OK----->OK
+证书导入完毕
+
+autoproxy
+点击“福”字右侧的箭头----->首选项----->代理服务器----->编辑代理服务器
+GoAgent 127.0.0.1 8087
+
+root@Kali:~# netstat -pantu | grep 8087
+tcp         0     0 127.0.0.1:8087        0.0.0.0:*            LISTEN
+20387/python2.7
+
+完成代理！

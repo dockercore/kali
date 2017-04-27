@@ -1,0 +1,121 @@
+课时39 缓冲区溢出
+
+╋━━━━━━━━━━━━━━━━╋
+┃程序漏洞从哪里来                ┃
+┃罪恶的根源：变量                ┃
+┃数据与代码边界不清              ┃
+┃最简漏洞原理-----shell脚本漏洞  ┃
+╋━━━━━━━━━━━━━━━━╋
+
+root@kali:~# ls
+a.sh  b.sh  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+root@kali:~# cat a.sh
+#!/bin/bash
+echo $1
+
+root@kali:~# /a.sh adadadadadadd
+adadadadadadd
+
+root@kali:~# /a.sh pwd
+pwd
+
+root@kali:~# /a.sh ;pwd
+
+/root
+
+root@kali:~# /a.sh ;id
+
+uid=0(root) gid=0(root) 组=0(root)
+
+root@kali:~# /a.sh ;ls
+
+a.sh  b.sh  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+root@kali:~# /a.sh &&ls
+
+a.sh  b.sh  公共  模板  视频  图片  文档  下载  音乐  桌面
+
+root@kali:~# /a.sh &ls
+[1] 1699
+
+a.sh  b.sh  公共  模板  视频  图片  文档  下载  音乐  桌面
+[1]+ 已完成                   ./a.sh
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃缓冲区溢出                                                              ┃
+┃当缓冲区边界兼职不严格时，由于变量传入畸形数据或程序运行错误，导致缓冲区┃
+┃被“撑爆”，从而覆盖了相邻内存区域的数据；                              ┃
+┃成功修改内存数据，可造成进程劫持，执行恶意代码，获取服务器控制权等后果  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃如何发现漏洞                                      ┃
+┃源码审计                                          ┃
+┃逆向工程                                          ┃
+┃模糊测试                                          ┃
+┃    向程序堆栈半随机的数据，根据内存变化判断溢出  ┃
+┃    数据生成器：生成随机、半随机数据              ┃
+┃    测试工具：识别溢出漏洞                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━╋
+┃WINDOWS 缓冲区溢出┃
+╋━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━╋
+┃FUZZER                          ┃
+┃SLMail 5.5.0 Mail Server        ┃
+┃lmmunityDebugger_1_85_setup.exe ┃
+┃mona.py                         ┃
+╋━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃FUZZER                                                    ┃
+┃SLMail 5.5.0 Mail Server                                  ┃
+┃    POP3 PASS命令存在缓冲区溢出漏洞                       ┃
+┃    无需身份验证实现远程代码执行                          ┃
+┃    DEP: 阻止代码从数据页被执行                           ┃
+┃    ASLR: 随机内存地址加载执行程序和DLL，每次重启地址变化 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+root@kali:~# nc 192.168.1.119 25
+220 lab.com SMTP Server SLMail 5.5.0.4433 Ready ESMTP spoken here
+helo
+250 lab.com
+mail from
+500 Syntax error, command unrecognized
+exit
+500 Syntax error, command unrecognized
+
+quit
+221 lab.com Service closing transmission channel
+
+root@kali:~# nc 192.168.1.119 110
++OK POP3 server lab.com ready <00001.589347@lab.com>
+USER yuanfh
++OK yuanfh welcome here
+-ERR invalid password
+quit
++OK POP3 server lab.com signing off
+
+root@kali:~# nc 192.168.1.119 110
++OK POP3 server lab.com ready <00001.589347@lab.com>
+help
+-ERR unknown password
+HELP
+-ERR unknown password
+?
+-ERR unknown password
+/?
+-ERR unknown password
+USER
++OK welcome here
+PASS
+-ERR unable to lock mailbox
+USER hgjhkhjgklhgffgfhjjhjhkljkhhkhkjh
++OK hgjhkhjgklhgffgfhjjhjhkljkhhkhkjh welcome here
+USER ;ls
+-ERR unknown password
+USER | pwd
++OK | pwd welcome here

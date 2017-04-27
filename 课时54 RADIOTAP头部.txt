@@ -1,0 +1,209 @@
+课时54 RADIOTAP头部
+
+╋━━━━━━━━━━━━━╋
+┃      RADIOTAP头部        ┃
+╋━━━━━━━━━━━━━╋
+
+root@kali:~# iw dev wlan2 interface add wlan2mon type monitor
+
+root@kali:~# iwconfig
+eth0      no wireless extensions
+
+wlan2     IEEE 802.11nbgn  ESSID:off/any
+          Mode:Managed  Access Point: No-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:off
+
+wlan2mon  IEEE 802.11bgn  ESSID:off/any
+          Mode:Managed  Access Ponit: Not-Associated   Tx-Power=20 dBm
+          Retry short limit:7   RTS thr:off    Fragment thr:off
+          Encryption key:off
+
+lo        no wireless extensions
+
+root@kali:~# ifconfig wlan0mon up
+
+root@kali:~# ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:fd:1c:9d
+          inet addr:192.168.20.8  Bcast:192.168.20.255  Mask:255.255.255.0
+          inet6 addr:  fe80::a00:27ff:fefd:1c9d/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST MTU:1500  MetricL:1
+          Rx packets:0 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:50 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (0.0 KiB)   TX bytes:1200 (0.0 KiB)
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1 Mask:255.0.0.0
+          inet addr. ::1/128 Scope:Host
+          UP LOOKBACK RUNNING  MTU:65536 MetricL:1
+          Rx packets:20 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:20 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          Rx bytes:1200 (1.1 KiB)   TX bytes:1200 (1.1 KiB)
+
+wlan2mon  Link encap:UNSPEC  HWaddr 08-57-00-0c-96-68-00-00-00-00-00-00-00-00-00-00
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          Rx packets:85 errors:0 dropped:0 overruns:0 frame:0
+          Tx packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          Rx bytes:18257 (17.8 B)   TX bytes:0 (0.0 B)
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RADIOTAP头                                                              ┃
+┃802.11帧发射和接收的事实标准，802.11依赖Radiotap完成通信过程            ┃
+┃Linux系统在驱动和API中内建支持Radiotap                                  ┃
+┃802.11帧发射之前，网卡驱动在802.11头前面添加Radiotap头，反之当网卡接收到┃
+┃无线帧时，驱动通知MAC层，此帧头包含Radioap头                            ┃
+┃不破坏原始头结构，增加传递的信息                                        ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃RADIOTAP头                                                  ┃
+┃分为Header和data                                            ┃
+┃Version （8bit)                                             ┃
+┃    值始终为0                                               ┃
+┃Pad (8bit)                                                  ┃
+┃    未使用，只作为字段强制对其的占位；                      ┃
+┃Length(16bit)                                               ┃
+┃    整个radiotap头长度（可变），作用是确定802.11头的开始位置┃
+┃Present(32bit)                                              ┃
+┃    Data段的掩码                                            ┃
+┃    Ext (1、0)                                              ┃
+┃    MAC不能理解的头部直接忽略                               ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━╋
+┃       802.11头部         ┃
+╋━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                            ┃
+┃DU (Data Unit)即数据单元，信息传输的最小数据集合  ┃
+┃传递过程逐层封装 (Encapsulation)                  ┃
+┃SDU (Service Data Unit) /PDU (Protocol Data Unit) ┃
+┃MSDU->MIC->分帧->添加IV->加密->添加MAC头部->MPDU  ┃
+┃MPDU/PSDU+物理头=PPDU->RF发射                     ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+┌───────────────────────────────────────┐
+│                           physical Layer PDU (PPDU)                          │
+├──────────┬─────┬──────────────────────┤
+│                    │Start of  │                                            │
+│ Preamble Sequence  │Frame     │           physical Layer SDU (PSDU)        │
+│                    │Delimiter │                                            │
+└──────────┴─────┴──────────────────────┘
+
+┌───────────────────────────────────────┐
+│                            MAC Layer PDU (MPDU)                              │
+├─────┬──┬──────────────────────────────┤
+│Frame     │Seq.│                                                            │
+│Control   │Nr. │                MAC Layer SDU (MSDU                         │
+│Field     │    │                                                            │
+└─────┴──┴──────────────────────────────┘
+
+╋━━━━━━━━━━╋
+┃802.11头部          ┃
+┃802.11 MAC头结构    ┃
+╋━━━━━━━━━━╋
+
+btyes          30                 0-2324            4
+      ┌─────────┬─────────┬─────┐
+      │      Header      │       Data       │   FCS    │
+      └─────────┴─────────┴─────┘
+      │
+      │
+      │
+      │
+bytes          2           2             6          6            6          2         6
+      ┌──────┬──────┬─────┬─────┬─────┬────┬─────┐
+      │    Frame   │ Duration/ID│ Address 1│ Address 2│ Address 3│Sequence│ Address 4│
+      │   control  │            │          │          │          │ Control│          │
+      └──────┴──────┴─────┴─────┴─────┴────┴─────┘
+      │                                                              │           ╲
+      │                                                              │             ╲
+bits                                                                  │    12         ╲   4
+      │                                                              ┌────────┬────┐
+      │                                                              │Sequence Number │Fragment│
+      │                                                              │                │ Number │
+      │                                                              └────────┴────┘
+      │
+      │
+bits  │    2           2                4            1     1     1     1       1      1     1       1
+      ┌─────┬─────┬──────────┬─┬──┬──┬───┬───┬──┬──┬───┐
+      │ Protocol │   Type   │      Subtype       │TO│From│More│Retry │Power │More│ WEP│ Order│
+      │ Version  │          │                    │DS│DS  │flag│      │Mgmt  │Data│    │      │
+      └─────┴─────┴──────────┴─┴──┴──┴───┴───┴──┴──┴───┘
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                    ┃
+┃Protocol Version (2bit) :802.11协议版本，始终为0、1、2、3                 ┃
+┃Type (2bit) :规定帧的具体用途 (3种帧类型）                                ┃
+┃    控制帧（1）                                                           ┃
+┃    数据帧（2）                                                           ┃
+┃    管理帧（0）                                                           ┃
+┃SubType (4bit)                                                            ┃
+┃    每个类型对应多个子类型，协议规定不同类型/子类型的帧完成不同功能的操作 ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+
+          B0    B1   B2     B3   B4    B7   B8   B9   B10    B11     B12      B13   B14    B15
+      ┌─────┬─────┬─────┬─┬──┬──┬───┬────┬──┬──┬───┐
+      │ Protocol │   Type   │ Subtype  │TO│From│More│Retry │Power   │More│ WEP│ Order│
+      │ Version  │          │          │DS│DS  │flag│      │Manage- │Data│    │      │
+      │          │          │          │  │    │    │      │ments   │    │    │      │
+      └─────┴─────┴─────┴─┴──┴──┴───┴────┴──┴──┴───┘
+Bits       2           2           4         1     1     1     1       1        1     1       1  
+ 
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                        ┃
+┃To DS / From DS (1/1bit)                                                      ┃
+┃    标示帧的传输方向，传向DS或者来自DS；这两个字段的值决定这MAC头中4个Address ┃
+┃    字段的不同定义，具体如下所示：                                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+┌────┬─────┬───────┬───────┬───────┬───────┐
+│  TODS  │  FromDS  │  Address 1   │   Address 2  │   Address3   │   Address4   │
+├────┼─────┼───────┼───────┼───────┼───────┤
+│   0    │    0     │     DA       │      SA      │    BSSID     │              │
+├────┼─────┼───────┼───────┼───────┼───────┤
+│   0    │    1     │     DA       │     BSSID    │     SA       │              │
+├────┼─────┼───────┼───────┼───────┼───────┤
+│   1    │    0     │    BSSID     │      SA      │     DA       │              │
+├────┼─────┼───────┼───────┼───────┼───────┤
+│   1    │    1     │     RS       │      TA      │     DA       │     SA       │
+└────┴─────┴───────┴───────┴───────┴───────┘
+
+                DA:Destination Address      RA:Recipient Address
+                SA:Source Address           TA:Transmitter Address
+
+
+          B0    B1   B2     B3   B4    B7   B8   B9   B10    B11     B12      B13   B14    B15
+      ┌─────┬─────┬─────┬─┬──┬──┬───┬────┬──┬──┬───┐
+      │ Protocol │   Type   │ Subtype  │TO│From│More│Retry │Power   │More│ WEP│ Order│
+      │ Version  │          │          │DS│DS  │flag│      │Manage- │Data│    │      │
+      │          │          │          │  │    │    │      │ments   │    │    │      │
+      └─────┴─────┴─────┴─┴──┴──┴───┴────┴──┴──┴───┘
+Bits       2           2           4         1     1     1     1       1        1     1       1  
+
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃802.11                                                                      ┃
+┃0x00: 出现在IBSS环境中（可能是Management帧或者是Control帧类型）；或者是STSTL┃
+┃(Station to Station Link) 中两个STA间通信，这种情况下通信不通过AP；         ┃
+┃0x01: 表示Data帧从AP向STA传递；                                             ┃
+┃0x02: 标示Data帧从STA向AP传递；                                             ┃
+┃0x03:标示两个AP间通信，这是典型的WDS (Wireless Distribution System) 环境    ┃
+┃下AP间的通信，或者标示Mesh环境下MP间通信：只有此时才会使用到Address4字段；  ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+          B0    B1   B2     B3   B4    B7   B8   B9   B10    B11     B12      B13   B14    B15
+      ┌─────┬─────┬─────┬─┬──┬──┬───┬────┬──┬──┬───┐
+      │ Protocol │   Type   │ Subtype  │TO│From│More│Retry │Power   │More│ WEP│ Order│
+      │ Version  │          │          │DS│DS  │flag│      │Manage- │Data│    │      │
+      │          │          │          │  │    │    │      │ments   │    │    │      │
+      └─────┴─────┴─────┴─┴──┴──┴───┴────┴──┴──┴───┘
+Bits       2           2           4         1     1     1     1       1        1     1       1  
+

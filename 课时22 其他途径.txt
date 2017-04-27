@@ -1,0 +1,241 @@
+课时22 其他途径
+
+╋━━━━━━━━━━━━━━━━━━━╋
+┃其他途径                              ┃                    
+┃  社交网络                            ┃
+┃  工商注册                            ┃
+┃  新闻组/论坛                         ┃
+┃  招聘网站                            ┃
+┃  http://www.archive.org/web/web.php  ┃
+╋━━━━━━━━━━━━━━━━━━━╋
+
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+┃个人专属的密码字典                                ┃
+┃  按个人信息生成其专属的密码字典                  ┃
+┃  CUPP------Common User Password Profiler         ┃
+┃      git clone http://github.com/Mebus/cupp.git  ┃
+┃      python cup.py -i                            ┃
+╋━━━━━━━━━━━━━━━━━━━━━━━━━╋
+
+apt-get install cupp     //kali工具包木有这个工具
+
+root@kali:~# git clone http://github.com/Mebus/cupp.git
+正克隆到 'cupp'...
+remote: Counting objects: 31, done.
+remote: Total 31 (delta 0), reused 0 (delta 0), pack-reused 31
+展开对象中: 100% (31/31), 完成.
+检查连接... 完成。
+
+root@kali:~# ls
+cupp      test                  wydomain  模板  图片  下载  桌面
+sina.xml  vmware-tools-distrib  公共      视频  文档  音乐
+
+root@kali:~# cd cupp/
+
+root@kali:~/cupp# ls
+cupp.cfg  cupp.py  docs  README.md
+
+root@kali:~/cupp# apt-get install cup
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树       
+正在读取状态信息... 完成       
+下列【新】软件包将被安装：
+  cup
+升级了 0 个软件包，新安装了 1 个软件包，要卸载 0 个软件包，有 0 个软件包未被升级。
+需要下载 120 kB 的软件包。
+解压缩后会消耗掉 242 kB 的额外空间。
+获取：1 http://http.kali.org/kali/ sana/main cup all 0.11a+20060608-3 [120 kB]
+下载 120 kB，耗时 21秒 (5,490 B/s)
+正在选中未选择的软件包 cup。
+(正在读取数据库 ... 系统当前共安装有 337358 个文件和目录。)
+正准备解包 .../cup_0.11a+20060608-3_all.deb  ...
+正在解包 cup (0.11a+20060608-3) ...
+正在处理用于 man-db (2.7.0.2-5) 的触发器 ...
+正在设置 cup (0.11a+20060608-3) ...
+
+root@kali:~/cupp# cat README.md
+# cupp.py - Common User Passwords Profiler
+
+ 
+## About
+
+  The most common form of authentication is the combination of a username
+  and a password or passphrase. If both match values stored within a locally
+  stored table, the user is authenticated for a connection. Password strength is
+  a measure of the difficulty involved in guessing or breaking the password
+  through cryptographic techniques or library-based automated testing of
+  alternate values.
+
+  A weak password might be very short or only use alphanumberic characters,
+  making decryption simple. A weak password can also be one that is easily
+  guessed by someone profiling the user, such as a birthday, nickname, address,
+  name of a pet or relative, or a common word such as God, love, money or password.
+
+  That is why CUPP has born, and it can be used in situations like legal
+  penetration tests or forensic crime investigations.
+
+
+
+## Options
+
+  Usage: cupp.py [OPTIONS]
+
+        -h      this menu
+
+        -i      Interactive questions for user password profiling
+
+        -w      Use this option to profile existing dictionary,
+                or WyD.pl output to make some pwnsauce :)
+
+        -l      Download huge wordlists from repository
+
+        -a      Parse default usernames and passwords directly from Alecto DB.
+                Project Alecto uses purified databases of Phenoelit and CIRT which where merged and enhanced.
+
+        -v      Version of the program
+
+
+
+## Configuration
+
+   CUPP has configuration file cupp.cfg with instructions.
+
+
+
+## License
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  See 'docs/LICENSE' for more information.
+
+
+
+## Author
+
+  Muris Kurgas aka j0rgan
+  j0rgan@remote-exploit.org
+  http://www.remote-exploit.org
+  http://www.azuzi.me
+
+
+## Contributors
+
+  Bosko Petrovic aka bolexxx
+  bole_loser@hotmail.com
+  http://www.offensive-security.com
+  http://www.bolexxx.net
+
+root@kali:~/cupp# python cupp.py -i      //按个人信息生成其专属的密码字典
+
+[+] Insert the informations about the victim to make a dictionary
+[+] If you don't know all the info, just hit enter when asked! ;)
+
+> First Name: fanghong
+> Surname: 
+> Nickname: yuanfh
+> Birthdate (DDMMYYYY): 01011990
+
+
+> Partners) name: aaaa
+> Partners) nickname: aa
+> Partners) birthdate (DDMMYYYY): 01011949
+
+
+> Child's name: bbbb
+> Child's nickname: bb
+> Child's birthdate (DDMMYYYY): 01012000
+
+
+> Pet's name: xiaoqiang
+> Company name: sina
+
+
+> Do you want to add some key words about the victim? Y/[N]: Y
+> Do you want to add special chars at the end of words? Y/[N]: Y
+> Do you want to add some random numbers at the end of words? Y/[N]Y
+> Leet mode? (i.e. leet = 1337) Y/[N]: 007
+
+[+] Now making a dictionary...
+[+] Sorting list and removing duplicates...
+[+] Saving dictionary to fanghong.txt, counting 4304 words.
+[+] Now load your pistolero with fanghong.txt and shoot! Good luck!
+
+root@kali:~/cupp# more fanghong.txt
+
+╋━━━━━━━━╋
+┃METADATA        ┃
+┃  Exif图片信息  ┃
+┃  foca          ┃
+╋━━━━━━━━╋
+
+root@kali:~# exif
+
+exifautotran exiftool
+
+root@kali:~# exiftool w.jpg
+
+root@kali:~# exiftool p.jpg
+
+╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤╤
+Foca是款西班牙同僚开发的信息收集安全利器,主要对DNS和metadata元数据扫描分析还不错,Vul扫描似乎不太给力。官网猛戳这里：https://www.elevenpaths.com/labstools/foca/index.html
+
+
+一、 说明（Description）：
+
+FOCA主要是个检查和扫描文件的元数据及隐藏信息的信息收集工具。这些文件可以是在网页上的，FOCA能下载并分析它们。
+文件分析可以是多种多样的，最常见的Microsoft Office文件，Open Office或PDF文件，甚至还可以分析Adobe InDesign或者SVG文件。
+FOCA可以使用是谷歌，Bing和Exalead等搜索引擎来搜寻下载相关文件；通过剥落这些文件的信息，攻击者可以获取文件上传者的机器名，操作系统及相关软件安装路径和版本等信息。
+
+二、 功能（Functionality）：
+
+站内搜索（Web Search）
+
+DNS搜索(DNS Search)
+
+IP解析(IP resolution)
+
+PTR扫描(PTR Scanning)
+
+IP反查(Bing IP)
+
+常规攻击(Common names)
+
+DNS预测(DNS Prediction)
+
+Robtex
+
+三、 特征（Characteristics）：
+
+Metadata extraction.
+Network analysis.
+DNS Snooping.
+Search for common files.
+Juicy files.
+Proxies search.
+Technologies identification.
+Fingerprinting.
+Leaks.
+Backups search.
+Error forcing.
+Open directories search.
+
+
+四、 下载（Download）：
+
+下载请猛戳这里 FOCA final version 3.4
+https://www.elevenpaths.com/downloads/FocaPro.zip
+
+╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧╧
+
